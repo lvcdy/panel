@@ -3,10 +3,10 @@ import Layout from '../layouts/Layout.astro';
 import { CATEGORIES, SEARCH_ENGINES } from '../data/links';
 import '../styles/global.css';
 
-// 从环境变量读取 API Key (Cloudflare Pages 部署时配置)
+// 环境变量配置（在后台设置 PUBLIC_ICON_API_KEY）
 const API_KEY = import.meta.env.PUBLIC_ICON_API_KEY;
 const ICON_API_BASE = "https://favicon.org.cn/get.php";
-const BG_URL = "https://t.alcy.cc/ycy"; 
+const BG_URL = "https://t.alcy.cc/ycy"; // 背景图 API
 ---
 
 <Layout>
@@ -20,7 +20,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
                 document.body.style.backgroundAttachment = 'fixed';
                 document.body.style.backgroundPosition = 'center';
                 document.body.style.backgroundRepeat = 'no-repeat';
-                document.body.style.transition = 'background-image 0.5s ease-in-out';
+                document.body.style.transition = 'background-image 0.8s ease-in-out';
             };
         })();
     </script>
@@ -29,7 +29,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
         
         <div class="mt-24 text-center select-none">
             <h1 id="clock" class="text-7xl font-bold tracking-tight text-white drop-shadow-2xl">--:--:--</h1>
-            <p id="date" class="text-xl font-medium opacity-90 mt-1 text-white">正在加载...</p>
+            <p id="date" class="text-xl font-medium opacity-90 mt-1 text-white">正在初始化...</p>
         </div>
 
         <script is:inline>
@@ -53,11 +53,13 @@ const BG_URL = "https://t.alcy.cc/ycy";
                 <div id="engineBtn" class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all">
                     <i id="currentIcon" class="fab fa-google text-xl text-white/80"></i>
                 </div>
+                
                 <input 
                     type="text" 
                     id="searchInput" 
-                    placeholder="正在获取一言..." 
+                    placeholder="正在加载一言..." 
                     class="bg-transparent flex-grow h-full px-4 outline-none text-white placeholder-white/40 font-medium" 
+                    autocomplete="off"
                 />
                 <i class="fas fa-search mr-4 opacity-40 text-white"></i>
             </div>
@@ -65,7 +67,8 @@ const BG_URL = "https://t.alcy.cc/ycy";
             <div id="engineMenu" class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col overflow-hidden z-50 border border-white/20 shadow-2xl">
                 {SEARCH_ENGINES.map(e => (
                     <div class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium transition-colors text-white" data-url={e.url} data-icon={e.icon}>
-                        <i class={`${e.icon} w-5 text-center`}></i> {e.name}
+                        <i class={`${e.icon} w-5 text-center`}></i> 
+                        <span>{e.name}</span>
                     </div>
                 ))}
             </div>
@@ -74,25 +77,23 @@ const BG_URL = "https://t.alcy.cc/ycy";
         <script is:inline>
             (function() {
                 const input = document.getElementById('searchInput');
-                let hitokotoText = "请输入搜索内容...";
+                let hitokotoCache = "请输入搜索内容...";
 
-                // 异步获取一言
                 fetch('https://v1.hitokoto.cn/?c=i')
                     .then(res => res.json())
                     .then(data => {
-                        hitokotoText = `${data.hitokoto}  —— 「${data.from}」`;
-                        if (input) input.placeholder = hitokotoText;
+                        hitokotoCache = `${data.hitokoto}  —— 「${data.from}」`;
+                        if (input) input.placeholder = hitokotoCache;
                     })
                     .catch(() => {
                         if (input) input.placeholder = "即使生活再忙，也要记得微笑。";
                     });
 
-                // 聚焦时显示简洁提示，失去焦点且为空时恢复一言
                 input?.addEventListener('focus', () => {
                     input.placeholder = "请输入搜索内容...";
                 });
                 input?.addEventListener('blur', () => {
-                    if (input.value === "") input.placeholder = hitokotoText;
+                    if (input.value === "") input.placeholder = hitokotoCache;
                 });
             })();
         </script>
@@ -100,13 +101,13 @@ const BG_URL = "https://t.alcy.cc/ycy";
         <div class="w-full max-w-[1500px] px-10 mt-20">
             {CATEGORIES.map(cat => (
                 <div class="mb-14">
-                    <h2 class="text-2xl font-bold mb-8 opacity-95 text-white pl-2 tracking-wide">{cat.title}</h2>
+                    <h2 class="text-2xl font-bold mb-8 opacity-95 text-white pl-2 tracking-wide drop-shadow-md">{cat.title}</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
                         {cat.links.map(link => {
                             let domain = "";
                             try { domain = new URL(link.url).hostname; } catch(e) {}
                             return (
-                                <a href={link.url || "#"} class="glass sun-card flex items-center p-5 rounded-[1.8rem] border border-white/10 shadow-lg group hover:bg-white/10 transition-all">
+                                <a href={link.url || "#"} target="_blank" class="glass sun-card flex items-center p-5 rounded-[1.8rem] border border-white/10 shadow-lg group hover:bg-white/10 transition-all">
                                     <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5">
                                         {domain ? (
                                             <div class="relative w-full h-full flex items-center justify-center">
@@ -154,23 +155,41 @@ const BG_URL = "https://t.alcy.cc/ycy";
         const menu = document.getElementById('engineMenu');
         const icon = document.getElementById('currentIcon');
         const input = document.getElementById('searchInput') as HTMLInputElement;
+        
+        // 初始搜索 URL（可根据 SEARCH_ENGINES 第一项调整）
         let currentUrl = 'https://www.google.com/search?q=';
 
-        btn?.addEventListener('click', (e) => { e.stopPropagation(); menu?.classList.toggle('hidden'); });
+        // 切换菜单显示/隐藏
+        btn?.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            menu?.classList.toggle('hidden'); 
+        });
+
+        // 引擎切换点击逻辑
         document.querySelectorAll('.engine-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 const target = e.currentTarget as HTMLElement;
                 currentUrl = target.dataset.url!;
-                if (icon) icon.className = target.dataset.icon! + ' text-xl text-white/80';
+                const newIcon = target.dataset.icon!;
+                
+                // 动态更新图标类名
+                if (icon) {
+                    icon.className = `${newIcon} text-xl text-white/80 transition-all`;
+                }
+                
                 menu?.classList.add('hidden');
                 input.focus();
             });
         });
+
+        // 回车搜索
         input?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && input.value.trim()) {
-                window.location.href = currentUrl + encodeURIComponent(input.value.trim());
+                window.open(currentUrl + encodeURIComponent(input.value.trim()), '_blank');
             }
         });
+
+        // 点击外部关闭菜单
         window.onclick = () => menu?.classList.add('hidden');
     </script>
 </Layout>
