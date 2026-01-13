@@ -8,9 +8,9 @@ export const CATEGORIES = [
   {
     title: "我的网站",
     links: [
-      { name: "Affine", url: "https://affine.lvcy.cn", icon: "fas fa-link", color: "#4caf50" },
-      { name: "Blog", url: "https://blog.lvcy.cn", icon: "fas fa-blog", color: "#ff5722" },
-      { name: "Certd", url: "https://cerrtd.lvcdy.cn", icon: "fas fa-certificate", color: "#2196f3" },
+      { name: "Affine", url: "https://affine.lvcdy.cn", icon: "fas fa-link", color: "#4caf50" },
+      { name: "Blog", url: "https://blog.lvcdy.cn", icon: "fas fa-blog", color: "#ff5722" },
+      { name: "Certd", url: "https://certd.lvcdy.cn", icon: "fas fa-certificate", color: "#2196f3" },
       { name: "Time", url: "https://time.lvcdy.cn", icon: "fas fa-clock", color: "#9c27b0" }
     ]
   },
@@ -41,7 +41,7 @@ export const CATEGORIES = [
       { name: "rls", url: "https://rls.ovh/", icon: "fas fa-terminal", color: "#ed1c24" },
       { name: "中国科学技术大学测速网站", url: "https://test.ustc.edu.cn/", icon: "fas fa-tachometer-alt", color: "#004098" },
       { name: "ip测漏", url: "https://ipcelou.com", icon: "fas fa-user-secret", color: "#2c3e50" },
-      { name: "双子星", url: "https://v2-dev.xsyd.top/", icon: "fas fa-star", color: "#f1c40f" },
+      { name: "双子星", url: "https://v2-dev.xsyd.top/", icon: "fas fa-star", color: "#f1c40f" }
     ]
   },
   {

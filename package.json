@@ -21,6 +21,7 @@
     "tsx": "^4.21.0"
   },
   "scripts": {
+    "dev": "astro dev",
     "start": "pnpm run sync && astro dev",
     "build": "pnpm run sync && astro build",
     "preview": "astro preview",
