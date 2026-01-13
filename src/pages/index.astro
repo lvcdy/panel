@@ -5,7 +5,7 @@ import '../styles/global.css';
 
 const ICON_API_BASE = "https://favicon.org.cn/get.php";
 const API_KEY = "usr-9a1992c27bb0fff27d1a2e133c4a06b7d9cb7290";
-// 你的背景图 API
+// 你的背景图 API 地址
 const BG_URL = "https://t.alcy.cc/ycy"; 
 ---
 
@@ -19,35 +19,38 @@ const BG_URL = "https://t.alcy.cc/ycy";
                 document.body.style.backgroundSize = 'cover';
                 document.body.style.backgroundAttachment = 'fixed';
                 document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+                // 图片加载完后可以加一个淡入动画
+                document.body.style.transition = 'background-image 0.5s ease-in-out';
             };
         })();
     </script>
 
-    <main class="flex flex-col items-center pb-24 relative z-10">
+    <main class="flex flex-col items-center pb-24 relative z-10 min-h-screen">
+        
         <div class="mt-24 text-center select-none">
-            <h1 id="clock" class="text-7xl font-bold tracking-tight">--:--:--</h1>
-            <p id="date" class="text-xl font-medium opacity-80 mt-1">...</p>
+            <h1 id="clock" class="text-7xl font-bold tracking-tight text-white drop-shadow-2xl">--:--:--</h1>
+            <p id="date" class="text-xl font-medium opacity-90 mt-1 text-white">正在加载...</p>
         </div>
 
         <script is:inline>
-            function initClock() {
+            (function() {
                 const clockEl = document.getElementById('clock');
                 const dateEl = document.getElementById('date');
-                const update = () => {
+                function update() {
                     const now = new Date();
                     if (clockEl) clockEl.innerText = now.toTimeString().split(' ')[0];
                     if (dateEl) dateEl.innerText = now.toLocaleDateString('zh-CN', {
                         month: 'long', day: 'numeric', weekday: 'long'
                     });
-                };
-                update();
+                }
+                update(); 
                 setInterval(update, 1000);
-            }
-            initClock();
+            })();
         </script>
 
         <div class="mt-12 w-full max-w-[650px] px-6 relative">
-            <div class="glass flex items-center h-16 rounded-2xl px-2 border border-white/10 shadow-2xl">
+            <div class="glass flex items-center h-16 rounded-2xl px-2 border border-white/10 shadow-2xl backdrop-blur-md">
                 <div id="engineBtn" class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all">
                     <i id="currentIcon" class="fab fa-google text-xl text-white/80"></i>
                 </div>
@@ -55,9 +58,9 @@ const BG_URL = "https://t.alcy.cc/ycy";
                 <i class="fas fa-search mr-4 opacity-40"></i>
             </div>
             
-            <div id="engineMenu" class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col overflow-hidden z-50 border border-white/20">
+            <div id="engineMenu" class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col overflow-hidden z-50 border border-white/20 shadow-2xl">
                 {SEARCH_ENGINES.map(e => (
-                    <div class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium transition-colors" data-url={e.url} data-icon={e.icon}>
+                    <div class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium transition-colors text-white" data-url={e.url} data-icon={e.icon}>
                         <i class={`${e.icon} w-5 text-center`}></i> {e.name}
                     </div>
                 ))}
@@ -67,22 +70,22 @@ const BG_URL = "https://t.alcy.cc/ycy";
         <div class="w-full max-w-[1500px] px-10 mt-20">
             {CATEGORIES.map(cat => (
                 <div class="mb-14">
-                    <h2 class="text-2xl font-bold mb-8 opacity-95 pl-2 tracking-wide text-white/90">{cat.title}</h2>
+                    <h2 class="text-2xl font-bold mb-8 opacity-95 text-white pl-2 tracking-wide">{cat.title}</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
                         {cat.links.map(link => {
                             let domain = "";
                             try { domain = new URL(link.url).hostname; } catch(e) {}
                             return (
-                                <a href={link.url || "#"} class="glass sun-card flex items-center p-5 rounded-[2rem] border border-white/5 shadow-lg group hover:bg-white/20">
+                                <a href={link.url || "#"} class="glass sun-card flex items-center p-5 rounded-[1.8rem] border border-white/10 shadow-lg group hover:bg-white/10 transition-all">
                                     <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5">
                                         {domain ? (
                                             <div class="relative w-full h-full flex items-center justify-center">
                                                 <img 
                                                     src={`/icons/${domain}.png`} 
-                                                    loading="lazy"
+                                                    loading="lazy" 
                                                     class="w-full h-full object-contain transition-opacity duration-300"
-                                                    style="opacity: 0;"
                                                     onload="this.style.opacity='1'"
+                                                    style="opacity: 0;"
                                                     onerror={`
                                                         if(!this.dataset.retry){
                                                             this.dataset.retry='1';
@@ -104,8 +107,8 @@ const BG_URL = "https://t.alcy.cc/ycy";
                                             </div>
                                         )}
                                     </div>
-                                    <div class="ml-5 flex-grow overflow-hidden text-white/90">
-                                        <div class="font-bold text-[16px] truncate">{link.name}</div>
+                                    <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">
+                                        {link.name}
                                     </div>
                                 </a>
                             );
@@ -117,7 +120,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
     </main>
 
     <script>
-        // 搜索引擎切换逻辑
+        // 搜索逻辑
         const btn = document.getElementById('engineBtn');
         const menu = document.getElementById('engineMenu');
         const icon = document.getElementById('currentIcon');
@@ -125,7 +128,6 @@ const BG_URL = "https://t.alcy.cc/ycy";
         let currentUrl = 'https://www.google.com/search?q=';
 
         btn?.addEventListener('click', (e) => { e.stopPropagation(); menu?.classList.toggle('hidden'); });
-        
         document.querySelectorAll('.engine-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 const target = e.currentTarget as HTMLElement;
@@ -135,13 +137,11 @@ const BG_URL = "https://t.alcy.cc/ycy";
                 input.focus();
             });
         });
-
         input?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && input.value.trim()) {
                 window.location.href = currentUrl + encodeURIComponent(input.value.trim());
             }
         });
-
         window.onclick = () => menu?.classList.add('hidden');
     </script>
 </Layout>
