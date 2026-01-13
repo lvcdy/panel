@@ -37,6 +37,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
         <script is:inline>
             (function() {
+                // 时钟逻辑
                 const clockEl = document.getElementById('clock');
                 const dateEl = document.getElementById('date');
                 function update() {
@@ -49,27 +50,30 @@ const BG_URL = "https://t.alcy.cc/ycy";
                 update(); 
                 setInterval(update, 1000);
 
+                // IP 逻辑 (搜狐方案)
                 const ipBox = document.getElementById('ip-info');
                 const ipText = document.getElementById('ip-address');
-                fetch('https://whois.pconline.com.cn/ipJson.jsp?json=true')
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && data.addr) {
-                            ipText.innerText = `${data.ip} · ${data.addr.trim()}`;
-                            ipBox.style.opacity = '1';
-                        }
-                    })
-                    .catch(() => {
-                        ipText.innerText = "欢迎回来";
+
+                const script = document.createElement('script');
+                script.src = 'https://pv.sohu.com/cityjson?ie=utf-8';
+                script.onload = function() {
+                    if (typeof returnCitySN !== 'undefined') {
+                        ipText.innerText = `${returnCitySN["cip"]} · ${returnCitySN["cname"]}`;
                         ipBox.style.opacity = '1';
-                    });
+                    }
+                };
+                script.onerror = function() {
+                    ipText.innerText = "欢迎回来";
+                    ipBox.style.opacity = '1';
+                };
+                document.body.appendChild(script);
             })();
         </script>
 
         <div class="mt-12 w-full max-w-[650px] px-6 relative">
             <div class="glass flex items-center h-16 rounded-2xl px-2 border border-white/10 shadow-2xl backdrop-blur-md">
                 <div id="engineBtn" class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all">
-                    <i id="currentIcon" class="fab fa-google text-xl text-white/80"></i>
+                    <i id="currentIcon" class="fas fa-search text-xl text-white/80"></i>
                 </div>
                 <input type="text" id="searchInput" placeholder="正在加载一言..." class="bg-transparent flex-grow h-full px-4 outline-none text-white placeholder-white/40 font-medium" autocomplete="off" />
                 <i class="fas fa-search mr-4 opacity-40 text-white"></i>
@@ -83,6 +87,29 @@ const BG_URL = "https://t.alcy.cc/ycy";
                 ))}
             </div>
         </div>
+
+        <script is:inline>
+            (function() {
+                const input = document.getElementById('searchInput');
+                let hitokotoCache = "即使生活再忙，也要记得微笑。";
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                fetch('https://v1.hitokoto.cn/?c=i', { signal: controller.signal })
+                    .then(res => res.json())
+                    .then(data => {
+                        clearTimeout(timeoutId);
+                        hitokotoCache = `${data.hitokoto}  —— 「${data.from}」`;
+                        if (input) input.placeholder = hitokotoCache;
+                    })
+                    .catch(() => {
+                        if (input) input.placeholder = hitokotoCache;
+                    });
+
+                input?.addEventListener('focus', () => { input.placeholder = "请输入搜索内容..."; });
+                input?.addEventListener('blur', () => { if (input.value === "") input.placeholder = hitokotoCache; });
+            })();
+        </script>
 
         <div class="w-full max-w-[1500px] px-10 mt-20">
             {CATEGORIES.map(cat => (
@@ -130,7 +157,9 @@ const BG_URL = "https://t.alcy.cc/ycy";
         const menu = document.getElementById('engineMenu');
         const icon = document.getElementById('currentIcon');
         const input = document.getElementById('searchInput') as HTMLInputElement;
-        let currentUrl = 'https://www.google.com/search?q=';
+        
+        // 修改 2：默认 URL 调整为百度
+        let currentUrl = 'https://www.baidu.com/s?wd=';
 
         btn?.addEventListener('click', (e) => { e.stopPropagation(); menu?.classList.toggle('hidden'); });
         document.querySelectorAll('.engine-item').forEach(item => {
