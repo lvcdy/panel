@@ -1,0 +1,147 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { CATEGORIES, SEARCH_ENGINES } from '../data/links';
+import '../styles/global.css';
+
+const ICON_API_BASE = "https://favicon.org.cn/get.php";
+const API_KEY = "usr-9a1992c27bb0fff27d1a2e133c4a06b7d9cb7290";
+// 你的背景图 API
+const BG_URL = "https://t.alcy.cc/ycy"; 
+---
+
+<Layout>
+    <script is:inline define:vars={{ BG_URL }}>
+        (function() {
+            const img = new Image();
+            img.src = BG_URL;
+            img.onload = function() {
+                document.body.style.backgroundImage = `url('${BG_URL}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundAttachment = 'fixed';
+                document.body.style.backgroundPosition = 'center';
+            };
+        })();
+    </script>
+
+    <main class="flex flex-col items-center pb-24 relative z-10">
+        <div class="mt-24 text-center select-none">
+            <h1 id="clock" class="text-7xl font-bold tracking-tight">--:--:--</h1>
+            <p id="date" class="text-xl font-medium opacity-80 mt-1">...</p>
+        </div>
+
+        <script is:inline>
+            function initClock() {
+                const clockEl = document.getElementById('clock');
+                const dateEl = document.getElementById('date');
+                const update = () => {
+                    const now = new Date();
+                    if (clockEl) clockEl.innerText = now.toTimeString().split(' ')[0];
+                    if (dateEl) dateEl.innerText = now.toLocaleDateString('zh-CN', {
+                        month: 'long', day: 'numeric', weekday: 'long'
+                    });
+                };
+                update();
+                setInterval(update, 1000);
+            }
+            initClock();
+        </script>
+
+        <div class="mt-12 w-full max-w-[650px] px-6 relative">
+            <div class="glass flex items-center h-16 rounded-2xl px-2 border border-white/10 shadow-2xl">
+                <div id="engineBtn" class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all">
+                    <i id="currentIcon" class="fab fa-google text-xl text-white/80"></i>
+                </div>
+                <input type="text" id="searchInput" placeholder="请输入搜索内容" class="bg-transparent flex-grow h-full px-4 outline-none text-white placeholder-white/40 font-medium" />
+                <i class="fas fa-search mr-4 opacity-40"></i>
+            </div>
+            
+            <div id="engineMenu" class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col overflow-hidden z-50 border border-white/20">
+                {SEARCH_ENGINES.map(e => (
+                    <div class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium transition-colors" data-url={e.url} data-icon={e.icon}>
+                        <i class={`${e.icon} w-5 text-center`}></i> {e.name}
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        <div class="w-full max-w-[1500px] px-10 mt-20">
+            {CATEGORIES.map(cat => (
+                <div class="mb-14">
+                    <h2 class="text-2xl font-bold mb-8 opacity-95 pl-2 tracking-wide text-white/90">{cat.title}</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+                        {cat.links.map(link => {
+                            let domain = "";
+                            try { domain = new URL(link.url).hostname; } catch(e) {}
+                            return (
+                                <a href={link.url || "#"} class="glass sun-card flex items-center p-5 rounded-[2rem] border border-white/5 shadow-lg group hover:bg-white/20">
+                                    <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5">
+                                        {domain ? (
+                                            <div class="relative w-full h-full flex items-center justify-center">
+                                                <img 
+                                                    src={`/icons/${domain}.png`} 
+                                                    loading="lazy"
+                                                    class="w-full h-full object-contain transition-opacity duration-300"
+                                                    style="opacity: 0;"
+                                                    onload="this.style.opacity='1'"
+                                                    onerror={`
+                                                        if(!this.dataset.retry){
+                                                            this.dataset.retry='1';
+                                                            this.src='${ICON_API_BASE}?url=${domain}&size=128&key=${API_KEY}';
+                                                        }else{
+                                                            this.style.display='none';
+                                                            this.nextElementSibling.classList.remove('hidden');
+                                                            this.nextElementSibling.classList.add('flex');
+                                                        }
+                                                    `}
+                                                />
+                                                <div class="fallback-icon hidden w-full h-full items-center justify-center text-2xl" style={`color: ${link.color || '#fff'}`}>
+                                                    <i class={link.icon || 'fas fa-link'}></i>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div class="text-2xl" style={`color: ${link.color || '#fff'}`}>
+                                                <i class={link.icon}></i>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="ml-5 flex-grow overflow-hidden text-white/90">
+                                        <div class="font-bold text-[16px] truncate">{link.name}</div>
+                                    </div>
+                                </a>
+                            );
+                        })}
+                    </div>
+                </div>
+            ))}
+        </div>
+    </main>
+
+    <script>
+        // 搜索引擎切换逻辑
+        const btn = document.getElementById('engineBtn');
+        const menu = document.getElementById('engineMenu');
+        const icon = document.getElementById('currentIcon');
+        const input = document.getElementById('searchInput') as HTMLInputElement;
+        let currentUrl = 'https://www.google.com/search?q=';
+
+        btn?.addEventListener('click', (e) => { e.stopPropagation(); menu?.classList.toggle('hidden'); });
+        
+        document.querySelectorAll('.engine-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const target = e.currentTarget as HTMLElement;
+                currentUrl = target.dataset.url!;
+                if (icon) icon.className = target.dataset.icon! + ' text-xl text-white/80';
+                menu?.classList.add('hidden');
+                input.focus();
+            });
+        });
+
+        input?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim()) {
+                window.location.href = currentUrl + encodeURIComponent(input.value.trim());
+            }
+        });
+
+        window.onclick = () => menu?.classList.add('hidden');
+    </script>
+</Layout>
