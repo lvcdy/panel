@@ -1,5 +1,7 @@
 ---
+/* src/pages/index.astro */
 import Layout from "../layouts/Layout.astro";
+import Footer from "../components/Footer.astro";
 import { CATEGORIES, SEARCH_ENGINES } from "../data/links";
 import "../styles/global.css";
 
@@ -8,331 +10,181 @@ const BG_URL = "https://t.alcy.cc/ycy";
 ---
 
 <Layout>
-    <script is:inline define:vars={{ BG_URL }}>
-        (function () {
-            const img = new Image();
-            img.src = BG_URL;
-            img.onload = function () {
-                document.body.style.backgroundImage = `url('${BG_URL}')`;
-                document.body.style.backgroundSize = "cover";
-                document.body.style.backgroundAttachment = "fixed";
-                document.body.style.backgroundPosition = "center";
-                document.body.style.backgroundRepeat = "no-repeat";
-                document.body.style.transition =
-                    "background-image 0.8s ease-in-out";
-            };
-        })();
-    </script>
+  <script is:inline define:vars={{ BG_URL }}>
+    (function () {
+      const img = new Image();
+      img.src = BG_URL;
+      img.onload = function () {
+        // 将背景图地址注入到根元素变量中
+        document.documentElement.style.setProperty('--bg-url', `url("${BG_URL}")`);
+        document.body.classList.add('bg-loaded');
+      };
+    })();
+  </script>
 
-    <main class="flex flex-col items-center min-h-screen pb-10 relative z-10">
-        <div class="mt-24 text-center select-none">
-            <h1
-                id="clock"
-                class="text-7xl font-bold tracking-tight text-white drop-shadow-2xl"
-            >
-                --:--:--
-            </h1>
-            <p id="date" class="text-xl font-medium opacity-90 mt-1 text-white">
-                正在初始化...
-            </p>
+  <main class="flex flex-col items-center min-h-screen pb-10 relative z-10">
+    <div class="mt-24 text-center select-none">
+      <h1 id="clock" class="text-7xl font-bold tracking-tight text-white drop-shadow-2xl">
+        --:--:--
+      </h1>
+      <p id="date" class="text-xl font-medium opacity-90 mt-1 text-white">
+        正在初始化...
+      </p>
 
-            <div
-                id="ip-info"
-                class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-xs text-white/70 opacity-0 transition-opacity duration-700"
-            >
-                <i class="fas fa-location-dot text-[10px]"></i>
-                <span id="ip-address">正在定位...</span>
-            </div>
+      <div id="ip-info" class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 cursor-default transition-all duration-700">
+        <i class="fas fa-location-dot text-[10px]"></i>
+        <span id="ip-address">正在定位...</span>
+      </div>
+    </div>
+
+    <div class="mt-12 w-full max-w-[650px] px-6 relative">
+      <div class="glass flex items-center h-16 rounded-2xl px-2 shadow-2xl">
+        <div id="engineBtn" class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all">
+          <i id="currentIcon" class="fas fa-paw text-xl text-white/80"></i>
         </div>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="正在加载一言..."
+          class="bg-transparent flex-grow h-full px-4 outline-none text-white placeholder-white/40 font-medium"
+          autocomplete="off"
+        />
+        <i class="fas fa-search mr-4 opacity-40 text-white"></i>
+      </div>
 
-        <script is:inline>
-            (function () {
-                // 时钟逻辑
-                const clockEl = document.getElementById("clock");
-                const dateEl = document.getElementById("date");
-                function update() {
-                    const now = new Date();
-                    if (clockEl)
-                        clockEl.innerText = now.toTimeString().split(" ")[0];
-                    if (dateEl)
-                        dateEl.innerText = now.toLocaleDateString("zh-CN", {
-                            month: "long",
-                            day: "numeric",
-                            weekday: "long",
-                        });
-                }
-                update();
-                setInterval(update, 1000);
+      <div id="engineMenu" class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col overflow-hidden z-50 shadow-2xl">
+        {SEARCH_ENGINES.map((e) => (
+          <div
+            class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium transition-colors text-white"
+            data-url={e.url}
+            data-icon={e.icon}
+          >
+            <i class={`${e.icon} w-5 text-center`} />
+            <span>{e.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
 
-                // IP 逻辑 - 多个 API 备选方案
-                const ipBox = document.getElementById("ip-info");
-                const ipText = document.getElementById("ip-address");
-
-                async function tryFetchIP() {
-                    // 方案 1: 使用 IP API
-                    try {
-                        const response = await fetch(
-                            "https://api.ip.sb/geoip",
-                            {
-                                method: "GET",
-                                headers: { Accept: "application/json" },
-                            },
-                        );
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.ip) {
-                                const city = data.city || data.country || "";
-                                ipText.innerText = city
-                                    ? `${data.ip} · ${city}`
-                                    : data.ip;
-                                ipBox.style.opacity = "1";
-                                return;
-                            }
-                        }
-                    } catch (e) {
-                        console.log("API 1 failed");
-                    }
-
-                    // 方案 2: 使用 IPAPI
-                    try {
-                        const response = await fetch("https://ipapi.co/json/");
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.ip) {
-                                const city =
-                                    data.city || data.country_name || "";
-                                ipText.innerText = city
-                                    ? `${data.ip} · ${city}`
-                                    : data.ip;
-                                ipBox.style.opacity = "1";
-                                return;
-                            }
-                        }
-                    } catch (e) {
-                        console.log("API 2 failed");
-                    }
-
-                    // 方案 3: 使用 IP Whois
-                    try {
-                        const response = await fetch("https://ipwho.is/");
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.ip) {
-                                const city = data.city || data.country || "";
-                                ipText.innerText = city
-                                    ? `${data.ip} · ${city}`
-                                    : data.ip;
-                                ipBox.style.opacity = "1";
-                                return;
-                            }
-                        }
-                    } catch (e) {
-                        console.log("API 3 failed");
-                    }
-
-                    // 所有 API 都失败，显示欢迎信息
-                    ipText.innerText = "欢迎回来";
-                    ipBox.style.opacity = "1";
-                }
-
-                tryFetchIP();
-            })();
-        </script>
-
-        <div class="mt-12 w-full max-w-[650px] px-6 relative">
-            <div
-                class="glass flex items-center h-16 rounded-2xl px-2 border border-white/10 shadow-2xl backdrop-blur-md"
-            >
-                <div
-                    id="engineBtn"
-                    class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all"
-                >
-                    <i
-                        id="currentIcon"
-                        class="fas fa-search text-xl text-white/80"></i>
-                </div>
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="正在加载一言..."
-                    class="bg-transparent flex-grow h-full px-4 outline-none text-white placeholder-white/40 font-medium"
-                    autocomplete="off"
-                />
-                <i class="fas fa-search mr-4 opacity-40 text-white"></i>
-            </div>
-            <div
-                id="engineMenu"
-                class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col overflow-hidden z-50 border border-white/20 shadow-2xl"
-            >
-                {
-                    SEARCH_ENGINES.map((e) => (
-                        <div
-                            class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium transition-colors text-white"
-                            data-url={e.url}
-                            data-icon={e.icon}
-                        >
-                            <i class={`${e.icon} w-5 text-center`} />
-                            <span>{e.name}</span>
-                        </div>
-                    ))
-                }
-            </div>
-        </div>
-
-        <script is:inline>
-            (function () {
-                const input = document.getElementById("searchInput");
-                let hitokotoCache = "即使生活再忙，也要记得微笑。";
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-                fetch("https://v1.hitokoto.cn/?c=i", {
-                    signal: controller.signal,
-                })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        clearTimeout(timeoutId);
-                        hitokotoCache = `${data.hitokoto}  —— 「${data.from}」`;
-                        if (input) input.placeholder = hitokotoCache;
-                    })
-                    .catch(() => {
-                        if (input) input.placeholder = hitokotoCache;
-                    });
-
-                input?.addEventListener("focus", () => {
-                    input.placeholder = "请输入搜索内容...";
-                });
-                input?.addEventListener("blur", () => {
-                    if (input.value === "") input.placeholder = hitokotoCache;
-                });
-            })();
-        </script>
-
-        <div class="w-full max-w-[1500px] px-10 mt-20">
-            {
-                CATEGORIES.map((cat) => (
-                    <div class="mb-14">
-                        <h2 class="text-2xl font-bold mb-8 opacity-95 text-white pl-2 tracking-wide drop-shadow-md">
-                            {cat.title}
-                        </h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
-                            {cat.links.map((link) => {
-                                const remoteIconUrl = `${ICON_API_BASE}?url=${link.url}`;
-                                return (
-                                    <a
-                                        href={link.url || "#"}
-                                        target="_blank"
-                                        class="glass sun-card flex items-center p-5 rounded-[1.8rem] border border-white/10 shadow-lg group hover:bg-white/10 transition-all"
-                                    >
-                                        <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5">
-                                            <div class="relative w-full h-full flex items-center justify-center">
-                                                <img
-                                                    src={remoteIconUrl}
-                                                    loading="lazy"
-                                                    class="w-full h-full object-contain transition-opacity duration-300"
-                                                    onload="this.style.opacity='1'"
-                                                    style="opacity: 0;"
-                                                    onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden'); this.nextElementSibling.classList.add('flex');"
-                                                />
-                                                <div
-                                                    class="fallback-icon hidden w-full h-full items-center justify-center text-2xl"
-                                                    style={`color: ${link.color || "#fff"}`}
-                                                >
-                                                    <i
-                                                        class={
-                                                            link.icon ||
-                                                            "fas fa-link"
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">
-                                            {link.name}
-                                        </div>
-                                    </a>
-                                );
-                            })}
-                        </div>
+    <div class="w-full max-w-[1500px] px-10 mt-12">
+      {CATEGORIES.map((cat) => (
+        <div class="mb-10"> 
+          <h2 class="text-2xl font-bold mb-6 opacity-95 text-white pl-2 tracking-wide drop-shadow-md">
+            {cat.title}
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+            {cat.links.map((link) => (
+              <a
+                href={link.url || "#"}
+                target="_blank"
+                class="glass sun-card flex items-center p-5 rounded-[1.8rem] group"
+              >
+                <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5">
+                  <div class="relative w-full h-full flex items-center justify-center">
+                    <img
+                      src={`${ICON_API_BASE}?url=${link.url}`}
+                      loading="lazy"
+                      class="w-full h-full object-contain transition-opacity duration-500"
+                      onload="this.style.opacity='1'"
+                      style="opacity: 0;"
+                      onerror="this.parentElement.querySelector('.fallback-icon').classList.remove('hidden'); this.style.display='none';"
+                    />
+                    <div class="fallback-icon hidden w-full h-full items-center justify-center text-2xl" style={`color: ${link.color || "#fff"}`}>
+                      <i class={link.icon || "fas fa-link"} />
                     </div>
-                ))
-            }
+                  </div>
+                </div>
+                <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">
+                  {link.name}
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
+      ))}
+    </div>
 
-        <footer
-            class="mt-auto py-12 w-full flex flex-col items-center justify-center text-white/40 text-[13px] select-none"
-        >
-            <div class="flex flex-col items-center gap-y-3 mb-4">
-                <a
-                    href="https://beian.miit.gov.cn/"
-                    rel="noreferrer"
-                    target="_blank"
-                    class="hover:text-white/80 transition-all flex items-center gap-2"
-                >
-                    <img
-                        src="https://ywtb.mps.gov.cn/authservice/images/foot-icp.png"
-                        width="14"
-                        height="14"
-                        class="opacity-60"
-                        alt="ICP"
-                    />
-                    <span>辽ICP备2025051495号-2</span>
-                </a>
-                <a
-                    href="https://beian.mps.gov.cn/#/query/webSearch?code=21070002000117"
-                    rel="noreferrer"
-                    target="_blank"
-                    class="hover:text-white/80 transition-all flex items-center gap-2"
-                >
-                    <img
-                        src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png"
-                        width="14"
-                        height="14"
-                        class="opacity-60"
-                        alt="GAB"
-                    />
-                    <span>辽公网安备21070002000117号</span>
-                </a>
-            </div>
-            <p class="opacity-30 text-[11px] tracking-widest uppercase">
-                © {new Date().getFullYear()} LVCDY · PERSONAL DASHBOARD
-            </p>
-        </footer>
-    </main>
+    <Footer />
+  </main>
 
-    <script>
-        const btn = document.getElementById("engineBtn");
-        const menu = document.getElementById("engineMenu");
-        const icon = document.getElementById("currentIcon");
-        const input = document.getElementById(
-            "searchInput",
-        ) as HTMLInputElement;
-
-        // 修改 2：默认 URL 调整为百度
-        let currentUrl = "https://www.baidu.com/s?wd=";
-
-        btn?.addEventListener("click", (e) => {
-            e.stopPropagation();
-            menu?.classList.toggle("hidden");
+  <script is:inline>
+    (function () {
+      const clockEl = document.getElementById("clock");
+      const dateEl = document.getElementById("date");
+      function updateClock() {
+        const now = new Date();
+        if (clockEl) clockEl.innerText = now.toTimeString().split(" ")[0];
+        if (dateEl) dateEl.innerText = now.toLocaleDateString("zh-CN", {
+          month: "long", day: "numeric", weekday: "long"
         });
-        document.querySelectorAll(".engine-item").forEach((item) => {
-            item.addEventListener("click", (e) => {
-                const target = e.currentTarget as HTMLElement;
-                currentUrl = target.dataset.url!;
-                if (icon)
-                    icon.className = `${target.dataset.icon!} text-xl text-white/80 transition-all`;
-                menu?.classList.add("hidden");
-                input.focus();
-            });
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      const ipBox = document.getElementById("ip-info");
+      const ipText = document.getElementById("ip-address");
+      async function fetchIP() {
+        try {
+          const res = await fetch("https://api.ip.sb/geoip");
+          if (res.ok) {
+            const data = await res.json();
+            ipText.innerText = data.city ? `${data.ip} · ${data.city}` : data.ip;
+            ipBox.style.opacity = "1";
+          }
+        } catch (e) {
+          ipText.innerText = "欢迎回来";
+          ipBox.style.opacity = "1";
+        }
+      }
+      fetchIP();
+
+      const input = document.getElementById("searchInput");
+      let hitokotoCache = "即使生活再忙，也要记得微笑。";
+      fetch("https://v1.hitokoto.cn/?c=i")
+        .then(res => res.json())
+        .then(data => {
+          hitokotoCache = `${data.hitokoto} —— 「${data.from}」`;
+          if (input) input.placeholder = hitokotoCache;
         });
-        input?.addEventListener("keypress", (e) => {
-            if (e.key === "Enter" && input.value.trim()) {
-                window.open(
-                    currentUrl + encodeURIComponent(input.value.trim()),
-                    "_blank",
-                );
-            }
-        });
-        window.onclick = () => menu?.classList.add("hidden");
-    </script>
+
+      input?.addEventListener("focus", () => { input.placeholder = "请输入搜索内容..."; });
+      input?.addEventListener("blur", () => { if (input.value === "") input.placeholder = hitokotoCache; });
+    })();
+  </script>
+
+  <script>
+    const btn = document.getElementById("engineBtn");
+    const menu = document.getElementById("engineMenu");
+    const icon = document.getElementById("currentIcon");
+    const input = document.getElementById("searchInput") as HTMLInputElement;
+
+    // 默认使用百度 (SEARCH_ENGINES[0])
+    let currentUrl = "https://www.baidu.com/s?wd=";
+
+    btn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      menu?.classList.toggle("hidden");
+    });
+
+    document.querySelectorAll(".engine-item").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        const target = e.currentTarget as HTMLElement;
+        currentUrl = target.dataset.url!;
+        // 关键更新：支持切换 fas (百度) 和 fab (Google/Github) 图标
+        if (icon) {
+          icon.className = `${target.dataset.icon!} text-xl text-white/80 transition-all`;
+        }
+        menu?.classList.add("hidden");
+        input.focus();
+      });
+    });
+
+    input?.addEventListener("keypress", (e) => {
+      if (e.key === "Enter" && input.value.trim()) {
+        window.open(currentUrl + encodeURIComponent(input.value.trim()), "_blank");
+      }
+    });
+
+    window.onclick = () => menu?.classList.add("hidden");
+  </script>
 </Layout>

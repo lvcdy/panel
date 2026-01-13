@@ -1,9 +1,9 @@
 export const SEARCH_ENGINES = [
   { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw' },
   { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google' },
-  { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft' }
+  { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft' },
+  { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github' }
 ];
-
 export const CATEGORIES = [
   {
     title: "我的网站",

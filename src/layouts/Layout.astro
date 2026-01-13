@@ -11,24 +11,8 @@
             rel="stylesheet" 
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
             crossorigin="anonymous" 
-            referrerpolicy="no-referrer" 
+            referrerpolicy="no-referrer"
         />
-        
-        <style is:inline>
-            /* 基础重置：防止图片加载瞬间的位移和白屏 */
-            body {
-                background-color: #1a1a1a;
-                margin: 0;
-                overflow-x: hidden;
-                /* 允许页面滚动但隐藏滚动条（可选） */
-                scrollbar-width: none; /* Firefox */
-                -ms-overflow-style: none; /* IE/Edge */
-            }
-            body::-webkit-scrollbar {
-                display: none; /* Chrome/Safari */
-            }
-            img:not([src]) { opacity: 0; }
-        </style>
     </head>
     <body class="relative min-h-screen antialiased">
         <div class="fixed inset-0 bg-black/35 pointer-events-none z-[-1]"></div>
@@ -38,47 +22,8 @@
 </html>
 
 <style is:global>
-    /* 引入全局字体变量 */
+    /* 预留全局变量定义，方便后续组件调用 */
     :root {
-        --font-sans: 'MiSans', 'Inter', 'PingFang SC', system-ui, -apple-system, sans-serif;
-    }
-
-    html, body {
-        width: 100%;
-        height: 100%;
-        font-family: var(--font-sans);
-        color: white;
-        scroll-behavior: smooth;
-    }
-
-    /* 玻璃拟态基础效果 */
-    .glass {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* 悬停卡片时的边缘高亮增强 */
-    .sun-card:hover {
-        border-color: rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-4px);
-    }
-
-    /* 移动端点击高亮优化 */
-    * {
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    /* 时钟数字等宽处理，防止跳动 */
-    #clock {
-        font-variant-numeric: tabular-nums;
-    }
-
-    /* 限制所有图片的拖拽 */
-    img {
-        user-select: none;
-        -webkit-user-drag: none;
+        --primary: #3b82f6; /* 默认蓝色，可根据喜好修改 */
     }
 </style>

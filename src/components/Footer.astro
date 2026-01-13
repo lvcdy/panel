@@ -1,0 +1,37 @@
+---
+/* src/components/Footer.astro */
+
+const profileConfig = {
+    name: "与众不同的糖",
+};
+
+const currentYear = new Date().getFullYear();
+---
+
+<div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-10 lg:mx-32"></div>
+
+<footer class="transition border-dashed border-black/10 dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6 py-8">
+    <div class="transition text-black/50 dark:text-white/50 text-xs sm:text-sm text-center leading-normal">
+        
+        <div class="mb-1">
+            &copy; {currentYear} <span class="text-black/80 dark:text-white/80 font-medium">{profileConfig.name}</span>. All Rights Reserved.
+        </div>
+
+        <div class="mb-0.5">
+            Powered by
+            <a class="transition text-black/60 dark:text-white/60 font-medium hover:text-black dark:hover:text-white hover:underline" target="_blank" href="https://astro.build">Astro</a> &
+            <a class="transition text-black/60 dark:text-white/60 font-medium hover:text-black dark:hover:text-white hover:underline" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a>
+        </div>
+
+        <div class="mt-0.5 flex flex-col items-center gap-y-1">
+            <a href="https://beian.miit.gov.cn/" rel="noreferrer" target="_blank" class="hover:text-black dark:hover:text-white transition-all flex items-center gap-2">
+                <img src="https://ywtb.mps.gov.cn/authservice/images/foot-icp.png" class="w-3 h-3 sm:w-3.5 sm:h-3.5 opacity-70">
+                <span>辽ICP备2025051495号-2</span>
+            </a>
+            <a href="https://beian.mps.gov.cn/#/query/webSearch?code=21070002000117" rel="noreferrer" target="_blank" class="hover:text-black dark:hover:text-white transition-all flex items-center gap-2">
+                <img src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png" class="w-3 h-3 sm:w-3.5 sm:h-3.5 opacity-70">
+                <span>辽公网安备21070002000117号</span>
+            </a>
+        </div>
+    </div>
+</footer>

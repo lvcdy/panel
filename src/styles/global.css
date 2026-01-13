@@ -2,68 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 基础样式 */
-body {
-    background-color: #1a1a1a;
-    font-family: 'MiSans', 'Inter', -apple-system, sans-serif;
-    color: white;
-    min-height: 100vh;
-    /* 隐藏溢出，防止背景图加载时的微小位移 */
-    overflow-x: hidden; 
+/* 全局变量定义 */
+:root {
+    --primary: #3b82f6; /* 蓝色，可根据喜好调整 */
+    --font-sans: 'MiSans', 'Inter', 'PingFang SC', system-ui, -apple-system, sans-serif;
 }
 
-/* 核心毛玻璃效果 */
+/* 基础样式优化 */
+body {
+    background-color: #1a1a1a;
+    font-family: var(--font-sans);
+    color: white;
+    min-height: 100vh;
+    
+    /* 核心修复：消费 JS 传入的 --bg-url 变量，添加默认值 none */
+    background-image: var(--bg-url, none); 
+    
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    overflow-x: hidden; 
+    
+    /* 平滑过渡效果 */
+    transition: background-image 0.8s ease-in-out;
+}
+
+/* 确保背景加载后的类名能强制触发显示 */
+body.bg-loaded {
+    background-image: var(--bg-url) !important;
+}
+
+/* 当背景图还没加载时，防止意外干扰 */
+body:not(.bg-loaded) {
+    background-image: none !important;
+}
+
+/* 核心毛玻璃效果 - 深度打磨 */
 .glass {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(25px) saturate(160%);
-    -webkit-backdrop-filter: blur(25px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* 导航卡片悬浮动画 */
 .sun-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .sun-card:hover {
-    transform: translateY(-6px);
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 /* 时钟数字优化：等宽字体防止跳动 */
 #clock {
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* IP 属地与备案号通用的“胶囊”样式 */
+/* 交互元素通用微动效 */
 #ip-info, footer a {
     transition: all 0.3s ease;
 }
 
-#ip-info:hover, footer a:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.02);
+/* 彻底隐藏滚动条（全平台兼容） */
+html {
+    scrollbar-width: none; /* Firefox */
 }
-
-/* 彻底隐藏滚动条 */
 ::-webkit-scrollbar {
-    display: none;
+    display: none; /* Chrome/Safari */
 }
 
 /* 搜索引擎图标交互 */
 #engineBtn i {
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
 #engineBtn:hover i {
-    transform: rotate(15deg) scale(1.2);
-    color: white;
+    transform: rotate(15deg) scale(1.15);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
 }
 
-/* 一言占位符渐变动画 */
+/* 输入框占位符过渡 */
 #searchInput::placeholder {
-    transition: opacity 0.5s ease;
+    transition: all 0.3s ease;
+}
+
+/* 移动端适配微调：减少卡片内间距 */
+@media (max-width: 640px) {
+    .sun-card {
+        padding: 1rem !important;
+    }
 }
