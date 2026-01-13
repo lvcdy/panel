@@ -42,7 +42,6 @@ export const CATEGORIES = [
       { name: "中国科学技术大学测速网站", url: "https://test.ustc.edu.cn/", icon: "fas fa-tachometer-alt", color: "#004098" },
       { name: "ip测漏", url: "https://ipcelou.com", icon: "fas fa-user-secret", color: "#2c3e50" },
       { name: "双子星", url: "https://v2-dev.xsyd.top/", icon: "fas fa-star", color: "#f1c40f" },
-      { name: "Affine", url: "https://affine.lvcdy.cn", icon: "fas fa-edit", color: "#000000" }
     ]
   },
   {
