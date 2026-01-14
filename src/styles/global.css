@@ -2,53 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --primary: #3b82f6;
-  --font-sans: 'MiSans', 'Inter', 'PingFang SC', system-ui, sans-serif;
-}
-
 body {
-  background-color: #1a1a1a;
-  font-family: var(--font-sans);
-  color: white;
-  overflow-x: hidden;
+  @apply bg-[#1a1a1a] text-white overflow-x-hidden antialiased;
+  font-family: 'MiSans', 'Inter', 'PingFang SC', system-ui, sans-serif;
 }
 
 .glass {
+  @apply border border-white/10 shadow-2xl;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .sun-card {
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  @apply transition-all duration-300;
+  will-change: transform;
 }
 
 .sun-card:hover {
-  transform: translateY(-8px);
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  @apply translate-y-[-6px] bg-white/15 border-white/25;
 }
 
 #clock {
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-}
-
-html { scrollbar-width: none; }
-::-webkit-scrollbar { display: none; }
-
-#engineBtn i {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-#engineBtn:hover i {
-  transform: rotate(15deg) scale(1.15);
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 640px) {
-  .sun-card { padding: 1rem !important; }
+  .sun-card { @apply p-4 !important; }
 }

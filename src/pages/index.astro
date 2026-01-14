@@ -4,27 +4,25 @@ import Footer from "../components/Footer.astro";
 import { CATEGORIES, SEARCH_ENGINES } from "../data/links";
 import "../styles/global.css";
 
-const ICON_API_BASE = "https://ico.kucat.cn/get.php";
+const ICON_API = "https://ico.kucat.cn/get.php?url=";
 const BG_URL = "https://t.alcy.cc/ycy";
 ---
 
 <Layout>
   <script is:inline define:vars={{ BG_URL }}>
-    (function () {
-      const img = new Image();
-      img.src = BG_URL;
-      img.onload = () => {
-        document.documentElement.style.setProperty('--bg-url', `url("${BG_URL}")`);
-        document.body.classList.add('bg-loaded');
-      };
-    })();
+    const img = new Image();
+    img.src = BG_URL;
+    img.onload = () => {
+      document.documentElement.style.setProperty('--bg-url', `url("${BG_URL}")`);
+      document.body.classList.add('bg-loaded');
+    };
   </script>
 
-  <main class="flex flex-col items-center min-h-screen pb-10 relative z-10">
+  <main class="flex flex-col items-center min-h-screen pb-10 relative z-10 text-white">
     <div class="mt-24 text-center select-none">
-      <h1 id="clock" class="text-7xl font-bold tracking-tight text-white drop-shadow-2xl">--:--:--</h1>
-      <p id="date" class="text-xl font-medium opacity-90 mt-1 text-white">正在初始化...</p>
-      <div id="ip-info" class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 transition-all duration-700">
+      <h1 id="clock" class="text-7xl font-bold tracking-tight drop-shadow-2xl">--:--:--</h1>
+      <p id="date" class="text-xl font-medium opacity-90 mt-1">正在初始化...</p>
+      <div id="ip-info" class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 transition-opacity duration-700">
         <i class="fas fa-location-dot text-[10px]"></i>
         <span id="ip-address">正在定位...</span>
       </div>
@@ -35,13 +33,12 @@ const BG_URL = "https://t.alcy.cc/ycy";
         <div id="engineBtn" class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all">
           <i id="currentIcon" class="fas fa-paw text-xl text-white/80"></i>
         </div>
-        <input type="text" id="searchInput" placeholder="正在加载一言..." class="bg-transparent flex-grow h-full px-4 outline-none text-white placeholder-white/40 font-medium" autocomplete="off" />
-        <i class="fas fa-search mr-4 opacity-40 text-white"></i>
+        <input type="text" id="searchInput" placeholder="正在加载一言..." class="bg-transparent flex-grow h-full px-4 outline-none placeholder-white/40 font-medium" />
+        <i class="fas fa-search mr-4 opacity-40"></i>
       </div>
-
-      <div id="engineMenu" class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col overflow-hidden z-50 shadow-2xl">
-        {SEARCH_ENGINES.map((e) => (
-          <div class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium transition-colors text-white" data-url={e.url} data-icon={e.icon}>
+      <div id="engineMenu" class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col z-50 shadow-2xl overflow-hidden">
+        {SEARCH_ENGINES.map(e => (
+          <div class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium" data-url={e.url} data-icon={e.icon}>
             <i class={`${e.icon} w-5 text-center`} />
             <span>{e.name}</span>
           </div>
@@ -50,19 +47,15 @@ const BG_URL = "https://t.alcy.cc/ycy";
     </div>
 
     <div class="w-full max-w-[1500px] px-10 mt-12">
-      {CATEGORIES.map((cat) => (
-        <div class="mb-10"> 
-          <h2 class="text-2xl font-bold mb-6 opacity-95 text-white pl-2 drop-shadow-md">{cat.title}</h2>
+      {CATEGORIES.map(cat => (
+        <div class="mb-10">
+          <h2 class="text-2xl font-bold mb-6 pl-2 drop-shadow-md">{cat.title}</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
-            {cat.links.map((link) => (
-              <a href={link.url || "#"} target="_blank" class="glass sun-card flex items-center p-5 rounded-[1.8rem] group">
+            {cat.links.map(link => (
+              <a href={link.url} target="_blank" class="glass sun-card flex items-center p-5 rounded-[1.8rem] group">
                 <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5">
-                  <div class="relative w-full h-full flex items-center justify-center">
-                    <img src={`${ICON_API_BASE}?url=${link.url}`} loading="lazy" class="w-full h-full object-contain transition-opacity duration-500" onload="this.style.opacity='1'" style="opacity: 0;" onerror="this.nextElementSibling.classList.remove('hidden'); this.remove();" />
-                    <div class="fallback-icon hidden w-full h-full flex items-center justify-center text-2xl" style={`color: ${link.color || "#fff"}`}>
-                      <i class={link.icon || "fas fa-link"} />
-                    </div>
-                  </div>
+                  <img src={ICON_API + link.url} loading="lazy" class="w-full h-full object-contain transition-opacity opacity-0" onload="this.style.opacity=1" onerror="this.nextElementSibling.classList.remove('hidden');this.remove()" />
+                  <div class="hidden w-full h-full flex items-center justify-center text-2xl" style={`color:${link.color}`}><i class={link.icon} /></div>
                 </div>
                 <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">{link.name}</div>
               </a>
@@ -76,62 +69,56 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
   <script is:inline>
     (function () {
-      const clockEl = document.getElementById("clock"), dateEl = document.getElementById("date"), ipText = document.getElementById("ip-address"), ipBox = document.getElementById("ip-info"), input = document.getElementById("searchInput");
-      let hitokotoCache = "即使生活再忙，也要记得微笑。";
+      const d = document,
+            $ = (id) => d.getElementById(id),
+            clock = $('clock'), dateEl = $('date'), ipText = $('ip-address'), ipBox = $('ip-info'), input = $('searchInput');
+      let hitokoto = "即使生活再忙，也要记得微笑。";
 
-      const updateClock = () => {
+      setInterval(() => {
         const now = new Date();
-        clockEl.innerText = now.toTimeString().split(" ")[0];
-        dateEl.innerText = now.toLocaleDateString("zh-CN", { month: "long", day: "numeric", weekday: "long" });
-      };
-      updateClock(); setInterval(updateClock, 1000);
+        clock.innerText = now.toTimeString().split(' ')[0];
+        dateEl.innerText = now.toLocaleDateString('zh-CN', {month:'long',day:'numeric',weekday:'long'});
+      }, 1000);
 
-      const fetchIP = async () => {
+      const init = async () => {
         try {
-          const controller = new AbortController(), timeoutId = setTimeout(() => controller.abort(), 5000);
-          const ipRes = await fetch("https://api.ip.sb/ip", { signal: controller.signal, headers: { 'Accept': 'text/plain' } });
-          const userIp = (await ipRes.text()).trim();
-          const geoRes = await fetch(`https://v2.xxapi.cn/api/ip?ip=${userIp}`, { signal: controller.signal });
-          const geoData = await geoRes.json();
-          clearTimeout(timeoutId);
-          ipText.innerText = (geoData.code === 200 && geoData.data) ? `${userIp} · ${geoData.data.address}` : userIp;
-        } catch (e) {
-          const fb = await (await fetch("https://v2.xxapi.cn/api/ip")).json();
-          ipText.innerText = fb.code === 200 ? `${fb.data.ip} · ${fb.data.address}` : "欢迎回来";
-        }
-        ipBox.style.opacity = "1";
+          const c = new AbortController(), t = setTimeout(() => c.abort(), 5000);
+          const ip = (await (await fetch("https://api.ip.sb/ip", {signal:c.signal,headers:{Accept:'text/plain'}})).text()).trim();
+          const geo = await (await fetch(`https://api.pearktrue.cn/api/ip/high/?ip=${ip}`, {signal:c.signal})).json();
+          clearTimeout(t);
+          const res = geo.data;
+          ipText.innerText = geo.code === 200 ? `${ip} · ${res.address || [res.province,res.city,res.district].filter((v,i,a)=>v&&a.indexOf(v)===i).join(' · ')}` : ip;
+        } catch { ipText.innerText = "欢迎回来"; }
+        ipBox.style.opacity = 1;
+
+        fetch("https://v1.hitokoto.cn/?c=i").then(r=>r.json()).then(data => {
+          hitokoto = `${data.hitokoto} —— 「${data.from}」`;
+          input.placeholder = hitokoto;
+        }).catch(()=>{});
       };
 
-      const fetchHitokoto = async () => {
-        try {
-          const res = await (await fetch("https://v1.hitokoto.cn/?c=i")).json();
-          hitokotoCache = `${res.hitokoto} —— 「${res.from}」`;
-          input.placeholder = hitokotoCache;
-        } catch (e) {}
-      };
-
-      window.addEventListener('load', () => { fetchIP(); fetchHitokoto(); });
+      init();
       input?.addEventListener("focus", () => input.placeholder = "请输入搜索内容...");
-      input?.addEventListener("blur", () => { if (!input.value) input.placeholder = hitokotoCache; });
+      input?.addEventListener("blur", () => { if(!input.value) input.placeholder = hitokoto; });
     })();
   </script>
 
   <script>
     const btn = document.getElementById("engineBtn"), menu = document.getElementById("engineMenu"), icon = document.getElementById("currentIcon"), input = document.getElementById("searchInput") as HTMLInputElement;
-    let currentUrl = "https://www.baidu.com/s?wd=";
+    let url = "https://www.baidu.com/s?wd=";
 
     btn?.addEventListener("click", e => { e.stopPropagation(); menu?.classList.toggle("hidden"); });
     document.querySelectorAll(".engine-item").forEach(item => {
       item.addEventListener("click", e => {
         const t = e.currentTarget as HTMLElement;
-        currentUrl = t.dataset.url!;
+        url = t.dataset.url!;
         if (icon) icon.className = `${t.dataset.icon} text-xl text-white/80 transition-all`;
         menu?.classList.add("hidden");
         input.focus();
       });
     });
     input?.addEventListener("keypress", e => {
-      if (e.key === "Enter" && input.value.trim()) window.open(currentUrl + encodeURIComponent(input.value.trim()), "_blank");
+      if (e.key === "Enter" && input.value.trim()) window.open(url + encodeURIComponent(input.value.trim()), "_blank");
     });
     window.onclick = () => menu?.classList.add("hidden");
   </script>

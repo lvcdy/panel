@@ -4,12 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
     <title>Panel</title>
-    <link rel="dns-prefetch" href="https://t.alcy.cc" />
-    <link rel="dns-prefetch" href="https://cdn.bootcdn.net" />
-    <link rel="dns-prefetch" href="https://ico.kucat.cn" />
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://api.pearktrue.cn" />
+    <link rel="preconnect" href="https://t.alcy.cc" />
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   </head>
   <body class="relative min-h-screen antialiased bg-[#1a1a1a]">
     <div class="fixed inset-0 bg-black/35 pointer-events-none z-[-1]"></div>
@@ -18,21 +16,16 @@
 </html>
 
 <style is:global>
-  :root { --primary: #3b82f6; }
-  body { background-color: #1a1a1a; }
   body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background-image: var(--bg-url);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: var(--bg-url) center/cover no-repeat fixed;
     opacity: 0;
     transition: opacity 1s ease-in-out;
     z-index: -2;
-    will-change: opacity;
   }
   body.bg-loaded::before { opacity: 1; }
+  ::-webkit-scrollbar { display: none; }
+  html { scrollbar-width: none; -ms-overflow-style: none; }
 </style>
