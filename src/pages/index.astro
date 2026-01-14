@@ -1,12 +1,14 @@
 ---
 /* src/pages/index.astro */
+
 import Layout from "../layouts/Layout.astro";
 import Footer from "../components/Footer.astro";
 import { CATEGORIES, SEARCH_ENGINES } from "../data/links";
 import "../styles/global.css";
 
-const ICON_API_BASE = "https://ico.kucat.cn/get.php";
-const BG_URL = "https://t.alcy.cc/ycy";
+// 外部 API 接口配置
+const ICON_API_BASE = "https://ico.kucat.cn/get.php"; // 图标获取服务
+const BG_URL = "https://t.alcy.cc/ycy";                // 动态背景图片地址
 ---
 
 <Layout>
@@ -15,7 +17,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
       const img = new Image();
       img.src = BG_URL;
       img.onload = function () {
-        // 将背景图地址注入到根元素变量中
+        // 当图片加载完成后，将地址注入 CSS 变量并添加加载完成状态
         document.documentElement.style.setProperty('--bg-url', `url("${BG_URL}")`);
         document.body.classList.add('bg-loaded');
       };
@@ -23,6 +25,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
   </script>
 
   <main class="flex flex-col items-center min-h-screen pb-10 relative z-10">
+    
     <div class="mt-24 text-center select-none">
       <h1 id="clock" class="text-7xl font-bold tracking-tight text-white drop-shadow-2xl">
         --:--:--
@@ -109,6 +112,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
   <script is:inline>
     (function () {
+      // a. 时钟更新逻辑
       const clockEl = document.getElementById("clock");
       const dateEl = document.getElementById("date");
       function updateClock() {
@@ -121,6 +125,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
       updateClock();
       setInterval(updateClock, 1000);
 
+      // b. IP SB 定位接口调用
       const ipBox = document.getElementById("ip-info");
       const ipText = document.getElementById("ip-address");
       async function fetchIP() {
@@ -138,6 +143,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
       }
       fetchIP();
 
+      // c. 一言 (Hitokoto) 接口调用
       const input = document.getElementById("searchInput");
       let hitokotoCache = "即使生活再忙，也要记得微笑。";
       fetch("https://v1.hitokoto.cn/?c=i")
@@ -147,6 +153,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
           if (input) input.placeholder = hitokotoCache;
         });
 
+      // 搜索框聚焦效果处理
       input?.addEventListener("focus", () => { input.placeholder = "请输入搜索内容..."; });
       input?.addEventListener("blur", () => { if (input.value === "") input.placeholder = hitokotoCache; });
     })();
@@ -158,19 +165,20 @@ const BG_URL = "https://t.alcy.cc/ycy";
     const icon = document.getElementById("currentIcon");
     const input = document.getElementById("searchInput") as HTMLInputElement;
 
-    // 默认使用百度 (SEARCH_ENGINES[0])
-    let currentUrl = "https://www.baidu.com/s?wd=";
+    let currentUrl = "https://www.baidu.com/s?wd="; // 默认引擎地址
 
+    // 切换菜单显示/隐藏
     btn?.addEventListener("click", (e) => {
       e.stopPropagation();
       menu?.classList.toggle("hidden");
     });
 
+    // 引擎项点击事件
     document.querySelectorAll(".engine-item").forEach((item) => {
       item.addEventListener("click", (e) => {
         const target = e.currentTarget as HTMLElement;
-        currentUrl = target.dataset.url!;
-        // 关键更新：支持切换 fas (百度) 和 fab (Google/Github) 图标
+        currentUrl = target.dataset.url!; // 更新当前搜索 URL 前缀
+        // 动态更新按钮图标类名（支持 FontAwesome 不同前缀）
         if (icon) {
           icon.className = `${target.dataset.icon!} text-xl text-white/80 transition-all`;
         }
@@ -179,12 +187,14 @@ const BG_URL = "https://t.alcy.cc/ycy";
       });
     });
 
+    // 回车执行搜索
     input?.addEventListener("keypress", (e) => {
       if (e.key === "Enter" && input.value.trim()) {
         window.open(currentUrl + encodeURIComponent(input.value.trim()), "_blank");
       }
     });
 
+    // 点击页面其他区域关闭引擎菜单
     window.onclick = () => menu?.classList.add("hidden");
   </script>
 </Layout>

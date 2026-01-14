@@ -15,7 +15,6 @@ body {
     color: white;
     min-height: 100vh;
     
-    /* 核心修复：消费 JS 传入的 --bg-url 变量，添加默认值 none */
     background-image: var(--bg-url, none); 
     
     background-position: center;
@@ -38,7 +37,7 @@ body:not(.bg-loaded) {
     background-image: none !important;
 }
 
-/* 核心毛玻璃效果 - 深度打磨 */
+/* 毛玻璃效果 */
 .glass {
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px) saturate(180%);
@@ -69,7 +68,6 @@ body:not(.bg-loaded) {
     transition: all 0.3s ease;
 }
 
-/* 彻底隐藏滚动条（全平台兼容） */
 html {
     scrollbar-width: none; /* Firefox */
 }
@@ -91,7 +89,6 @@ html {
     transition: all 0.3s ease;
 }
 
-/* 移动端适配微调：减少卡片内间距 */
 @media (max-width: 640px) {
     .sun-card {
         padding: 1rem !important;
