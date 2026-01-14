@@ -2,29 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-[#1a1a1a] text-white overflow-x-hidden antialiased;
-  font-family: 'MiSans', 'Inter', 'PingFang SC', system-ui, sans-serif;
+@layer base {
+  body {
+    @apply bg-[#1a1a1a] text-white overflow-x-hidden antialiased;
+    font-family: 'MiSans', 'Inter', 'PingFang SC', system-ui, sans-serif;
+  }
 }
 
-.glass {
-  @apply border border-white/10 shadow-2xl;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px) saturate(180%);
+@layer components {
+  /* 统一磨砂玻璃效果 */
+  .glass {
+    @apply border border-white/10 shadow-2xl;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  /* 链接卡片交互 */
+  .sun-card {
+    @apply transition-all duration-300 will-change-transform;
+  }
+
+  .sun-card:hover {
+    @apply -translate-y-1.5 bg-white/15 border-white/25 shadow-white/5;
+  }
 }
 
-.sun-card {
-  @apply transition-all duration-300;
-  will-change: transform;
-}
-
-.sun-card:hover {
-  @apply translate-y-[-6px] bg-white/15 border-white/25;
-}
-
+/* 核心组件细节 */
 #clock {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums; /* 防止数字跳动 */
   text-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* 响应式微调 */
+@screen sm {
+  .sun-card { @apply p-5; }
 }
 
 @media (max-width: 640px) {

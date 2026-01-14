@@ -18,7 +18,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
     };
   </script>
 
-  <main class="flex flex-col items-center min-h-screen pb-10 relative z-10 text-white">
+  <main class="flex flex-col items-center min-h-screen relative z-10 text-white">
     <div class="mt-24 text-center select-none">
       <h1 id="clock" class="text-7xl font-bold tracking-tight drop-shadow-2xl">--:--:--</h1>
       <p id="date" class="text-xl font-medium opacity-90 mt-1">正在初始化...</p>
@@ -46,16 +46,16 @@ const BG_URL = "https://t.alcy.cc/ycy";
       </div>
     </div>
 
-    <div class="w-full max-w-[1500px] px-10 mt-12">
+    <div class="w-full max-w-[1500px] px-10 mt-12 flex-grow">
       {CATEGORIES.map(cat => (
         <div class="mb-10">
           <h2 class="text-2xl font-bold mb-6 pl-2 drop-shadow-md">{cat.title}</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
             {cat.links.map(link => (
               <a href={link.url} target="_blank" class="glass sun-card flex items-center p-5 rounded-[1.8rem] group">
-                <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5">
+                <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5 text-2xl">
                   <img src={ICON_API + link.url} loading="lazy" class="w-full h-full object-contain transition-opacity opacity-0" onload="this.style.opacity=1" onerror="this.nextElementSibling.classList.remove('hidden');this.remove()" />
-                  <div class="hidden w-full h-full flex items-center justify-center text-2xl" style={`color:${link.color}`}><i class={link.icon} /></div>
+                  <div class="hidden w-full h-full flex items-center justify-center" style={`color:${link.color}`}><i class={link.icon} /></div>
                 </div>
                 <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">{link.name}</div>
               </a>
@@ -64,62 +64,76 @@ const BG_URL = "https://t.alcy.cc/ycy";
         </div>
       ))}
     </div>
+
     <Footer />
   </main>
 
   <script is:inline>
     (function () {
-      const d = document,
-            $ = (id) => d.getElementById(id),
-            clock = $('clock'), dateEl = $('date'), ipText = $('ip-address'), ipBox = $('ip-info'), input = $('searchInput');
-      let hitokoto = "即使生活再忙，也要记得微笑。";
+      const d = document, $ = (id) => d.getElementById(id);
+      const clock = $('clock'), dateEl = $('date'), ipText = $('ip-address'), ipBox = $('ip-info'), 
+            input = $('searchInput'), engineBtn = $('engineBtn'), engineMenu = $('engineMenu'), currentIcon = $('currentIcon');
+      let searchUrl = "https://www.baidu.com/s?wd=", hitokoto = "欢迎回来";
 
+      // 1. Clock & Date
       setInterval(() => {
         const now = new Date();
         clock.innerText = now.toTimeString().split(' ')[0];
         dateEl.innerText = now.toLocaleDateString('zh-CN', {month:'long',day:'numeric',weekday:'long'});
       }, 1000);
 
+      // 2. Main Logic
       const init = async () => {
+        // IP 定位
         try {
-          const c = new AbortController(), t = setTimeout(() => c.abort(), 5000);
+          const c = new AbortController(), t = setTimeout(() => c.abort(), 4000);
           const ip = (await (await fetch("https://api.ip.sb/ip", {signal:c.signal,headers:{Accept:'text/plain'}})).text()).trim();
           const geo = await (await fetch(`https://api.pearktrue.cn/api/ip/high/?ip=${ip}`, {signal:c.signal})).json();
           clearTimeout(t);
-          const res = geo.data;
-          ipText.innerText = geo.code === 200 ? `${ip} · ${res.address || [res.province,res.city,res.district].filter((v,i,a)=>v&&a.indexOf(v)===i).join(' · ')}` : ip;
-        } catch { ipText.innerText = "欢迎回来"; }
+          if (geo.code === 200) {
+            const r = geo.data;
+            ipText.innerText = `${ip} · ${[r.province, r.city, r.district].filter((v,i,a) => v && a.indexOf(v) === i).join(' · ')}`;
+          } else { ipText.innerText = ip; }
+        } catch { ipText.innerText = "Enjoy your day"; }
         ipBox.style.opacity = 1;
 
+        // 服务商识别 (Footer 注入)
+        try {
+          const res = await fetch(window.location.href, { method: 'HEAD' });
+          const s = (res.headers.get('server') || '').toLowerCase(), k = [...res.headers.keys()].join(' ');
+          const pT = $('pro-name'), pB = $('pro-info');
+          if(pT && pB) {
+            pT.innerText = (k.includes('ali-ray') || s.includes('esa')) ? "Alibaba Cloud ESA" : (k.includes('cf-ray') || s.includes('cloudflare')) ? "Cloudflare Edge" : "Global Edge Network";
+            pB.style.opacity = 1;
+          }
+        } catch {}
+
+        // 一言
         fetch("https://v1.hitokoto.cn/?c=i").then(r=>r.json()).then(data => {
-          hitokoto = `${data.hitokoto} —— 「${data.from}」`;
-          input.placeholder = hitokoto;
+          input.placeholder = hitokoto = `${data.hitokoto} —— 「${data.from}」`;
         }).catch(()=>{});
       };
 
-      init();
-      input?.addEventListener("focus", () => input.placeholder = "请输入搜索内容...");
-      input?.addEventListener("blur", () => { if(!input.value) input.placeholder = hitokoto; });
-    })();
-  </script>
-
-  <script>
-    const btn = document.getElementById("engineBtn"), menu = document.getElementById("engineMenu"), icon = document.getElementById("currentIcon"), input = document.getElementById("searchInput") as HTMLInputElement;
-    let url = "https://www.baidu.com/s?wd=";
-
-    btn?.addEventListener("click", e => { e.stopPropagation(); menu?.classList.toggle("hidden"); });
-    document.querySelectorAll(".engine-item").forEach(item => {
-      item.addEventListener("click", e => {
-        const t = e.currentTarget as HTMLElement;
-        url = t.dataset.url!;
-        if (icon) icon.className = `${t.dataset.icon} text-xl text-white/80 transition-all`;
-        menu?.classList.add("hidden");
-        input.focus();
+      // 3. Search Engine Logic
+      engineBtn.onclick = (e) => { e.stopPropagation(); engineMenu.classList.toggle("hidden"); };
+      d.querySelectorAll(".engine-item").forEach(item => {
+        item.onclick = (e) => {
+          searchUrl = e.currentTarget.dataset.url;
+          currentIcon.className = e.currentTarget.dataset.icon + " text-xl text-white/80 transition-all";
+          engineMenu.classList.add("hidden");
+          input.focus();
+        };
       });
-    });
-    input?.addEventListener("keypress", e => {
-      if (e.key === "Enter" && input.value.trim()) window.open(url + encodeURIComponent(input.value.trim()), "_blank");
-    });
-    window.onclick = () => menu?.classList.add("hidden");
+
+      input.onkeypress = (e) => {
+        if (e.key === "Enter" && input.value.trim()) window.open(searchUrl + encodeURIComponent(input.value.trim()), "_blank");
+      };
+
+      d.onclick = () => engineMenu.classList.add("hidden");
+      input.onfocus = () => input.placeholder = "请输入搜索内容...";
+      input.onblur = () => { if(!input.value) input.placeholder = hitokoto; };
+
+      init();
+    })();
   </script>
 </Layout>

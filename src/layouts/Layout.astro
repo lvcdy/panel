@@ -1,31 +1,59 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="scrollbar-hide">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Panel</title>
-    <link rel="preconnect" href="https://api.pearktrue.cn" />
-    <link rel="preconnect" href="https://t.alcy.cc" />
+    
+    <link rel="dns-prefetch" href="https://api.pearktrue.cn" />
+    <link rel="dns-prefetch" href="https://v1.hitokoto.cn" />
+    <link rel="dns-prefetch" href="https://api.ip.sb" />
+    
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   </head>
-  <body class="relative min-h-screen antialiased bg-[#1a1a1a]">
-    <div class="fixed inset-0 bg-black/35 pointer-events-none z-[-1]"></div>
+  <body class="relative min-h-screen antialiased bg-[#1a1a1a] overflow-x-hidden">
+    <div class="fixed inset-0 bg-black/30 backdrop-blur-[2px] pointer-events-none z-[-1]"></div>
     <slot />
   </body>
 </html>
 
 <style is:global>
+  :root { --bg-url: none; }
+  
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     background: var(--bg-url) center/cover no-repeat fixed;
     opacity: 0;
-    transition: opacity 1s ease-in-out;
     z-index: -2;
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity;
   }
+  
   body.bg-loaded::before { opacity: 1; }
-  ::-webkit-scrollbar { display: none; }
-  html { scrollbar-width: none; -ms-overflow-style: none; }
+
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  html { 
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>

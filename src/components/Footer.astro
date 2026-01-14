@@ -6,27 +6,32 @@ const currentYear = new Date().getFullYear();
 <div class="border-t border-white/10 my-10 border-dashed mx-10 lg:mx-32"></div>
 
 <footer class="mb-12 flex flex-col items-center justify-center px-6 py-8 select-none">
-  <div class="text-white/60 text-[11px] sm:text-xs text-center leading-relaxed [text-shadow:_0_1px_4px_rgba(0,0,0,0.5)]">
+  <div class="text-white/60 text-[11px] sm:text-xs text-center leading-relaxed [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]">
     
     <div class="mb-1">
       &copy; {currentYear} <span class="font-bold text-white/80">{profileConfig.name}</span>. All Rights Reserved.
     </div>
 
-    <div class="mb-2 opacity-80">
+    <div class="mb-3 opacity-80">
       Powered by 
       <a class="text-white hover:underline font-medium" target="_blank" href="https://astro.build">Astro</a> & 
       <a class="text-white hover:underline font-medium" target="_blank" href="https://github.com/lvcdy/panel">Panel</a>
     </div>
 
-    <div class="flex flex-col items-center gap-y-1.5">
-      <a href="https://beian.miit.gov.cn/" rel="noreferrer" target="_blank" class="hover:text-white transition-colors flex items-center gap-1.5">
-        <img src="https://ywtb.mps.gov.cn/authservice/images/foot-icp.png" class="w-3 h-3 brightness-125">
+    <div class="flex flex-col items-center gap-y-2 mb-6 text-white/50">
+      <a href="https://beian.miit.gov.cn/" target="_blank" class="hover:text-white transition-all flex items-center gap-1.5">
+        <img src="https://ywtb.mps.gov.cn/authservice/images/foot-icp.png" class="w-3 h-3 brightness-110 opacity-80" alt="ICP">
         <span>辽ICP备2025051495号-2</span>
       </a>
-      <a href="https://beian.mps.gov.cn/#/query/webSearch?code=21070002000117" rel="noreferrer" target="_blank" class="hover:text-white transition-colors flex items-center gap-1.5">
-        <img src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png" class="w-3 h-3 brightness-125">
+      <a href="https://beian.mps.gov.cn/#/query/webSearch?code=21070002000117" target="_blank" class="hover:text-white transition-all flex items-center gap-1.5">
+        <img src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png" class="w-3 h-3 brightness-110 opacity-80" alt="GWA">
         <span>辽公网安备21070002000117号</span>
       </a>
+    </div>
+
+    <div id="pro-info" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-[10px] text-white/50 opacity-0 transition-opacity duration-700 uppercase tracking-widest">
+      <i class="fas fa-server text-[9px]"></i>
+      <span id="pro-name">Detecting...</span>
     </div>
   </div>
 </footer>
