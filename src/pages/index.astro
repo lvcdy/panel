@@ -68,70 +68,77 @@ const BG_URL = "https://t.alcy.cc/ycy";
     <Footer />
   </main>
 
-  <script is:inline>
+  <script>
+    import { UapiClient } from 'uapi-sdk-typescript';
+
     (function () {
-      const d = document, $ = (id) => d.getElementById(id);
-      const clock = $('clock'), dateEl = $('date'), ipText = $('ip-address'), ipBox = $('ip-info'), 
-            input = $('searchInput'), engineBtn = $('engineBtn'), engineMenu = $('engineMenu'), currentIcon = $('currentIcon');
+      const $ = (s) => document.querySelector(s);
+      const els = {
+        clock: $('#clock'), date: $('#date'), ip: $('#ip-address'), ipBox: $('#ip-info'),
+        input: $('#searchInput'), engineBtn: $('#engineBtn'), menu: $('#engineMenu'), icon: $('#currentIcon')
+      };
       let searchUrl = "https://www.baidu.com/s?wd=", hitokoto = "欢迎回来";
 
-      // 1. Clock & Date
-      setInterval(() => {
+      // 1. Clock
+      const updateTime = () => {
         const now = new Date();
-        clock.innerText = now.toTimeString().split(' ')[0];
-        dateEl.innerText = now.toLocaleDateString('zh-CN', {month:'long',day:'numeric',weekday:'long'});
-      }, 1000);
+        els.clock.innerText = now.toLocaleTimeString('zh-CN', { hour12: false });
+        els.date.innerText = now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
+      };
+      setInterval(updateTime, 1000); updateTime();
 
-      // 2. Main Logic
+      // 2. Data Initialization
+      const client = new UapiClient('https://uapis.cn');
+
       const init = async () => {
-        // IP 定位
+        // UAPI IP Info
         try {
-          const c = new AbortController(), t = setTimeout(() => c.abort(), 4000);
-          const ip = (await (await fetch("https://api.ip.sb/ip", {signal:c.signal,headers:{Accept:'text/plain'}})).text()).trim();
-          const geo = await (await fetch(`https://api.pearktrue.cn/api/ip/high/?ip=${ip}`, {signal:c.signal})).json();
-          clearTimeout(t);
-          if (geo.code === 200) {
-            const r = geo.data;
-            ipText.innerText = `${ip} · ${[r.province, r.city, r.district].filter((v,i,a) => v && a.indexOf(v) === i).join(' · ')}`;
-          } else { ipText.innerText = ip; }
-        } catch { ipText.innerText = "Enjoy your day"; }
-        ipBox.style.opacity = 1;
+          const res = await client.network.getNetworkIpinfo({ source: "commercial" });
+          if (res.code === 200) {
+            const { ip, prov, city, isp } = res.data;
+            els.ip.innerText = `${ip} · ${prov}${city} ${isp}`;
+          }
+        } catch { els.ip.innerText = "欢迎回来"; }
+        els.ipBox.style.opacity = 1;
 
-        // 服务商识别 (Footer 注入)
+        // Hitokoto
+        fetch("https://v1.hitokoto.cn/?c=i").then(r => r.json()).then(d => {
+          els.input.placeholder = hitokoto = `${d.hitokoto} —— 「${d.from}」`;
+        });
+
+        // Edge Detection
         try {
-          const res = await fetch(window.location.href, { method: 'HEAD' });
-          const s = (res.headers.get('server') || '').toLowerCase(), k = [...res.headers.keys()].join(' ');
-          const pT = $('pro-name'), pB = $('pro-info');
-          if(pT && pB) {
-            pT.innerText = (k.includes('ali-ray') || s.includes('esa')) ? "Alibaba Cloud ESA" : (k.includes('cf-ray') || s.includes('cloudflare')) ? "Cloudflare Edge" : "Global Edge Network";
+          const head = await fetch(location.href, { method: 'HEAD' });
+          const srv = (head.headers.get('server') || '').toLowerCase();
+          const pT = $('#pro-name'), pB = $('#pro-info');
+          if (pT) {
+            pT.innerText = srv.includes('cloudflare') ? "Cloudflare Edge" : srv.includes('esa') ? "Alibaba Cloud ESA" : "Global Edge Network";
             pB.style.opacity = 1;
           }
         } catch {}
-
-        // 一言
-        fetch("https://v1.hitokoto.cn/?c=i").then(r=>r.json()).then(data => {
-          input.placeholder = hitokoto = `${data.hitokoto} —— 「${data.from}」`;
-        }).catch(()=>{});
       };
 
-      // 3. Search Engine Logic
-      engineBtn.onclick = (e) => { e.stopPropagation(); engineMenu.classList.toggle("hidden"); };
-      d.querySelectorAll(".engine-item").forEach(item => {
+      // 3. Interactions
+      els.engineBtn.onclick = (e) => { e.stopPropagation(); els.menu.classList.toggle("hidden"); };
+      
+      document.querySelectorAll(".engine-item").forEach(item => {
         item.onclick = (e) => {
-          searchUrl = e.currentTarget.dataset.url;
-          currentIcon.className = e.currentTarget.dataset.icon + " text-xl text-white/80 transition-all";
-          engineMenu.classList.add("hidden");
-          input.focus();
+          const target = e.currentTarget as HTMLElement;
+          searchUrl = target.dataset.url;
+          els.icon.className = `${target.dataset.icon} text-xl text-white/80 transition-all`;
+          els.menu.classList.add("hidden");
+          els.input.focus();
         };
       });
 
-      input.onkeypress = (e) => {
-        if (e.key === "Enter" && input.value.trim()) window.open(searchUrl + encodeURIComponent(input.value.trim()), "_blank");
+      els.input.onkeydown = (e) => {
+        if (e.key === "Enter" && els.input.value.trim()) 
+          window.open(searchUrl + encodeURIComponent(els.input.value.trim()), "_blank");
       };
 
-      d.onclick = () => engineMenu.classList.add("hidden");
-      input.onfocus = () => input.placeholder = "请输入搜索内容...";
-      input.onblur = () => { if(!input.value) input.placeholder = hitokoto; };
+      document.onclick = () => els.menu.classList.add("hidden");
+      els.input.onfocus = () => els.input.placeholder = "请输入搜索内容...";
+      els.input.onblur = () => { if(!els.input.value) els.input.placeholder = hitokoto; };
 
       init();
     })();
