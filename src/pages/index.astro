@@ -69,8 +69,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
   <script is:inline>
     (function () {
-      const d = document,
-            $ = (id) => d.getElementById(id),
+      const d = document, $ = (id) => d.getElementById(id),
             clock = $('clock'), dateEl = $('date'), ipText = $('ip-address'), ipBox = $('ip-info'), input = $('searchInput');
       let hitokoto = "即使生活再忙，也要记得微笑。";
 
@@ -80,20 +79,16 @@ const BG_URL = "https://t.alcy.cc/ycy";
         dateEl.innerText = now.toLocaleDateString('zh-CN', {month:'long',day:'numeric',weekday:'long'});
       }, 1000);
 
+      // 边缘函数对接逻辑：单次请求，零负担
       const init = async () => {
         try {
-          const c = new AbortController(), t = setTimeout(() => c.abort(), 5000);
-          const ip = (await (await fetch("https://api.ip.sb/ip", {signal:c.signal,headers:{Accept:'text/plain'}})).text()).trim();
-          const geo = await (await fetch(`https://api.pearktrue.cn/api/ip/high/?ip=${ip}`, {signal:c.signal})).json();
-          clearTimeout(t);
-          const res = geo.data;
-          ipText.innerText = geo.code === 200 ? `${ip} · ${res.address || [res.province,res.city,res.district].filter((v,i,a)=>v&&a.indexOf(v)===i).join(' · ')}` : ip;
+          const res = await (await fetch("/api/geo")).json();
+          ipText.innerText = `${res.ip} · ${res.address}`;
         } catch { ipText.innerText = "欢迎回来"; }
         ipBox.style.opacity = 1;
 
         fetch("https://v1.hitokoto.cn/?c=i").then(r=>r.json()).then(data => {
-          hitokoto = `${data.hitokoto} —— 「${data.from}」`;
-          input.placeholder = hitokoto;
+          input.placeholder = hitokoto = `${data.hitokoto} —— 「${data.from}」`;
         }).catch(()=>{});
       };
 
