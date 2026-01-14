@@ -64,7 +64,6 @@ const BG_URL = "https://t.alcy.cc/ycy";
         </div>
       ))}
     </div>
-
     <Footer />
   </main>
 
@@ -79,7 +78,6 @@ const BG_URL = "https://t.alcy.cc/ycy";
       };
       let searchUrl = "https://www.baidu.com/s?wd=", hitokoto = "欢迎回来";
 
-      // 1. Clock
       const updateTime = () => {
         const now = new Date();
         els.clock.innerText = now.toLocaleTimeString('zh-CN', { hour12: false });
@@ -87,16 +85,15 @@ const BG_URL = "https://t.alcy.cc/ycy";
       };
       setInterval(updateTime, 1000); updateTime();
 
-      // 2. Data Initialization
       const client = new UapiClient('https://uapis.cn');
 
       const init = async () => {
-        // UAPI IP Info
         try {
-          const res = await client.network.getNetworkIpinfo({ source: "commercial" });
+          const res = await client.network.getNetworkIpinfo();
           if (res.code === 200) {
-            const { ip, prov, city, isp } = res.data;
-            els.ip.innerText = `${ip} · ${prov}${city} ${isp}`;
+            const { ip, prov, city, district } = res.data;
+            const addr = [prov, city, district].filter((v, i, a) => v && a.indexOf(v) === i).join(' ');
+            els.ip.innerText = `${ip} · ${addr || '未知位置'}`;
           }
         } catch { els.ip.innerText = "欢迎回来"; }
         els.ipBox.style.opacity = 1;
@@ -106,10 +103,10 @@ const BG_URL = "https://t.alcy.cc/ycy";
           els.input.placeholder = hitokoto = `${d.hitokoto} —— 「${d.from}」`;
         });
 
-        // Edge Detection
+        // Node Detection
         try {
-          const head = await fetch(location.href, { method: 'HEAD' });
-          const srv = (head.headers.get('server') || '').toLowerCase();
+          const res = await fetch(location.href, { method: 'HEAD' });
+          const srv = (res.headers.get('server') || '').toLowerCase();
           const pT = $('#pro-name'), pB = $('#pro-info');
           if (pT) {
             pT.innerText = srv.includes('cloudflare') ? "Cloudflare Edge" : srv.includes('esa') ? "Alibaba Cloud ESA" : "Global Edge Network";
@@ -118,7 +115,6 @@ const BG_URL = "https://t.alcy.cc/ycy";
         } catch {}
       };
 
-      // 3. Interactions
       els.engineBtn.onclick = (e) => { e.stopPropagation(); els.menu.classList.toggle("hidden"); };
       
       document.querySelectorAll(".engine-item").forEach(item => {
