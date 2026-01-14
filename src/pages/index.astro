@@ -10,6 +10,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
 <Layout>
   <script is:inline define:vars={{ BG_URL }}>
+    // 背景预加载逻辑
     const img = new Image();
     img.src = BG_URL;
     img.onload = () => {
@@ -75,29 +76,31 @@ const BG_URL = "https://t.alcy.cc/ycy";
             input = $('searchInput'), engineBtn = $('engineBtn'), engineMenu = $('engineMenu'), currentIcon = $('currentIcon');
       let searchUrl = "https://www.baidu.com/s?wd=", hitokoto = "欢迎回来";
 
-      // 1. Clock & Date
+      // 1. 时钟
       setInterval(() => {
         const now = new Date();
         clock.innerText = now.toTimeString().split(' ')[0];
         dateEl.innerText = now.toLocaleDateString('zh-CN', {month:'long',day:'numeric',weekday:'long'});
       }, 1000);
 
-      // 2. Main Logic
+      // 2. 初始化逻辑
       const init = async () => {
-        // IP 定位
+        // --- 遵循 UAPI 最新示例调用 ---
         try {
-          const c = new AbortController(), t = setTimeout(() => c.abort(), 4000);
-          const ip = (await (await fetch("https://api.ip.sb/ip", {signal:c.signal,headers:{Accept:'text/plain'}})).text()).trim();
-          const geo = await (await fetch(`https://api.pearktrue.cn/api/ip/high/?ip=${ip}`, {signal:c.signal})).json();
-          clearTimeout(t);
-          if (geo.code === 200) {
-            const r = geo.data;
-            ipText.innerText = `${ip} · ${[r.province, r.city, r.district].filter((v,i,a) => v && a.indexOf(v) === i).join(' · ')}`;
-          } else { ipText.innerText = ip; }
-        } catch { ipText.innerText = "Enjoy your day"; }
+          const res = await fetch('https://uapi.cn/api/v1/network/myip');
+          const json = await res.json();
+          if (json.code === 200) {
+            const r = json.data;
+            // 拼接：IP · 省份 城市 · 运营商
+            ipText.innerText = `${r.ip} · ${r.province} ${r.city} · ${r.isp}`;
+          }
+        } catch (e) {
+          // 容错回退
+          ipText.innerText = "Welcome Back";
+        }
         ipBox.style.opacity = 1;
 
-        // 服务商识别 (Footer 注入)
+        // --- 服务商识别 ---
         try {
           const res = await fetch(window.location.href, { method: 'HEAD' });
           const s = (res.headers.get('server') || '').toLowerCase(), k = [...res.headers.keys()].join(' ');
@@ -108,13 +111,13 @@ const BG_URL = "https://t.alcy.cc/ycy";
           }
         } catch {}
 
-        // 一言
+        // --- 一言 ---
         fetch("https://v1.hitokoto.cn/?c=i").then(r=>r.json()).then(data => {
           input.placeholder = hitokoto = `${data.hitokoto} —— 「${data.from}」`;
         }).catch(()=>{});
       };
 
-      // 3. Search Engine Logic
+      // 3. 交互逻辑
       engineBtn.onclick = (e) => { e.stopPropagation(); engineMenu.classList.toggle("hidden"); };
       d.querySelectorAll(".engine-item").forEach(item => {
         item.onclick = (e) => {
