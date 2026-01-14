@@ -8,21 +8,14 @@
         <title>Panel</title>
 
         <link rel="dns-prefetch" href="https://t.alcy.cc" />
-        <link rel="dns-prefetch" href="https://assets.alicdn.com" />
+        <link rel="dns-prefetch" href="https://cdn.bootcdn.net" />
         <link rel="dns-prefetch" href="https://ico.kucat.cn" />
 
         <link 
             rel="stylesheet" 
             href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
-            crossorigin="anonymous" 
-            referrerpolicy="no-referrer"
-            media="print" 
-            onload="this.media='all'"
+            crossorigin="anonymous"
         />
-        
-        <noscript>
-            <link rel="stylesheet" href="https://assets.alicdn.com/g/p/font-awesome/6.4.2/css/all.min.css" />
-        </noscript>
     </head>
     <body class="relative min-h-screen antialiased bg-[#1a1a1a]">
         <div class="fixed inset-0 bg-black/35 pointer-events-none z-[-1]"></div>
@@ -37,10 +30,7 @@
     }
 
     body {
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        background-color: #1a1a1a;
     }
 
     body::before {
@@ -50,6 +40,8 @@
         background-image: var(--bg-url);
         background-size: cover;
         background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         opacity: 0;
         transition: opacity 1s ease-in-out;
         z-index: -2;

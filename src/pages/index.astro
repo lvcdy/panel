@@ -122,25 +122,21 @@ const BG_URL = "https://t.alcy.cc/ycy";
       async function fetchIP() {
         const ipText = document.getElementById("ip-address");
         const ipBox = document.getElementById("ip-info");
-        
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
         try {
           const ipRes = await fetch("https://api.ip.sb/ip", { 
             signal: controller.signal,
-            referrerPolicy: "no-referrer" 
+            headers: { 'Accept': 'text/plain' }
           });
-          if (!ipRes.ok) throw new Error("IP.sb 响应异常");
+          if (!ipRes.ok) throw new Error();
           const userIp = (await ipRes.text()).trim();
 
-          const geoRes = await fetch("https://v2.xxapi.cn/api/ip", { 
-            signal: controller.signal,
-            referrerPolicy: "no-referrer"
+          const geoRes = await fetch(`https://v2.xxapi.cn/api/ip?ip=${userIp}`, { 
+            signal: controller.signal 
           });
-          if (!geoRes.ok) throw new Error("XXAPI 响应异常");
           const geoData = await geoRes.json();
-          
           clearTimeout(timeoutId);
 
           let address = "";
@@ -153,10 +149,18 @@ const BG_URL = "https://t.alcy.cc/ycy";
             ipBox.style.opacity = "1";
           }
         } catch (e) {
-          console.error("IP获取失败:", e.message);
-          if (ipText && ipBox) {
-            ipText.innerText = "欢迎回来";
-            ipBox.style.opacity = "1";
+          try {
+            const fallbackRes = await fetch("https://v2.xxapi.cn/api/ip");
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData.code === 200 && ipText && ipBox) {
+              ipText.innerText = `${fallbackData.data.ip} · ${fallbackData.data.address}`;
+              ipBox.style.opacity = "1";
+            }
+          } catch (err) {
+            if (ipText && ipBox) {
+              ipText.innerText = "欢迎回来";
+              ipBox.style.opacity = "1";
+            }
           }
         }
       }
