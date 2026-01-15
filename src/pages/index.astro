@@ -87,11 +87,19 @@ const BG_URL = "https://t.alcy.cc/ycy";
     <div class="w-full max-w-[1500px] px-10 mt-12 flex-grow">
       {
         CATEGORIES.map((cat) => (
-          <div class="mb-10">
-            <h2 class="text-2xl font-bold mb-6 pl-2 drop-shadow-md">
-              {cat.title}
+          <div class="mb-10 category-section" data-collapsed="false">
+            <h2 class="text-2xl font-bold mb-6 pl-2 drop-shadow-md category-header flex items-center justify-between gap-3">
+              <span class="category-title">{cat.title}</span>
+              <button
+                type="button"
+                class="category-toggle-btn inline-flex items-center gap-2 text-sm font-medium text-white/80 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10"
+                aria-expanded="true"
+              >
+                <span class="category-toggle-label">收起</span>
+                <i class="fas fa-chevron-up category-toggle-icon text-xs" />
+              </button>
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+            <div class="category-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
               {cat.links.map((link) => (
                 <a
                   href={link.url}
@@ -156,6 +164,8 @@ const BG_URL = "https://t.alcy.cc/ycy";
       setupScrollListener,
       setupDocumentClickHandler,
       setupIPInfoHandler,
+      setupCategoryCollapse,
+      scheduleInit,
       DEFAULT_SEARCH_URL,
     } from "../lib/main";
 
@@ -243,15 +253,6 @@ const BG_URL = "https://t.alcy.cc/ycy";
           });
       };
 
-      const scheduleInit = (cb: () => void) => {
-        const ric = (window as any).requestIdleCallback;
-        if (ric) {
-          ric(cb, { timeout: 1200 });
-        } else {
-          setTimeout(cb, 200);
-        }
-      };
-
       setupEngineButtonHandler(els.engineBtn, els.menu);
 
       setupEngineItemHandlers(
@@ -283,15 +284,14 @@ const BG_URL = "https://t.alcy.cc/ycy";
       setupScrollListener(els.floatingSearchBtn);
 
       setupDocumentClickHandler(els.menu);
+      setupCategoryCollapse();
       scheduleInit(initData);
 
-      // 加载缓存的图标
       import("../lib/main").then(({ loadCachedIcons, setupIconCaching }) => {
         loadCachedIcons();
         setupIconCaching();
       });
 
-      // 检测所有URL状态
       scheduleInit(() => {
         import("../lib/main").then(({ checkAllUrls }) => {
           checkAllUrls(client);

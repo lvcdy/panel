@@ -82,6 +82,23 @@ const { bgUrl } = Astro.props;
     border-color: rgba(255, 255, 255, 0.2);
   }
 
+  .category-toggle-btn {
+    border: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+  }
+  .category-toggle-btn:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline-offset: 4px;
+  }
+  .category-toggle-icon {
+    transition: transform 0.2s ease;
+  }
+  .category-collapsed .category-toggle-icon {
+    transform: rotate(-90deg);
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
