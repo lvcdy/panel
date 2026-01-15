@@ -87,8 +87,7 @@ export const setupInputHandlers = (
     input: HTMLInputElement | null,
     searchTip: HTMLElement | null,
     onSearch: () => void,
-    onFilter: (query: string) => void,
-    onReset: () => void
+    onFilter: (query: string) => void
 ) => {
     if (!input) return;
 
@@ -104,7 +103,9 @@ export const setupInputHandlers = (
     };
 
     input.onblur = () => {
-        input.placeholder = originalPlaceholder;
+        if (!input.value.trim()) {
+            input.placeholder = originalPlaceholder;
+        }
         searchContainer?.classList.remove("focused");
         if (!input.value.trim()) {
             showAllIcons();

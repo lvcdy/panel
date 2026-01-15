@@ -155,7 +155,6 @@ const BG_URL = "https://t.alcy.cc/ycy";
     import {
       createElementCache,
       filterLinks,
-      hideAllIcons,
       showSearchTip,
       updateTime,
       setupEngineButtonHandler,
@@ -271,7 +270,6 @@ const BG_URL = "https://t.alcy.cc/ycy";
         els.searchTip,
         () => doSearch(),
         (query) => filterLinks(query),
-        () => hideAllIcons(),
       );
 
       setupSearchButtonHandler(els.searchBtn, () => doSearch());
