@@ -7,10 +7,10 @@ import {
     SCROLL_DURATION,
     SCROLL_THRESHOLD,
     DEFAULT_SEARCH_URL,
-    IP_INFO_URL,
 } from "./config";
 
 let cachedCategories: NodeListOf<Element> | null = null;
+let searchTipTimeout: NodeJS.Timeout | null = null;
 
 const getCategories = () => {
     if (!cachedCategories) {
@@ -21,6 +21,8 @@ const getCategories = () => {
 
 export const filterLinks = (query: string) => {
     const lowerQuery = query.toLowerCase();
+    let hasAnyVisibleCard = false;
+
     getCategories().forEach((catElement) => {
         const cards = catElement.querySelectorAll(SELECTOR_CARD);
         let hasVisibleCard = false;
@@ -33,7 +35,10 @@ export const filterLinks = (query: string) => {
             const matches = text.includes(lowerQuery) || url.includes(lowerQuery);
 
             cardElement.style.display = matches ? "" : "none";
-            if (matches) hasVisibleCard = true;
+            if (matches) {
+                hasVisibleCard = true;
+                hasAnyVisibleCard = true;
+            }
         });
 
         const title = catElement.querySelector(SELECTOR_CATEGORY_TITLE) as HTMLElement;
@@ -43,18 +48,21 @@ export const filterLinks = (query: string) => {
 
 export const showSearchTip = (tipElement: HTMLElement | null) => {
     if (!tipElement) return;
+    if (searchTipTimeout) clearTimeout(searchTipTimeout);
+
     tipElement.style.opacity = "1";
-    setTimeout(() => {
+    searchTipTimeout = setTimeout(() => {
         tipElement.style.opacity = "0";
     }, SEARCH_TIP_SHOW_TIME);
 };
 
 export const setupEngineButtonHandler = (engineBtn: HTMLElement | null, menu: HTMLElement | null) => {
-    if (!engineBtn) return;
-    engineBtn.onclick = (e) => {
+    if (!engineBtn || !menu) return;
+
+    engineBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        menu?.classList.toggle("hidden");
-    };
+        menu.classList.toggle("hidden");
+    });
 };
 
 export const setupEngineItemHandlers = (
@@ -63,14 +71,14 @@ export const setupEngineItemHandlers = (
     onEngineSelect: (url: string, iconClass: string) => void
 ) => {
     document.querySelectorAll(".engine-item").forEach((item) => {
-        (item as HTMLElement).onclick = (e) => {
+        (item as HTMLElement).addEventListener("click", (e) => {
             const target = e.currentTarget as HTMLElement;
             const url = target.dataset.url || DEFAULT_SEARCH_URL;
             const iconClass = target.dataset.icon || "";
             onEngineSelect(url, iconClass);
             menu?.classList.add("hidden");
             input?.focus();
-        };
+        });
     });
 };
 
@@ -81,7 +89,6 @@ const toggleCategoryVisibility = (visible: boolean) => {
 };
 
 export const hideAllIcons = () => toggleCategoryVisibility(false);
-
 export const showAllIcons = () => toggleCategoryVisibility(true);
 
 export const setupInputHandlers = (
@@ -93,44 +100,39 @@ export const setupInputHandlers = (
     if (!input) return;
 
     let originalPlaceholder = "";
-    const searchContainer = document.querySelector(".search-container") as HTMLElement | null;
 
-    input.onfocus = () => {
+    input.addEventListener("focus", () => {
         originalPlaceholder = input.placeholder;
         input.placeholder = "请输入搜索内容";
         if (searchTip) searchTip.style.opacity = "0";
-        searchContainer?.classList.add("focused");
-        hideAllIcons();
-    };
+        if (!input.value.trim()) hideAllIcons();
+    });
 
-    input.onblur = () => {
+    input.addEventListener("blur", () => {
         if (!input.value.trim()) {
             input.placeholder = originalPlaceholder;
-        }
-        searchContainer?.classList.remove("focused");
-        if (!input.value.trim()) {
             showAllIcons();
         }
-    };
+    });
 
-    input.oninput = () => {
+    input.addEventListener("input", () => {
         const query = input.value.trim();
-        query ? onFilter(query) : hideAllIcons();
-    };
+        query ? onFilter(query) : showAllIcons();
+    });
 
-    input.onkeydown = (e) => {
+    input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") onSearch();
         if (e.key === "Escape") {
             input.value = "";
             showAllIcons();
             input.blur();
         }
-    };
+    });
 };
 
 export const setupSearchButtonHandler = (searchBtn: HTMLElement | null, onSearch: () => void) => {
     if (!searchBtn) return;
-    searchBtn.onclick = onSearch;
+    searchBtn.addEventListener("click", onSearch);
 };
 
 export const setupFloatingButtonHandler = (
@@ -138,33 +140,33 @@ export const setupFloatingButtonHandler = (
     input: HTMLInputElement | null
 ) => {
     if (!floatingBtn) return;
-    floatingBtn.onclick = () => {
+
+    floatingBtn.addEventListener("click", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         setTimeout(() => input?.focus(), SCROLL_DURATION);
-    };
-};
-
-export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
-    window.addEventListener("scroll", () => {
-        if (!floatingBtn) return;
-        if (window.scrollY > SCROLL_THRESHOLD) {
-            floatingBtn.style.opacity = "1";
-            floatingBtn.style.pointerEvents = "auto";
-        } else {
-            floatingBtn.style.opacity = "0";
-            floatingBtn.style.pointerEvents = "none";
-        }
     });
 };
 
-export const setupDocumentClickHandler = (menu: HTMLElement | null) => {
-    document.onclick = () => menu?.classList.add("hidden");
+export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
+    if (!floatingBtn) return;
+
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    window.addEventListener("scroll", () => {
+        if (scrollTimeout) return;
+
+        scrollTimeout = setTimeout(() => {
+            if (window.scrollY > SCROLL_THRESHOLD) {
+                floatingBtn!.style.opacity = "1";
+                floatingBtn!.style.pointerEvents = "auto";
+            } else {
+                floatingBtn!.style.opacity = "0";
+                floatingBtn!.style.pointerEvents = "none";
+            }
+            scrollTimeout = null;
+        }, 100);
+    }, { passive: true });
 };
 
-export const setupIPInfoHandler = (ipBox: HTMLElement | null) => {
-    if (!ipBox) return;
-    ipBox.onclick = (e) => {
-        e.stopPropagation();
-        window.open(IP_INFO_URL, "_blank");
-    };
+export const setupDocumentClickHandler = (menu: HTMLElement | null) => {
+    document.addEventListener("click", () => menu?.classList.add("hidden"));
 };

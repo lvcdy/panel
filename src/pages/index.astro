@@ -164,134 +164,97 @@ const BG_URL = "https://t.alcy.cc/ycy";
       setupFloatingButtonHandler,
       setupScrollListener,
       setupDocumentClickHandler,
-      setupIPInfoHandler,
       setupCategoryCollapse,
       scheduleInit,
       DEFAULT_SEARCH_URL,
+      loadCachedIcons,
+      setupIconCaching,
+      checkAllUrls,
     } from "../lib/main";
 
-    (function () {
-      const els = createElementCache();
-      let searchUrl = DEFAULT_SEARCH_URL;
+    const els = createElementCache();
+    let searchUrl = DEFAULT_SEARCH_URL;
 
-      const doSearch = () => {
-        if (els.input && els.input.value.trim()) {
-          window.open(
-            searchUrl + encodeURIComponent(els.input.value.trim()),
-            "_blank",
-          );
-        } else {
-          showSearchTip(els.searchTip);
-        }
-      };
+    // 搜索功能
+    const doSearch = () => {
+      if (els.input?.value.trim()) {
+        window.open(
+          searchUrl + encodeURIComponent(els.input.value.trim()),
+          "_blank",
+        );
+      } else {
+        showSearchTip(els.searchTip);
+      }
+    };
 
-      setInterval(() => updateTime(els.clock, els.date), 1000);
-      updateTime(els.clock, els.date);
+    // 初始化时间显示
+    updateTime(els.clock, els.date);
+    setInterval(() => updateTime(els.clock, els.date), 1000);
 
-      const initData = async () => {
-        try {
-          const res: any = await client.network.getNetworkMyip({
-            _t: Date.now(),
-          });
-          const r = res?.data || res;
-          if (r?.ip && els.ip) {
-            const operator = r.llc || r.isp || "";
-            let loc = r.region && r.region !== "未知地区" ? r.region : "";
-            if (r.district && r.district !== "未知") loc += ` ${r.district}`;
-            els.ip.innerText = [r.ip, operator, loc]
-              .filter(Boolean)
-              .join(" · ");
-          }
-        } catch {
-          if (els.ip) els.ip.innerText = "Enjoy your day";
-        } finally {
-          if (els.ipBox) els.ipBox.style.opacity = "1";
-        }
+    // 初始化UI事件
+    setupEngineButtonHandler(els.engineBtn, els.menu);
+    setupEngineItemHandlers(els.menu, els.input, (url, iconClass) => {
+      searchUrl = url;
+      if (els.icon) {
+        els.icon.className = `${iconClass} text-xl text-white/80 transition-all`;
+      }
+    });
 
-        try {
-          const res = await fetch(window.location.href, {
-            method: "HEAD",
-            cache: "no-cache",
-          });
-          const s = (res.headers.get("server") || "").toLowerCase();
-          const k = [...res.headers.keys()].join(" ");
-          if (els.proName && els.proBox) {
-            let providerName = "";
-            let providerUrl = "";
+    setupInputHandlers(
+      els.input,
+      els.searchTip,
+      () => doSearch(),
+      (query) => filterLinks(query),
+    );
 
-            if (k.includes("ali-ray") || s.includes("esa")) {
-              providerName = "Alibaba Cloud ESA";
-              providerUrl = "https://www.aliyun.com/";
-            } else if (k.includes("cf-ray") || s.includes("cloudflare")) {
-              providerName = "Cloudflare Edge";
-              providerUrl = "https://www.cloudflare.com/";
-            } else {
-              providerName = "Global Edge Network";
-            }
+    setupSearchButtonHandler(els.searchBtn, () => doSearch());
+    setupFloatingButtonHandler(els.floatingSearchBtn, els.input);
+    setupScrollListener(els.floatingSearchBtn);
+    setupDocumentClickHandler(els.menu);
+    setupCategoryCollapse();
 
-            els.proName.innerText = providerName;
+    // 初始化图标缓存
+    loadCachedIcons();
+    setupIconCaching();
 
-            if (providerUrl) {
-              els.proBox.onclick = (e) => {
-                e.stopPropagation();
-                window.open(providerUrl, "_blank");
-              };
-            }
-            els.proBox.style.opacity = "1";
-          }
-        } catch {
-          if (els.proName) els.proName.innerText = "Edge Service";
-        }
-
-        fetch("https://v1.hitokoto.cn/?c=i")
-          .then((r) => r.json())
-          .then((d) => {
-            if (els.input)
-              els.input.placeholder = `${d.hitokoto} —— 「${d.from}」`;
-          })
-          .catch(() => {
-            if (els.input) els.input.placeholder = "永远相信美好的事情即将发生";
-          });
-      };
-
-      setupEngineButtonHandler(els.engineBtn, els.menu);
-
-      setupEngineItemHandlers(els.menu, els.input, (url, iconClass) => {
-        searchUrl = url;
-        if (els.icon) {
-          els.icon.className = `${iconClass} text-xl text-white/80 transition-all`;
-        }
-      });
-
-      setupIPInfoHandler(els.ipBox);
-
-      setupInputHandlers(
-        els.input,
-        els.searchTip,
-        () => doSearch(),
-        (query) => filterLinks(query),
-      );
-
-      setupSearchButtonHandler(els.searchBtn, () => doSearch());
-
-      setupFloatingButtonHandler(els.floatingSearchBtn, els.input);
-
-      setupScrollListener(els.floatingSearchBtn);
-
-      setupDocumentClickHandler(els.menu);
-      setupCategoryCollapse();
-      scheduleInit(initData);
-
-      import("../lib/main").then(({ loadCachedIcons, setupIconCaching }) => {
-        loadCachedIcons();
-        setupIconCaching();
-      });
-
-      scheduleInit(() => {
-        import("../lib/main").then(({ checkAllUrls }) => {
-          checkAllUrls(client);
+    // 异步加载网络信息和URL状态检测
+    scheduleInit(async () => {
+      try {
+        const res: any = await client.network.getNetworkMyip({
+          _t: Date.now(),
         });
-      });
-    })();
+        const r = res?.data || res;
+        if (r?.ip && els.ip) {
+          const operator = r.isp || "";
+          let loc = r.region && r.region !== "未知地区" ? r.region : "";
+          if (r.district && r.district !== "未知") loc += ` ${r.district}`;
+          els.ip.innerText = [r.ip, operator, loc].filter(Boolean).join(" · ");
+        }
+      } catch {
+        if (els.ip) els.ip.innerText = "Enjoy your day";
+      } finally {
+        if (els.ipBox) els.ipBox.style.opacity = "1";
+      }
+    });
+
+    // 获取随机一言作为占位符
+    scheduleInit(() => {
+      fetch("https://v1.hitokoto.cn/?c=i", {
+        signal: AbortSignal.timeout(3000),
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (els.input)
+            els.input.placeholder = `${d.hitokoto} —— 「${d.from}」`;
+        })
+        .catch(() => {
+          if (els.input) els.input.placeholder = "永远相信美好的事情即将发生";
+        });
+    });
+
+    // 检测URL状态
+    scheduleInit(() => {
+      checkAllUrls(client);
+    });
   </script>
 </Layout>

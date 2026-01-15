@@ -8,17 +8,15 @@ export default defineConfig({
 
   build: {
     format: 'file',
-    inlineStylesheets: 'always'
-  },
-
-  experimental: {
-    clientPrerender: true,
+    inlineStylesheets: 'always',
+    assets: '_assets'
   },
 
   vite: {
     build: {
       cssMinify: 'lightningcss',
-      chunkSizeWarningLimit: 1000,
+      minify: 'terser',
+      chunkSizeWarningLimit: 800,
       rollupOptions: {
         output: {
           manualChunks: {

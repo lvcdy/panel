@@ -9,17 +9,20 @@ const { bgUrl } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>Panel</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <link rel="preconnect" href="https://uapis.cn" />
     <link rel="preconnect" href="https://v1.hitokoto.cn" />
     <link rel="preconnect" href="https://ico.kucat.cn" />
     <link rel="preconnect" href="https://t.alcy.cc" />
     <link rel="dns-prefetch" href="https://ico.kucat.cn" />
-    <link rel="dns-prefetch" href="https://t.alcy.cc" />
-    {bgUrl && <link rel="preload" as="image" href={bgUrl} />}
+    {
+      bgUrl && (
+        <link rel="preload" as="image" href={bgUrl} fetchPriority="high" />
+      )
+    }
   </head>
   <body
     class="relative min-h-screen antialiased bg-[#1a1a1a] overflow-x-hidden selection:bg-white/20"
@@ -28,7 +31,6 @@ const { bgUrl } = Astro.props;
       class="fixed inset-0 bg-black/40 backdrop-blur-[1px] pointer-events-none z-[-1]"
     >
     </div>
-
     <slot />
   </body>
 </html>
@@ -36,8 +38,6 @@ const { bgUrl } = Astro.props;
 <style is:global>
   :root {
     --bg-url: none;
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-bg: rgba(255, 255, 255, 0.05);
   }
 
   body::before {
@@ -48,7 +48,6 @@ const { bgUrl } = Astro.props;
     opacity: 0;
     z-index: -2;
     transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateZ(0);
     will-change: opacity;
   }
 
@@ -59,27 +58,12 @@ const { bgUrl } = Astro.props;
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
   html {
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
-  }
-
-  .glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid var(--glass-border);
-  }
-
-  .sun-card {
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-  .sun-card:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.2);
   }
 
   .category-toggle-btn {
@@ -88,28 +72,9 @@ const { bgUrl } = Astro.props;
     color: inherit;
     cursor: pointer;
   }
+
   .category-toggle-btn:focus-visible {
     outline: 2px solid rgba(255, 255, 255, 0.35);
     outline-offset: 4px;
-  }
-  .category-toggle-icon {
-    transition: transform 0.2s ease;
-  }
-  .category-collapsed .category-toggle-icon {
-    transform: rotate(-90deg);
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .animate-fade-in {
-    animation: fadeIn 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
   }
 </style>

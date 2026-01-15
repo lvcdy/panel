@@ -14,13 +14,12 @@ const setCategoryCollapsed = (catElement: Element, collapsed: boolean) => {
     const icon = category.querySelector(SELECTOR_CATEGORY_TOGGLE_ICON) as HTMLElement | null;
 
     if (content) content.classList.toggle("hidden", collapsed);
-
     category.classList.toggle("category-collapsed", collapsed);
     category.setAttribute("data-collapsed", collapsed ? "true" : "false");
 
     if (toggleBtn) toggleBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");
     if (label) label.textContent = collapsed ? "展开" : "收起";
-    if (icon) icon.style.transform = collapsed ? "rotate(-90deg)" : "";
+    if (icon && icon.style) icon.style.transform = collapsed ? "rotate(-90deg)" : "none";
 };
 
 export const setupCategoryCollapse = () => {

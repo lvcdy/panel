@@ -5,7 +5,7 @@
 @layer base {
   body {
     @apply bg-[#1a1a1a] text-white overflow-x-hidden antialiased;
-    font-family: 'MiSans', 'Inter', 'PingFang SC', system-ui, sans-serif;
+    font-family: 'Inter', 'PingFang SC', system-ui, sans-serif;
   }
 }
 
@@ -19,53 +19,85 @@
 
   .sun-card {
     @apply will-change-transform;
-    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
-      background-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 200ms ease-out,
+      background-color 200ms ease-out,
+      border-color 200ms ease-out,
+      box-shadow 200ms ease-out;
   }
 
   .sun-card:hover {
-    @apply -translate-y-1.5 bg-white/15 border-white/20 shadow-xl;
+    @apply -translate-y-1 bg-white/15 border-white/20 shadow-lg;
   }
 
   .category-section {
     @apply will-change-transform;
-    transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
-      transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 200ms ease-out,
+      transform 200ms ease-out;
   }
 
   .category-section.hidden-icons {
     @apply opacity-0 pointer-events-none;
-    transform: translateY(1.5rem);
+    transform: translateY(1rem);
   }
 
   .search-container {
-    transition: backdrop-filter 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    @apply transition-all duration-200;
   }
 
-  .search-container.focused {
-    @apply backdrop-blur-0;
+  /* 优化的搜索引擎菜单动画 */
+  @keyframes slideDownFade {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
-}
 
-#clock {
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-}
+  @keyframes slideUpFade {
+    to {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+  }
 
-@screen sm {
-  .sun-card {
-    @apply p-5;
+  #engineMenu {
+    @apply will-change-transform;
+    transform-origin: top left;
+  }
+
+  #engineMenu:not(.hidden) {
+    animation: slideDownFade 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  #engineMenu.hidden {
+    animation: slideUpFade 120ms ease-in forwards;
+    pointer-events: none;
+  }
+
+  .engine-item {
+    @apply transition-colors duration-150 ease-out;
+  }
+
+  #clock {
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .status-indicator {
+    @apply transition-all duration-300 ease-out;
   }
 }
 
 @media (max-width: 640px) {
-  .sun-card {
-    @apply p-4;
+  #clock {
+    @apply text-5xl;
   }
 
-  #clock {
-    @apply text-6xl;
+  .sun-card {
+    @apply p-4;
   }
 }
