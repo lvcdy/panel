@@ -5,33 +5,65 @@ const currentYear = new Date().getFullYear();
 
 <div class="border-t border-white/10 my-10 border-dashed mx-10 lg:mx-32"></div>
 
-<footer class="mb-12 flex flex-col items-center justify-center px-6 py-8 select-none">
-  <div class="text-white/60 text-[11px] sm:text-xs text-center leading-relaxed [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]">
-    
+<footer
+  class="mb-12 flex flex-col items-center justify-center px-6 py-8 select-none"
+>
+  <div
+    class="text-white/60 text-[11px] sm:text-xs text-center leading-relaxed [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]"
+  >
     <div class="mb-1">
-      &copy; {currentYear} <span class="font-bold text-white/80">{profileConfig.name}</span>. All Rights Reserved.
+      &copy; {currentYear}
+      <span class="font-bold text-white/80">{profileConfig.name}</span>. All
+      Rights Reserved.
     </div>
 
     <div class="mb-3 opacity-80">
-      Powered by 
-      <a class="text-white hover:underline font-medium" target="_blank" href="https://astro.build">Astro</a> & 
-      <a class="text-white hover:underline font-medium" target="_blank" href="https://github.com/lvcdy/panel">Panel</a>
+      Powered by
+      <a
+        class="text-white hover:underline font-medium"
+        target="_blank"
+        href="https://astro.build">Astro</a
+      > &
+      <a
+        class="text-white hover:underline font-medium"
+        target="_blank"
+        href="https://github.com/lvcdy/panel">Panel</a
+      >
     </div>
 
     <div class="flex flex-col items-center gap-y-2 mb-6 text-white/50">
-      <a href="https://beian.miit.gov.cn/" target="_blank" class="hover:text-white transition-all flex items-center gap-1.5">
-        <img src="https://ywtb.mps.gov.cn/authservice/images/foot-icp.png" class="w-3 h-3 brightness-110 opacity-80" alt="ICP">
+      <a
+        href="https://beian.miit.gov.cn/"
+        target="_blank"
+        class="hover:text-white transition-all flex items-center gap-1.5"
+      >
+        <img
+          src="https://ywtb.mps.gov.cn/authservice/images/foot-icp.png"
+          class="w-3 h-3 brightness-110 opacity-80"
+          alt="ICP"
+        />
         <span>辽ICP备2025051495号-2</span>
       </a>
-      <a href="https://beian.mps.gov.cn/#/query/webSearch?code=21070002000117" target="_blank" class="hover:text-white transition-all flex items-center gap-1.5">
-        <img src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png" class="w-3 h-3 brightness-110 opacity-80" alt="GWA">
+      <a
+        href="https://beian.mps.gov.cn/#/query/webSearch?code=21070002000117"
+        target="_blank"
+        class="hover:text-white transition-all flex items-center gap-1.5"
+      >
+        <img
+          src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png"
+          class="w-3 h-3 brightness-110 opacity-80"
+          alt="GWA"
+        />
         <span>辽公网安备21070002000117号</span>
       </a>
     </div>
 
-    <div id="pro-info" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 text-[9px] text-white/40 opacity-0 transition-opacity duration-1000 uppercase tracking-[0.2em]">
-      <div class="w-1 h-1 rounded-full bg-blue-500/60 animate-pulse"></div>
-      <span id="pro-name">Detecting...</span>
+    <div
+      id="pro-info"
+      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 transition-opacity duration-1000"
+    >
+      <i class="fas fa-server text-[10px]"></i>
+      <span id="pro-name">正在同步服务数据...</span>
     </div>
   </div>
 </footer>
