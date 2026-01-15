@@ -6,6 +6,7 @@ import "../styles/global.css";
 
 const ICON_API = "https://ico.kucat.cn/get.php?url=";
 const BG_URL = "https://t.alcy.cc/ycy";
+const IP_LOOKUP_URL = "https://ip.sb";
 ---
 
 <Layout bgUrl={BG_URL}>
@@ -174,6 +175,13 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
     const els = createElementCache();
     let searchUrl = DEFAULT_SEARCH_URL;
+
+    // IP 详情跳转
+    if (els.ipBox) {
+      els.ipBox.addEventListener("click", () => {
+        window.open(IP_LOOKUP_URL, "_blank");
+      });
+    }
 
     // 搜索功能
     const doSearch = () => {
