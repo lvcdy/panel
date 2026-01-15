@@ -41,7 +41,9 @@ const BG_URL = "https://t.alcy.cc/ycy";
     </div>
 
     <div class="mt-12 w-full max-w-[650px] px-6 relative">
-      <div class="glass flex items-center h-16 rounded-2xl px-2 shadow-2xl">
+      <div
+        class="search-container glass flex items-center h-16 rounded-2xl px-2 shadow-2xl"
+      >
         <div
           id="engineBtn"
           class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all"
@@ -153,7 +155,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
     import {
       createElementCache,
       filterLinks,
-      resetLinks,
+      hideAllIcons,
       showSearchTip,
       updateTime,
       setupEngineButtonHandler,
@@ -255,17 +257,12 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
       setupEngineButtonHandler(els.engineBtn, els.menu);
 
-      setupEngineItemHandlers(
-        els.menu,
-        els.icon,
-        els.input,
-        (url, iconClass) => {
-          searchUrl = url;
-          if (els.icon) {
-            els.icon.className = `${iconClass} text-xl text-white/80 transition-all`;
-          }
-        },
-      );
+      setupEngineItemHandlers(els.menu, els.input, (url, iconClass) => {
+        searchUrl = url;
+        if (els.icon) {
+          els.icon.className = `${iconClass} text-xl text-white/80 transition-all`;
+        }
+      });
 
       setupIPInfoHandler(els.ipBox);
 
@@ -274,7 +271,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
         els.searchTip,
         () => doSearch(),
         (query) => filterLinks(query),
-        () => resetLinks(),
+        () => hideAllIcons(),
       );
 
       setupSearchButtonHandler(els.searchBtn, () => doSearch());

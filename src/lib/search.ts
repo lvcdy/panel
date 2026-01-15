@@ -36,19 +36,6 @@ export const filterLinks = (query: string) => {
     });
 };
 
-export const resetLinks = () => {
-    const categories = document.querySelectorAll(SELECTOR_CATEGORIES);
-    categories.forEach((catElement) => {
-        const cards = catElement.querySelectorAll(SELECTOR_CARD);
-        cards.forEach((card: Element) => {
-            (card as HTMLElement).style.display = "";
-        });
-
-        const title = catElement.querySelector(SELECTOR_CATEGORY_TITLE) as HTMLElement;
-        if (title) title.style.display = "";
-    });
-};
-
 export const showSearchTip = (tipElement: HTMLElement | null) => {
     if (!tipElement) return;
     tipElement.style.opacity = "1";
@@ -67,7 +54,6 @@ export const setupEngineButtonHandler = (engineBtn: HTMLElement | null, menu: HT
 
 export const setupEngineItemHandlers = (
     menu: HTMLElement | null,
-    _icon: HTMLElement | null,
     input: HTMLInputElement | null,
     onEngineSelect: (url: string, iconClass: string) => void
 ) => {
@@ -83,6 +69,20 @@ export const setupEngineItemHandlers = (
     });
 };
 
+export const hideAllIcons = () => {
+    const categories = document.querySelectorAll(SELECTOR_CATEGORIES);
+    categories.forEach((catElement) => {
+        (catElement as HTMLElement).classList.add("hidden-icons");
+    });
+};
+
+export const showAllIcons = () => {
+    const categories = document.querySelectorAll(SELECTOR_CATEGORIES);
+    categories.forEach((catElement) => {
+        (catElement as HTMLElement).classList.remove("hidden-icons");
+    });
+};
+
 export const setupInputHandlers = (
     input: HTMLInputElement | null,
     searchTip: HTMLElement | null,
@@ -93,27 +93,34 @@ export const setupInputHandlers = (
     if (!input) return;
 
     let originalPlaceholder = "";
+    const searchContainer = document.querySelector(".search-container") as HTMLElement | null;
 
     input.onfocus = () => {
         originalPlaceholder = input.placeholder;
         input.placeholder = "请输入搜索内容";
         if (searchTip) searchTip.style.opacity = "0";
+        searchContainer?.classList.add("focused");
+        hideAllIcons();
     };
 
     input.onblur = () => {
         input.placeholder = originalPlaceholder;
+        searchContainer?.classList.remove("focused");
+        if (!input.value.trim()) {
+            showAllIcons();
+        }
     };
 
     input.oninput = () => {
         const query = input.value.trim();
-        query ? onFilter(query) : onReset();
+        query ? onFilter(query) : hideAllIcons();
     };
 
     input.onkeydown = (e) => {
         if (e.key === "Enter") onSearch();
         if (e.key === "Escape") {
             input.value = "";
-            onReset();
+            showAllIcons();
             input.blur();
         }
     };
