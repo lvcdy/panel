@@ -10,6 +10,8 @@ export const createElementCache = () => ({
     engineBtn: qs<HTMLElement>("#engineBtn"),
     menu: qs<HTMLElement>("#engineMenu"),
     icon: qs<HTMLElement>("#currentIcon"),
+    proName: qs<HTMLElement>("#pro-name"),
+    proBox: qs<HTMLElement>("#pro-info"),
     searchBtn: qs<HTMLElement>("#searchBtn"),
     searchTip: qs<HTMLElement>("#searchTip"),
     floatingSearchBtn: qs<HTMLElement>("#floatingSearchBtn"),

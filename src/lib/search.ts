@@ -7,6 +7,7 @@ import {
     SCROLL_DURATION,
     SCROLL_THRESHOLD,
     DEFAULT_SEARCH_URL,
+    IP_INFO_URL,
 } from "./config";
 
 let cachedCategories: NodeListOf<Element> | null = null;
@@ -167,4 +168,12 @@ export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
 
 export const setupDocumentClickHandler = (menu: HTMLElement | null) => {
     document.addEventListener("click", () => menu?.classList.add("hidden"));
+};
+
+export const setupIPInfoHandler = (ipBox: HTMLElement | null) => {
+    if (!ipBox) return;
+    ipBox.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.open(IP_INFO_URL, "_blank");
+    });
 };

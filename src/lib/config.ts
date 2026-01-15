@@ -10,6 +10,7 @@ export const SELECTOR_CATEGORY_TITLE = "h2.text-2xl";
 
 // Search Configuration
 export const DEFAULT_SEARCH_URL = "https://www.baidu.com/s?wd=";
+export const IP_INFO_URL = "https://ip.xxir.com/";
 export const SEARCH_TIP_SHOW_TIME = 2000;
 
 // Scroll Configuration

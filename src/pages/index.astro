@@ -6,7 +6,6 @@ import "../styles/global.css";
 
 const ICON_API = "https://ico.kucat.cn/get.php?url=";
 const BG_URL = "https://t.alcy.cc/ycy";
-const IP_LOOKUP_URL = "https://ip.sb";
 ---
 
 <Layout bgUrl={BG_URL}>
@@ -165,6 +164,7 @@ const IP_LOOKUP_URL = "https://ip.sb";
       setupFloatingButtonHandler,
       setupScrollListener,
       setupDocumentClickHandler,
+      setupIPInfoHandler,
       setupCategoryCollapse,
       scheduleInit,
       DEFAULT_SEARCH_URL,
@@ -176,12 +176,7 @@ const IP_LOOKUP_URL = "https://ip.sb";
     const els = createElementCache();
     let searchUrl = DEFAULT_SEARCH_URL;
 
-    // IP 详情跳转
-    if (els.ipBox) {
-      els.ipBox.addEventListener("click", () => {
-        window.open(IP_LOOKUP_URL, "_blank");
-      });
-    }
+    setupIPInfoHandler(els.ipBox);
 
     // 搜索功能
     const doSearch = () => {
@@ -227,13 +222,14 @@ const IP_LOOKUP_URL = "https://ip.sb";
 
     // 异步加载网络信息和URL状态检测
     scheduleInit(async () => {
+      // 同步 IP 信息
       try {
         const res: any = await client.network.getNetworkMyip({
           _t: Date.now(),
         });
         const r = res?.data || res;
         if (r?.ip && els.ip) {
-          const operator = r.isp || "";
+          const operator = r.llc || r.isp || "";
           let loc = r.region && r.region !== "未知地区" ? r.region : "";
           if (r.district && r.district !== "未知") loc += ` ${r.district}`;
           els.ip.innerText = [r.ip, operator, loc].filter(Boolean).join(" · ");
@@ -242,6 +238,43 @@ const IP_LOOKUP_URL = "https://ip.sb";
         if (els.ip) els.ip.innerText = "Enjoy your day";
       } finally {
         if (els.ipBox) els.ipBox.style.opacity = "1";
+      }
+
+      // 识别并展示边缘提供商
+      try {
+        const res = await fetch(window.location.href, {
+          method: "HEAD",
+          cache: "no-cache",
+        });
+        const serverHeader = (res.headers.get("server") || "").toLowerCase();
+        const headerKeys = [...res.headers.keys()].join(" ");
+        if (els.proName && els.proBox) {
+          let providerName = "";
+          let providerUrl = "";
+
+          if (headerKeys.includes("ali-ray") || serverHeader.includes("esa")) {
+            providerName = "Alibaba Cloud ESA";
+            providerUrl = "https://www.aliyun.com/";
+          } else if (headerKeys.includes("cf-ray") || serverHeader.includes("cloudflare")) {
+            providerName = "Cloudflare Edge";
+            providerUrl = "https://www.cloudflare.com/";
+          } else {
+            providerName = "Global Edge Network";
+          }
+
+          els.proName.innerText = providerName;
+
+          if (providerUrl) {
+            els.proBox.onclick = (e) => {
+              e.stopPropagation();
+              window.open(providerUrl, "_blank");
+            };
+          }
+
+          els.proBox.style.opacity = "1";
+        }
+      } catch {
+        if (els.proName) els.proName.innerText = "Edge Service";
       }
     });
 
