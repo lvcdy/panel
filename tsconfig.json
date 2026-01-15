@@ -5,15 +5,28 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true
   },
-  "include": [".astro/types.d.ts", "**/*"],
+  "include": [
+    "src/**/*",
+    ".astro/types.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.astro"
+  ],
   "exclude": ["dist", "node_modules"]
 }

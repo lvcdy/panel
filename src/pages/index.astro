@@ -8,21 +8,33 @@ const ICON_API = "https://ico.kucat.cn/get.php?url=";
 const BG_URL = "https://t.alcy.cc/ycy";
 ---
 
-<Layout>
+<Layout bgUrl={BG_URL}>
   <script is:inline define:vars={{ BG_URL }}>
     const img = new Image();
+    img.fetchPriority = "high";
+    img.decoding = "async";
     img.src = BG_URL;
     img.onload = () => {
-      document.documentElement.style.setProperty('--bg-url', `url("${BG_URL}")`);
-      document.body.classList.add('bg-loaded');
+      document.documentElement.style.setProperty(
+        "--bg-url",
+        `url("${BG_URL}")`,
+      );
+      document.body.classList.add("bg-loaded");
     };
   </script>
 
-  <main class="flex flex-col items-center min-h-screen relative z-10 text-white">
+  <main
+    class="flex flex-col items-center min-h-screen relative z-10 text-white"
+  >
     <div class="mt-24 text-center select-none">
-      <h1 id="clock" class="text-7xl font-bold tracking-tight drop-shadow-2xl">--:--:--</h1>
+      <h1 id="clock" class="text-7xl font-bold tracking-tight drop-shadow-2xl">
+        --:--:--
+      </h1>
       <p id="date" class="text-xl font-medium opacity-90 mt-1">载入中...</p>
-      <div id="ip-info" class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 transition-opacity duration-1000">
+      <div
+        id="ip-info"
+        class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 transition-opacity duration-1000"
+      >
         <i class="fas fa-location-dot text-[10px]"></i>
         <span id="ip-address">正在同步网络数据...</span>
       </div>
@@ -30,106 +42,208 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
     <div class="mt-12 w-full max-w-[650px] px-6 relative">
       <div class="glass flex items-center h-16 rounded-2xl px-2 shadow-2xl">
-        <div id="engineBtn" class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all">
+        <div
+          id="engineBtn"
+          class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all"
+        >
           <i id="currentIcon" class="fas fa-paw text-xl text-white/80"></i>
         </div>
-        <input type="text" id="searchInput" placeholder="正在思考..." class="bg-transparent flex-grow h-full px-4 outline-none placeholder-white/40 font-medium" />
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="正在思考..."
+          class="bg-transparent flex-grow h-full px-4 outline-none placeholder-white/40 font-medium"
+        />
         <i class="fas fa-search mr-4 opacity-40"></i>
       </div>
-      <div id="engineMenu" class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col z-50 shadow-2xl overflow-hidden">
-        {SEARCH_ENGINES.map(e => (
-          <div class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium" data-url={e.url} data-icon={e.icon}>
-            <i class={`${e.icon} w-5 text-center`} />
-            <span>{e.name}</span>
-          </div>
-        ))}
+      <div
+        id="engineMenu"
+        class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col z-50 shadow-2xl overflow-hidden"
+      >
+        {
+          SEARCH_ENGINES.map((e) => (
+            <div
+              class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium"
+              data-url={e.url}
+              data-icon={e.icon}
+            >
+              <i class={`${e.icon} w-5 text-center`} />
+              <span>{e.name}</span>
+            </div>
+          ))
+        }
       </div>
     </div>
 
     <div class="w-full max-w-[1500px] px-10 mt-12 flex-grow">
-      {CATEGORIES.map(cat => (
-        <div class="mb-10">
-          <h2 class="text-2xl font-bold mb-6 pl-2 drop-shadow-md">{cat.title}</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
-            {cat.links.map(link => (
-              <a href={link.url} target="_blank" class="glass sun-card flex items-center p-5 rounded-[1.8rem] group">
-                <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5 text-2xl">
-                  <img src={ICON_API + link.url} class="w-full h-full object-contain transition-opacity opacity-0" onload="this.style.opacity=1" onerror="this.nextElementSibling.classList.remove('hidden');this.remove()" />
-                  <div class="hidden w-full h-full flex items-center justify-center" style={`color:${link.color}`}><i class={link.icon} /></div>
-                </div>
-                <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">{link.name}</div>
-              </a>
-            ))}
+      {
+        CATEGORIES.map((cat) => (
+          <div class="mb-10">
+            <h2 class="text-2xl font-bold mb-6 pl-2 drop-shadow-md">
+              {cat.title}
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+              {cat.links.map((link) => (
+                <a
+                  href={link.url}
+                  target="_blank"
+                  class="glass sun-card flex items-center p-5 rounded-[1.8rem] group"
+                >
+                  <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5 text-2xl">
+                    <img
+                      src={ICON_API + link.url}
+                      loading="lazy"
+                      decoding="async"
+                      fetchpriority="low"
+                      class="w-full h-full object-contain transition-opacity opacity-0"
+                      onload="this.style.opacity=1"
+                      onerror="this.nextElementSibling.classList.remove('hidden');this.remove()"
+                    />
+                    <div
+                      class="hidden w-full h-full flex items-center justify-center"
+                      style={`color:${link.color}`}
+                    >
+                      <i class={link.icon} />
+                    </div>
+                  </div>
+                  <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">
+                    {link.name}
+                  </div>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      }
     </div>
     <Footer />
   </main>
 
   <script>
-    import { client } from '../lib/uapi';
+    import { client } from "../lib/uapi";
 
     (function () {
       const $ = (s: string) => document.querySelector(s) as HTMLElement;
       const els = {
-        clock: $('#clock'), date: $('#date'), ip: $('#ip-address'), ipBox: $('#ip-info'),
-        input: $('#searchInput') as HTMLInputElement, engineBtn: $('#engineBtn'), menu: $('#engineMenu'), icon: $('#currentIcon')
+        clock: $("#clock"),
+        date: $("#date"),
+        ip: $("#ip-address"),
+        ipBox: $("#ip-info"),
+        input: $("#searchInput") as HTMLInputElement,
+        engineBtn: $("#engineBtn"),
+        menu: $("#engineMenu"),
+        icon: $("#currentIcon"),
+        proName: $("#pro-name"),
+        proBox: $("#pro-info"),
       };
-      
+
       let searchUrl = "https://www.baidu.com/s?wd=";
 
       const updateTime = () => {
         const now = new Date();
-        els.clock.innerText = now.toLocaleTimeString('zh-CN', { hour12: false });
-        els.date.innerText = now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
+        if (els.clock)
+          els.clock.innerText = now.toLocaleTimeString("zh-CN", {
+            hour12: false,
+          });
+        if (els.date)
+          els.date.innerText = now.toLocaleDateString("zh-CN", {
+            month: "long",
+            day: "numeric",
+            weekday: "long",
+          });
       };
-      setInterval(updateTime, 1000); 
+      setInterval(updateTime, 1000);
       updateTime();
 
       const initData = async () => {
         try {
-          const res: any = await client.network.getNetworkMyip({ _t: Date.now() });
-          const r = res.data || res;
-
-          if (r?.ip) {
-            const operator = r.llc || r.isp || "未知运营商";
-            let loc = (r.region && r.region !== "未知地区") ? r.region : "";
+          const res: any = await client.network.getNetworkMyip({
+            _t: Date.now(),
+          });
+          const r = res?.data || res;
+          if (r?.ip && els.ip) {
+            const operator = r.llc || r.isp || "";
+            let loc = r.region && r.region !== "未知地区" ? r.region : "";
             if (r.district && r.district !== "未知") loc += ` ${r.district}`;
-            els.ip.innerText = `${r.ip} · ${operator}${loc ? ' · ' + loc : ''}`;
-          } else {
-            els.ip.innerText = "Enjoy your day";
+            els.ip.innerText = [r.ip, operator, loc]
+              .filter(Boolean)
+              .join(" · ");
           }
         } catch {
-          els.ip.innerText = "Enjoy your day";
+          if (els.ip) els.ip.innerText = "Enjoy your day";
         } finally {
-          els.ipBox.style.opacity = "1";
+          if (els.ipBox) els.ipBox.style.opacity = "1";
         }
 
-        fetch("https://v1.hitokoto.cn/?c=i").then(r => r.json()).then(d => {
-          els.input.placeholder = `${d.hitokoto} —— 「${d.from}」`;
-        }).catch(() => {
-          els.input.placeholder = "永远相信美好的事情即将发生";
-        });
+        try {
+          const res = await fetch(window.location.href, {
+            method: "HEAD",
+            cache: "no-cache",
+          });
+          const s = (res.headers.get("server") || "").toLowerCase();
+          const k = [...res.headers.keys()].join(" ");
+          if (els.proName && els.proBox) {
+            els.proName.innerText =
+              k.includes("ali-ray") || s.includes("esa")
+                ? "Alibaba Cloud ESA"
+                : k.includes("cf-ray") || s.includes("cloudflare")
+                  ? "Cloudflare Edge"
+                  : "Global Edge Network";
+            els.proBox.style.opacity = "1";
+          }
+        } catch {
+          if (els.proName) els.proName.innerText = "Edge Service";
+        }
+
+        fetch("https://v1.hitokoto.cn/?c=i")
+          .then((r) => r.json())
+          .then((d) => {
+            if (els.input)
+              els.input.placeholder = `${d.hitokoto} —— 「${d.from}」`;
+          })
+          .catch(() => {
+            if (els.input) els.input.placeholder = "永远相信美好的事情即将发生";
+          });
       };
 
-      els.engineBtn.onclick = (e) => { e.stopPropagation(); els.menu.classList.toggle("hidden"); };
-      document.querySelectorAll(".engine-item").forEach(item => {
+      const scheduleInit = (cb: () => void) => {
+        const ric = (window as any).requestIdleCallback;
+        if (ric) {
+          ric(cb, { timeout: 1200 });
+        } else {
+          setTimeout(cb, 200);
+        }
+      };
+      if (els.engineBtn) {
+        els.engineBtn.onclick = (e) => {
+          e.stopPropagation();
+          els.menu?.classList.toggle("hidden");
+        };
+      }
+
+      document.querySelectorAll(".engine-item").forEach((item) => {
         (item as HTMLElement).onclick = (e) => {
           const target = e.currentTarget as HTMLElement;
           searchUrl = target.dataset.url || searchUrl;
-          els.icon.className = `${target.dataset.icon} text-xl text-white/80 transition-all`;
-          els.menu.classList.add("hidden");
-          els.input.focus();
+          if (els.icon)
+            els.icon.className = `${target.dataset.icon} text-xl text-white/80 transition-all`;
+          els.menu?.classList.add("hidden");
+          els.input?.focus();
         };
       });
-      els.input.onkeydown = (e) => {
-        if (e.key === "Enter" && els.input.value.trim()) 
-          window.open(searchUrl + encodeURIComponent(els.input.value.trim()), "_blank");
-      };
-      document.onclick = () => els.menu.classList.add("hidden");
-      
-      initData();
+
+      if (els.input) {
+        els.input.onkeydown = (e) => {
+          if (e.key === "Enter" && els.input.value.trim())
+            window.open(
+              searchUrl + encodeURIComponent(els.input.value.trim()),
+              "_blank",
+            );
+        };
+      }
+
+      document.onclick = () => els.menu?.classList.add("hidden");
+      scheduleInit(initData);
     })();
   </script>
 </Layout>

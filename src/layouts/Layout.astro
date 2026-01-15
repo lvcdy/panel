@@ -1,26 +1,45 @@
+---
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
+const { bgUrl } = Astro.props;
+---
+
 <!doctype html>
 <html lang="zh-CN" class="scrollbar-hide">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
     <title>Panel</title>
-    
-    <link rel="dns-prefetch" href="https://api.pearktrue.cn" />
-    <link rel="dns-prefetch" href="https://v1.hitokoto.cn" />
-    <link rel="dns-prefetch" href="https://api.ip.sb" />
-    
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <link rel="preconnect" href="https://uapis.cn" />
+    <link rel="preconnect" href="https://v1.hitokoto.cn" />
+    <link rel="preconnect" href="https://ico.kucat.cn" />
+    <link rel="preconnect" href="https://t.alcy.cc" />
+    <link rel="dns-prefetch" href="https://ico.kucat.cn" />
+    <link rel="dns-prefetch" href="https://t.alcy.cc" />
+    {bgUrl && <link rel="preload" as="image" href={bgUrl} />}
   </head>
-  <body class="relative min-h-screen antialiased bg-[#1a1a1a] overflow-x-hidden">
-    <div class="fixed inset-0 bg-black/30 backdrop-blur-[2px] pointer-events-none z-[-1]"></div>
+  <body
+    class="relative min-h-screen antialiased bg-[#1a1a1a] overflow-x-hidden selection:bg-white/20"
+  >
+    <div
+      class="fixed inset-0 bg-black/40 backdrop-blur-[1px] pointer-events-none z-[-1]"
+    >
+    </div>
+
     <slot />
   </body>
 </html>
 
 <style is:global>
-  :root { --bg-url: none; }
-  
+  :root {
+    --bg-url: none;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+  }
+
   body::before {
     content: "";
     position: fixed;
@@ -28,32 +47,57 @@
     background: var(--bg-url) center/cover no-repeat fixed;
     opacity: 0;
     z-index: -2;
-    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
     will-change: opacity;
   }
-  
-  body.bg-loaded::before { opacity: 1; }
 
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  html { 
-    scrollbar-width: none; 
+  body.bg-loaded::before {
+    opacity: 1;
+  }
+
+  /* 隐藏滚动条 */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  html {
+    scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
 
+  /* 通用毛玻璃效果 */
   .glass {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid var(--glass-border);
   }
 
-  .fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
+  /* 卡片悬停微动 */
+  .sun-card {
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .sun-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 
+  /* 全局进场动画 */
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  /* 建议在 index.astro 的 main 标签上使用此类名 */
+  .animate-fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
   }
 </style>
