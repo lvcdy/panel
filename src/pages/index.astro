@@ -183,12 +183,27 @@ const BG_URL = "https://t.alcy.cc/ycy";
           const s = (res.headers.get("server") || "").toLowerCase();
           const k = [...res.headers.keys()].join(" ");
           if (els.proName && els.proBox) {
-            els.proName.innerText =
-              k.includes("ali-ray") || s.includes("esa")
-                ? "Alibaba Cloud ESA"
-                : k.includes("cf-ray") || s.includes("cloudflare")
-                  ? "Cloudflare Edge"
-                  : "Global Edge Network";
+            let providerName = "";
+            let providerUrl = "";
+
+            if (k.includes("ali-ray") || s.includes("esa")) {
+              providerName = "Alibaba Cloud ESA";
+              providerUrl = "https://www.aliyun.com/product/esa";
+            } else if (k.includes("cf-ray") || s.includes("cloudflare")) {
+              providerName = "Cloudflare Edge";
+              providerUrl = "https://www.cloudflare.com/";
+            } else {
+              providerName = "Global Edge Network";
+            }
+
+            els.proName.innerText = providerName;
+
+            if (providerUrl) {
+              els.proBox.onclick = (e) => {
+                e.stopPropagation();
+                window.open(providerUrl, "_blank");
+              };
+            }
             els.proBox.style.opacity = "1";
           }
         } catch {
