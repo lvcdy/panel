@@ -54,7 +54,16 @@ const BG_URL = "https://t.alcy.cc/ycy";
           placeholder="正在思考..."
           class="bg-transparent flex-grow h-full px-4 outline-none placeholder-white/40 font-medium"
         />
-        <i class="fas fa-search mr-4 opacity-40"></i>
+        <i
+          id="searchBtn"
+          class="fas fa-search mr-4 opacity-40 cursor-pointer hover:opacity-70 transition-opacity"
+        ></i>
+      </div>
+      <div
+        id="searchTip"
+        class="mt-2 text-center text-red-400 text-sm opacity-0 transition-opacity duration-300"
+      >
+        请输入搜索内容
       </div>
       <div
         id="engineMenu"
@@ -135,9 +144,31 @@ const BG_URL = "https://t.alcy.cc/ycy";
         icon: $("#currentIcon"),
         proName: $("#pro-name"),
         proBox: $("#pro-info"),
+        searchBtn: $("#searchBtn"),
+        searchTip: $("#searchTip"),
       };
 
       let searchUrl = "https://www.baidu.com/s?wd=";
+
+      const showSearchTip = () => {
+        if (els.searchTip) {
+          els.searchTip.style.opacity = "1";
+          setTimeout(() => {
+            if (els.searchTip) els.searchTip.style.opacity = "0";
+          }, 2000);
+        }
+      };
+
+      const doSearch = () => {
+        if (els.input && els.input.value.trim()) {
+          window.open(
+            searchUrl + encodeURIComponent(els.input.value.trim()),
+            "_blank",
+          );
+        } else {
+          showSearchTip();
+        }
+      };
 
       const updateTime = () => {
         const now = new Date();
@@ -248,12 +279,28 @@ const BG_URL = "https://t.alcy.cc/ycy";
       });
 
       if (els.input) {
+        let originalPlaceholder = "";
+
+        els.input.onfocus = () => {
+          originalPlaceholder = els.input.placeholder;
+          els.input.placeholder = "请输入搜索内容";
+          if (els.searchTip) els.searchTip.style.opacity = "0";
+        };
+
+        els.input.onblur = () => {
+          els.input.placeholder = originalPlaceholder;
+        };
+
         els.input.onkeydown = (e) => {
-          if (e.key === "Enter" && els.input.value.trim())
-            window.open(
-              searchUrl + encodeURIComponent(els.input.value.trim()),
-              "_blank",
-            );
+          if (e.key === "Enter") {
+            doSearch();
+          }
+        };
+      }
+
+      if (els.searchBtn) {
+        els.searchBtn.onclick = () => {
+          doSearch();
         };
       }
 
