@@ -222,17 +222,33 @@ const BG_URL = "https://t.alcy.cc/ycy";
     setupIconCaching();
 
     // 异步加载网络信息和URL状态检测
+    const IP_INFO_API = "https://ipapi.xxlb.org/";
+
     const fetchIpInfo = async () => {
       try {
-        const res: any = await client.network.getNetworkMyip({
-          _t: Date.now(),
+        const res = await fetch(IP_INFO_API, {
+          cache: "no-store",
+          signal: AbortSignal.timeout(5000),
         });
-        const r = res?.data || res;
+        const r = await res.json();
         if (r?.ip && els.ip) {
-          const operator = r.llc || r.isp || "";
-          let loc = r.region && r.region !== "未知地区" ? r.region : "";
-          if (r.district && r.district !== "未知") loc += ` ${r.district}`;
-          els.ip.innerText = [r.ip, operator, loc].filter(Boolean).join(" · ");
+          const operator = r.as?.info || r.as?.name || "";
+          const country = r.country?.name || r.country?.code || "";
+          const [province, city, district] = r.regions || [];
+          const ipType = r.type || "";
+          const parts = [
+            r.ip,
+            operator,
+            country,
+            province,
+            city,
+            district,
+            ipType,
+          ].filter(Boolean);
+
+          if (parts.length) {
+            els.ip.innerText = parts.join(" · ");
+          }
         }
       } catch (error) {
         if (els.ip) els.ip.innerText = "Enjoy your day";
