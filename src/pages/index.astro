@@ -266,7 +266,7 @@ const BG_URL = "https://t.alcy.cc/ycy";
 
     // 获取随机一言作为占位符
     scheduleInit(() => {
-      fetch("https://v1.hitokoto.cn/?c=i", {
+      fetch("https://v1.hitokoto.cn/", {
         signal: AbortSignal.timeout(3000),
       })
         .then((r) => r.json())
