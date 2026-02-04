@@ -16,7 +16,7 @@ export const DEFAULT_SEARCH_URL = "https://cn.bing.com/search?q=";
 export const IP_INFO_URL = "https://ip.xxir.com/";
 export const IP_API_PRIMARY = "https://ipapi.xxlb.org/";
 export const HITOKOTO_APIS = [
-    "https://v1.hitokoto.cn/",
+    "https://api.lvcdy.cn/hitokoto",
 ];
 
 export const SEARCH_TIP_SHOW_TIME = 2000;
