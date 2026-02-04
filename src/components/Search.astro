@@ -1,0 +1,53 @@
+---
+import { SEARCH_ENGINES } from "../data/links";
+---
+
+<div
+    class="mt-12 w-full max-w-[650px] px-6 relative animate-fade-in-up"
+    style="animation-delay: 100ms"
+>
+    <div
+        class="search-container glass flex items-center h-16 rounded-2xl px-2 shadow-2xl"
+    >
+        <div
+            id="engineBtn"
+            class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all"
+        >
+            <i id="currentIcon" class="fab fa-microsoft text-xl text-white/80"
+            ></i>
+        </div>
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="正在思考..."
+            class="bg-transparent flex-grow h-full px-4 outline-none placeholder-white/40 font-medium"
+        />
+        <i
+            id="searchBtn"
+            class="fas fa-search mr-4 opacity-40 cursor-pointer hover:opacity-70 transition-opacity"
+        ></i>
+    </div>
+    <div
+        id="searchTip"
+        class="mt-2 text-center text-red-400 text-sm opacity-0 transition-opacity duration-300"
+    >
+        请输入搜索内容
+    </div>
+    <div
+        id="engineMenu"
+        class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col z-50 shadow-2xl overflow-hidden"
+    >
+        {
+            SEARCH_ENGINES.map((e) => (
+                <div
+                    class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium"
+                    data-url={e.url}
+                    data-icon={e.icon}
+                >
+                    <i class={`${e.icon} w-5 text-center`} />
+                    <span>{e.name}</span>
+                </div>
+            ))
+        }
+    </div>
+</div>

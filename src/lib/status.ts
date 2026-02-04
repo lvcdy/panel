@@ -1,8 +1,10 @@
 import { SELECTOR_CARD } from "./config";
 import { getStatusCache, setStatusCache } from "./cache";
+import { getClient } from "./uapi";
 
-export const checkUrlStatus = async (url: string, client: any) => {
+export const checkUrlStatus = async (url: string) => {
     try {
+        const client = await getClient();
         return await client.network.getNetworkUrlstatus({ url });
     } catch {
         return { status: "error" };
@@ -32,7 +34,7 @@ export const updateStatusIndicator = (card: HTMLElement, status: number | string
     indicator.classList.add("opacity-100");
 };
 
-export const checkAllUrls = async (client: any) => {
+export const checkAllUrls = async () => {
     const cards = document.querySelectorAll(SELECTOR_CARD);
     const cachedStatuses = getStatusCache();
 
@@ -47,15 +49,19 @@ export const checkAllUrls = async (client: any) => {
         return;
     }
 
-    const newStatuses: Record<string, number | string> = {};
     const urls = Array.from(cards).map((card) => (card as HTMLElement).getAttribute("data-url")).filter(Boolean);
 
-    // 并行检查多个URL，提高性能
-    await Promise.all(
-        urls.map(async (url) => {
-            if (!url) return;
+    const newStatuses: Record<string, number | string> = {};
+    const CONCURRENCY_LIMIT = 5;
+    const results: Promise<void>[] = [];
+    const pool: Promise<void>[] = [];
+
+    for (const url of urls) {
+        if (!url) continue;
+
+        const p = (async () => {
             try {
-                const result = await checkUrlStatus(url, client);
+                const result = await checkUrlStatus(url);
                 const status = result.status || "error";
                 newStatuses[url] = status;
                 const card = Array.from(cards).find((c) => (c as HTMLElement).getAttribute("data-url") === url);
@@ -63,8 +69,22 @@ export const checkAllUrls = async (client: any) => {
             } catch {
                 newStatuses[url] = "error";
             }
-        })
-    );
+        })();
+
+        results.push(p);
+
+        if (CONCURRENCY_LIMIT <= urls.length) {
+            const e = p.then(() => {
+                pool.splice(pool.indexOf(e), 1);
+            });
+            pool.push(e);
+            if (pool.length >= CONCURRENCY_LIMIT) {
+                await Promise.race(pool);
+            }
+        }
+    }
+
+    await Promise.all(results);
 
     setStatusCache(newStatuses);
 };

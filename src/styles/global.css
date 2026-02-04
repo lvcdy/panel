@@ -18,21 +18,30 @@
   }
 
   .sun-card {
-    @apply will-change-transform;
-    transition: transform 200ms ease-out,
+    @apply will-change-transform relative overflow-hidden;
+    transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
       background-color 200ms ease-out,
       border-color 200ms ease-out,
-      box-shadow 200ms ease-out;
+      box-shadow 300ms ease-out;
   }
 
   .sun-card:hover {
-    @apply -translate-y-1 bg-white/15 border-white/20 shadow-lg;
+    @apply -translate-y-1.5 scale-[1.02] bg-white/20 border-white/30 shadow-xl shadow-black/10;
+  }
+
+  .sun-card::after {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none bg-gradient-to-tr from-white/10 to-transparent;
+  }
+
+  .sun-card:hover::after {
+    @apply opacity-100;
   }
 
   .category-section {
     @apply will-change-transform;
-    transition: opacity 200ms ease-out,
-      transform 200ms ease-out;
+    transition: opacity 300ms ease-out,
+      transform 300ms ease-out;
   }
 
   .category-section.hidden-icons {
@@ -40,15 +49,30 @@
     transform: translateY(1rem);
   }
 
+  /* 抽屉收起动画 */
+  .category-section[data-collapsed="true"] .category-wrapper {
+    grid-template-rows: 0fr;
+  }
+
+  /* 确保收起状态下内容不可见且不占位 */
+  .category-section[data-collapsed="true"] .category-content {
+    padding-bottom: 0;
+  }
+
   .search-container {
-    @apply transition-all duration-200;
+    @apply transition-all duration-300 ease-out border border-transparent;
+  }
+
+  .search-container:focus-within {
+    @apply bg-white/10 border-white/20 shadow-lg scale-[1.01];
+    backdrop-filter: blur(24px) saturate(180%);
   }
 
   /* 优化的搜索引擎菜单动画 */
   @keyframes slideDownFade {
     from {
       opacity: 0;
-      transform: translateY(-8px) scale(0.98);
+      transform: translateY(-10px) scale(0.95);
     }
 
     to {
@@ -58,10 +82,32 @@
   }
 
   @keyframes slideUpFade {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
     to {
       opacity: 0;
-      transform: translateY(-8px) scale(0.98);
+      transform: translateY(-10px) scale(0.95);
     }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
   }
 
   #engineMenu {

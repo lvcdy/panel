@@ -1,0 +1,62 @@
+---
+import { CATEGORIES } from "../data/links";
+import { ICON_API } from "../lib/config";
+---
+
+<div class="w-full max-w-[1500px] px-10 mt-12 flex-grow">
+    {
+        CATEGORIES.map((cat) => (
+            <div class="mb-10 category-section" data-collapsed="false">
+                <h2 class="text-2xl font-bold mb-6 pl-2 drop-shadow-md category-header flex items-center justify-between gap-3">
+                    <span class="category-title">{cat.title}</span>
+                    <button
+                        type="button"
+                        class="category-toggle-btn inline-flex items-center gap-2 text-sm font-medium text-white/80 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10"
+                        aria-expanded="true"
+                    >
+                        <span class="category-toggle-label">收起</span>
+                        <i class="fas fa-chevron-up category-toggle-icon text-xs" />
+                    </button>
+                </h2>
+                <div class="category-wrapper grid grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+                    <div class="category-content overflow-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 pb-1">
+                        {cat.links.map((link, index) => (
+                            <a
+                                href={link.url}
+                                target="_blank"
+                                class="glass sun-card flex items-center p-5 rounded-[1.8rem] group relative animate-fade-in-up"
+                                style={`animation-delay: ${index * 50 + 100}ms`}
+                                data-url={link.url}
+                            >
+                                <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5 text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                                    <img
+                                        src={ICON_API + link.url}
+                                        loading="lazy"
+                                        decoding="async"
+                                        fetchpriority="low"
+                                        class="w-full h-full object-contain transition-opacity opacity-0"
+                                        onload="this.style.opacity=1"
+                                        onerror="this.nextElementSibling.classList.remove('hidden');this.remove()"
+                                    />
+                                    <div
+                                        class="hidden w-full h-full flex items-center justify-center"
+                                        style={`color:${link.color}`}
+                                    >
+                                        <i class={link.icon} />
+                                    </div>
+                                </div>
+                                <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">
+                                    {link.name}
+                                </div>
+                                <div
+                                    class="status-indicator absolute top-3 right-3 w-3 h-3 rounded-full bg-gray-400 opacity-50 transition-all"
+                                    title="检测中..."
+                                />
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        ))
+    }
+</div>

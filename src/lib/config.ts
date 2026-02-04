@@ -8,9 +8,19 @@ export const SELECTOR_CARD = ".sun-card";
 export const SELECTOR_CARD_TEXT = ".ml-4.overflow-hidden";
 export const SELECTOR_CATEGORY_TITLE = "h2.text-2xl";
 
-// Search Configuration
-export const DEFAULT_SEARCH_URL = "https://www.baidu.com/s?wd=";
+export const ICON_API = "https://ico.kucat.cn/get.php?url=";
+export const BG_URL = "https://t.alcy.cc/ycy";
+
+// Search & API Configuration
+export const DEFAULT_SEARCH_URL = "https://cn.bing.com/search?q=";
 export const IP_INFO_URL = "https://ip.xxir.com/";
+export const IP_API_PRIMARY = "https://ipapi.xxlb.org/";
+export const IP_API_FALLBACK = "https://ip.xxir.com/";
+export const HITOKOTO_APIS = [
+    "https://v1.hitokoto.cn/",
+    "https://hitokoto.lvcdy.cn/",
+];
+
 export const SEARCH_TIP_SHOW_TIME = 2000;
 
 // Scroll Configuration
@@ -20,7 +30,8 @@ export const SCROLL_DURATION = 600;
 // Cache Configuration
 export const CACHE_KEY = "url_status_cache";
 export const ICON_CACHE_KEY = "icon_cache";
-export const CACHE_DURATION = 3 * 60 * 60 * 1000;
+// More lenient cache duration: 7 days
+export const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
 
 export interface CacheData {
     timestamp: number;

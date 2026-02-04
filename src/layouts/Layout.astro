@@ -1,7 +1,5 @@
 ---
-import "@fortawesome/fontawesome-free/css/all.min.css";
 
-const { bgUrl } = Astro.props;
 ---
 
 <!doctype html>
@@ -18,11 +16,11 @@ const { bgUrl } = Astro.props;
     <link rel="preconnect" href="https://ico.kucat.cn" />
     <link rel="preconnect" href="https://t.alcy.cc" />
     <link rel="dns-prefetch" href="https://ico.kucat.cn" />
-    {
-      bgUrl && (
-        <link rel="preload" as="image" href={bgUrl} fetchpriority="high" />
-      )
-    }
+
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body
     class="relative min-h-screen antialiased bg-[#1a1a1a] overflow-x-hidden selection:bg-white/20"

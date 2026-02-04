@@ -11,10 +11,25 @@ export const loadCachedIcons = () => {
         if (!url || !iconCache[url]) return;
 
         const img = card.querySelector("img") as HTMLImageElement;
-        if (img && !img.complete) {
+        // Only use cache if it's a data URI (starts with data:image)
+        if (img && iconCache[url].startsWith('data:image')) {
             img.src = iconCache[url];
         }
     });
+};
+
+const convertImageToDataURL = (img: HTMLImageElement): string | null => {
+    try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return null;
+        ctx.drawImage(img, 0, 0);
+        return canvas.toDataURL("image/png");
+    } catch {
+        return null;
+    }
 };
 
 export const setupIconCaching = () => {
@@ -27,17 +42,22 @@ export const setupIconCaching = () => {
         const img = card.querySelector("img") as HTMLImageElement;
         if (!img) return;
 
-        // 监听图片加载完成
         const handleLoad = () => {
-            // 简化缓存逻辑，直接保存图片URL而不是转换为canvas
-            if (img.src && img.complete && img.naturalWidth > 0) {
-                saveIconToCache(url, img.src);
+            if (img.complete && img.naturalWidth > 0) {
+                // Convert to Data URL for improved offline/instant loading
+                // Note: CORS might block this if the icon API doesn't allow it. 
+                // If so, the catch block in convertImageToDataURL handles it gracefully.
+                const dataUrl = convertImageToDataURL(img);
+                if (dataUrl) {
+                    saveIconToCache(url, dataUrl);
+                }
             }
         };
 
         if (img.complete) {
             handleLoad();
         } else {
+            img.setAttribute('crossorigin', 'anonymous'); // Try to request CORS access
             img.addEventListener("load", handleLoad, { once: true });
         }
     });

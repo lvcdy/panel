@@ -4,13 +4,13 @@
 
 ## ✨ 主要功能
 
-- 🔍 **多搜索引擎快速切换** - 百度、Google、Bing、GitHub 搜索
-- 🌐 **分类导航** - 我的网站、常用工具、AI 服务、云服务等多个分类
-- 🎨 **现代化设计** - 基于 Tailwind CSS 的毛玻璃效果 UI
-- ⚡ **极速性能** - Astro 静态生成，秒级加载
+- 🔍 **多搜索引擎快速切换** - 支持百度、Google、Bing、GitHub 等，支持智能防抖搜索
+- 🌐 **分类导航** - 可折叠的分类卡片，支持检测链接可用性
+- 🎨 **现代化设计** - 基于 Tailwind CSS 的毛玻璃 UI，支持动态背景
+- ⚡ **性能优化** - 图标本地缓存（7天）、并发请求控制、懒加载与 requestIdleCallback 调度
 - 📱 **响应式布局** - 完美适配桌面、平板和手机
-- 🌍 **IP 地址显示** - 自动显示公网 IP 和城市位置
-- 🔧 **易于定制** - 简单配置即可自定义内容
+- 🌍 **网络仪表盘** - 实时显示时间、双栈 IP 地址（IPv4/IPv6）、运营商、详细地理位置（至区县）及网络类型
+- 🧩 **模块化架构** - 清晰的代码结构，易于维护和扩展
 
 ## 🚀 快速开始
 
@@ -47,28 +47,35 @@ panel/
 ├── src/
 │   ├── assets/             # 图片和媒体资源
 │   ├── components/         # Astro 组件
-│   │   └── Footer.astro    # 页脚组件
+│   │   ├── FloatingCtrl.astro # 浮动控制按钮
+│   │   ├── Footer.astro       # 页脚组件
+│   │   ├── Header.astro       # 头部（时间/日期/IP）
+│   │   ├── LinkList.astro     # 链接列表
+│   │   └── Search.astro       # 搜索栏组件
 │   ├── data/
 │   │   └── links.ts        # 导航链接和搜索引擎配置
 │   ├── layouts/
 │   │   └── Layout.astro    # 页面布局
 │   ├── lib/                # 工具函数库
-│   │   ├── cache.ts        # 缓存相关
-│   │   ├── category.ts     # 分类处理
-│   │   ├── config.ts       # 配置
-│   │   ├── dom.ts          # DOM 操作
-│   │   ├── icons.ts        # 图标处理
-│   │   ├── main.ts         # 主要功能
-│   │   ├── search.ts       # 搜索功能
-│   │   ├── status.ts       # 状态管理
-│   │   ├── time.ts         # 时间相关
-│   │   └── uapi.ts         # UAPI SDK 集成
+│   │   ├── cache.ts        # 缓存管理（localStorage）
+│   │   ├── category.ts     # 分类折叠逻辑
+│   │   ├── config.ts       # 全局配置常量
+│   │   ├── dom.ts          # DOM 选择器封装
+│   │   ├── hitokoto.ts     # 一言 API封装
+│   │   ├── icons.ts        # 图标缓存与处理
+│   │   ├── ip.ts           # IP 信息获取与解析
+│   │   ├── main.ts         # 统一导出入口
+│   │   ├── provider.ts     # 服务商检测
+│   │   ├── search.ts       # 搜索与筛选逻辑
+│   │   ├── status.ts       # 链接状态检测（带并发控制）
+│   │   ├── time.ts         # 时间更新
+│   │   └── uapi.ts         # UAPI SDK 客户端
 │   ├── pages/
-│   │   └── index.astro     # 首页
+│   │   └── index.astro     # 首页入口（组装组件）
 │   └── styles/
 │       └── global.css      # 全局样式
 ├── astro.config.mjs        # Astro 配置
-├── tailwind.config.mjs      # Tailwind 配置
+├── tailwind.config.mjs     # Tailwind 配置
 └── package.json            # 项目配置
 ```
 

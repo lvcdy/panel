@@ -20,8 +20,19 @@ const getCategories = () => {
     return cachedCategories;
 };
 
+const debounce = (fn: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: any[]) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), delay);
+    };
+};
+
 export const filterLinks = (query: string) => {
     const lowerQuery = query.toLowerCase();
+
+    // Ensure categories are visible when filtering
+    toggleCategoryVisibility(true);
 
     getCategories().forEach((catElement) => {
         const cards = catElement.querySelectorAll(SELECTOR_CARD);
@@ -31,7 +42,7 @@ export const filterLinks = (query: string) => {
             const cardElement = card as HTMLElement;
             const textDiv = cardElement.querySelector(SELECTOR_CARD_TEXT) as HTMLElement;
             const text = textDiv?.textContent?.toLowerCase() || "";
-            const url = cardElement.getAttribute("href")?.toLowerCase() || "";
+            const url = cardElement.getAttribute("data-url")?.toLowerCase() || cardElement.getAttribute("href")?.toLowerCase() || "";
             const matches = text.includes(lowerQuery) || url.includes(lowerQuery);
 
             cardElement.style.display = matches ? "" : "none";
@@ -88,7 +99,19 @@ const toggleCategoryVisibility = (visible: boolean) => {
 };
 
 export const hideAllIcons = () => toggleCategoryVisibility(false);
-export const showAllIcons = () => toggleCategoryVisibility(true);
+export const showAllIcons = () => {
+    toggleCategoryVisibility(true);
+    // Reset all display styles potentially set by filterLinks
+    getCategories().forEach((catElement) => {
+        const title = catElement.querySelector(SELECTOR_CATEGORY_TITLE) as HTMLElement;
+        if (title) title.style.display = "";
+
+        const cards = catElement.querySelectorAll(SELECTOR_CARD);
+        cards.forEach((card) => {
+            (card as HTMLElement).style.display = "";
+        });
+    });
+};
 
 export const setupInputHandlers = (
     input: HTMLInputElement | null,
@@ -98,16 +121,23 @@ export const setupInputHandlers = (
 ) => {
     if (!input) return;
 
+    // Create debounced filter function
+    const debouncedFilter = debounce((query: string) => {
+        query ? onFilter(query) : showAllIcons();
+    }, 150);
+
     let originalPlaceholder = "";
 
     input.addEventListener("focus", () => {
         originalPlaceholder = input.placeholder;
-        input.placeholder = "请输入搜索内容";
+        input.placeholder = "";
+        input.value = "";
         if (searchTip) searchTip.style.opacity = "0";
-        if (!input.value.trim()) hideAllIcons();
+        hideAllIcons();
     });
 
     input.addEventListener("blur", () => {
+        // Only show all icons if input is empty, otherwise we want to keep the filtered results
         if (!input.value.trim()) {
             input.placeholder = originalPlaceholder;
             showAllIcons();
@@ -116,7 +146,7 @@ export const setupInputHandlers = (
 
     input.addEventListener("input", () => {
         const query = input.value.trim();
-        query ? onFilter(query) : showAllIcons();
+        debouncedFilter(query);
     });
 
     input.addEventListener("keydown", (e) => {

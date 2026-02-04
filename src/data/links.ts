@@ -1,14 +1,13 @@
 export const SEARCH_ENGINES = [
-{ id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw' },
-  { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google' },
   { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft' },
+  { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw' },
+  { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google' },
   { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github' }
 ];
 export const CATEGORIES = [
   {
     title: "我的网站",
     links: [
-      { name: "Affine", url: "https://affine.lvcdy.cn", icon: "fas fa-link", color: "#4caf50" },
       { name: "Blog", url: "https://blog.lvcdy.cn", icon: "fas fa-blog", color: "#ff5722" },
       { name: "Certd", url: "https://certd.lvcdy.cn", icon: "fas fa-certificate", color: "#2196f3" },
       { name: "Time", url: "https://time.lvcdy.cn", icon: "fas fa-clock", color: "#9c27b0" }
@@ -28,7 +27,7 @@ export const CATEGORIES = [
       { name: "千问", url: "https://www.qianwen.com/", icon: "fas fa-robot", color: "#4d6bfe" },
       { name: "豆包", url: "https://www.doubao.com/", icon: "fas fa-robot", color: "#4d6bfe" }
     ]
-  }, 
+  },
   {
     title: "Tools",
     links: [

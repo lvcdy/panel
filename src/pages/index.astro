@@ -1,11 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Search from "../components/Search.astro";
+import LinkList from "../components/LinkList.astro";
+import FloatingCtrl from "../components/FloatingCtrl.astro";
 import Footer from "../components/Footer.astro";
-import { CATEGORIES, SEARCH_ENGINES } from "../data/links";
+import { BG_URL } from "../lib/config";
 import "../styles/global.css";
-
-const ICON_API = "https://ico.kucat.cn/get.php?url=";
-const BG_URL = "https://t.alcy.cc/ycy";
 ---
 
 <Layout bgUrl={BG_URL}>
@@ -26,132 +27,15 @@ const BG_URL = "https://t.alcy.cc/ycy";
   <main
     class="flex flex-col items-center min-h-screen relative z-10 text-white"
   >
-    <div class="mt-24 text-center select-none">
-      <h1 id="clock" class="text-7xl font-bold tracking-tight drop-shadow-2xl">
-        --:--:--
-      </h1>
-      <p id="date" class="text-xl font-medium opacity-90 mt-1">载入中...</p>
-      <div
-        id="ip-info"
-        class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 transition-opacity duration-1000 cursor-pointer hover:border-white/30 hover:text-white transition-colors"
-      >
-        <i class="fas fa-location-dot text-[10px]"></i>
-        <span id="ip-address">正在同步网络数据...</span>
-      </div>
-    </div>
-
-    <div class="mt-12 w-full max-w-[650px] px-6 relative">
-      <div
-        class="search-container glass flex items-center h-16 rounded-2xl px-2 shadow-2xl"
-      >
-        <div
-          id="engineBtn"
-          class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all"
-        >
-          <i id="currentIcon" class="fas fa-paw text-xl text-white/80"></i>
-        </div>
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="正在思考..."
-          class="bg-transparent flex-grow h-full px-4 outline-none placeholder-white/40 font-medium"
-        />
-        <i
-          id="searchBtn"
-          class="fas fa-search mr-4 opacity-40 cursor-pointer hover:opacity-70 transition-opacity"
-        ></i>
-      </div>
-      <div
-        id="searchTip"
-        class="mt-2 text-center text-red-400 text-sm opacity-0 transition-opacity duration-300"
-      >
-        请输入搜索内容
-      </div>
-      <div
-        id="engineMenu"
-        class="glass absolute top-[75px] left-6 w-44 rounded-2xl hidden flex-col z-50 shadow-2xl overflow-hidden"
-      >
-        {
-          SEARCH_ENGINES.map((e) => (
-            <div
-              class="engine-item p-4 hover:bg-white/20 cursor-pointer flex items-center gap-4 text-sm font-medium"
-              data-url={e.url}
-              data-icon={e.icon}
-            >
-              <i class={`${e.icon} w-5 text-center`} />
-              <span>{e.name}</span>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-
-    <div class="w-full max-w-[1500px] px-10 mt-12 flex-grow">
-      {
-        CATEGORIES.map((cat) => (
-          <div class="mb-10 category-section" data-collapsed="false">
-            <h2 class="text-2xl font-bold mb-6 pl-2 drop-shadow-md category-header flex items-center justify-between gap-3">
-              <span class="category-title">{cat.title}</span>
-              <button
-                type="button"
-                class="category-toggle-btn inline-flex items-center gap-2 text-sm font-medium text-white/80 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10"
-                aria-expanded="true"
-              >
-                <span class="category-toggle-label">收起</span>
-                <i class="fas fa-chevron-up category-toggle-icon text-xs" />
-              </button>
-            </h2>
-            <div class="category-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
-              {cat.links.map((link) => (
-                <a
-                  href={link.url}
-                  target="_blank"
-                  class="glass sun-card flex items-center p-5 rounded-[1.8rem] group relative"
-                  data-url={link.url}
-                >
-                  <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden p-2.5 text-2xl">
-                    <img
-                      src={ICON_API + link.url}
-                      loading="lazy"
-                      decoding="async"
-                      fetchpriority="low"
-                      class="w-full h-full object-contain transition-opacity opacity-0"
-                      onload="this.style.opacity=1"
-                      onerror="this.nextElementSibling.classList.remove('hidden');this.remove()"
-                    />
-                    <div
-                      class="hidden w-full h-full flex items-center justify-center"
-                      style={`color:${link.color}`}
-                    >
-                      <i class={link.icon} />
-                    </div>
-                  </div>
-                  <div class="ml-4 overflow-hidden text-white/90 font-bold truncate">
-                    {link.name}
-                  </div>
-                  <div
-                    class="status-indicator absolute top-3 right-3 w-3 h-3 rounded-full bg-gray-400 opacity-50 transition-all"
-                    title="检测中..."
-                  />
-                </a>
-              ))}
-            </div>
-          </div>
-        ))
-      }
-    </div>
+    <Header />
+    <Search />
+    <LinkList />
     <Footer />
   </main>
 
-  <div
-    id="floatingSearchBtn"
-    class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center cursor-pointer opacity-0 transition-opacity duration-300 hover:bg-white/30 z-40 shadow-2xl"
-  >
-    <i class="fas fa-search text-2xl text-white"></i>
-  </div>
+  <FloatingCtrl />
 
   <script>
-    import { client } from "../lib/uapi";
     import { fetchAndDetectProvider } from "../lib/provider";
     import {
       createElementCache,
@@ -172,6 +56,8 @@ const BG_URL = "https://t.alcy.cc/ycy";
       loadCachedIcons,
       setupIconCaching,
       checkAllUrls,
+      fetchIpInfo,
+      fetchHitokoto,
     } from "../lib/main";
 
     const els = createElementCache();
@@ -222,66 +108,25 @@ const BG_URL = "https://t.alcy.cc/ycy";
     setupIconCaching();
 
     // 异步加载网络信息和URL状态检测
-    const IP_INFO_API = "https://ipapi.xxlb.org/";
+    scheduleInit(() => {
+      const initNetworkData = async () => {
+        await fetchIpInfo(els.ip, els.ipBox);
+        await fetchAndDetectProvider(els.proName, els.proBox);
+      };
 
-    const fetchIpInfo = async () => {
-      try {
-        const res = await fetch(IP_INFO_API, {
-          cache: "no-store",
-          signal: AbortSignal.timeout(5000),
-        });
-        const r = await res.json();
-        if (r?.ip && els.ip) {
-          const operator = r.as?.info || r.as?.name || "";
-          const country = r.country?.name || r.country?.code || "";
-          const [province, city, district] = r.regions || [];
-          const ipType = r.type || "";
-          const parts = [
-            r.ip,
-            operator,
-            country,
-            province,
-            city,
-            district,
-            ipType,
-          ].filter(Boolean);
-
-          if (parts.length) {
-            els.ip.innerText = parts.join(" · ");
-          }
-        }
-      } catch (error) {
-        if (els.ip) els.ip.innerText = "Enjoy your day";
-      } finally {
-        if (els.ipBox) els.ipBox.style.opacity = "1";
-      }
-    };
-
-    const initNetworkData = async () => {
-      await fetchIpInfo();
-      await fetchAndDetectProvider(els.proName, els.proBox);
-    };
-
-    scheduleInit(initNetworkData);
+      initNetworkData().catch((err) => {
+        console.error("初始化网络数据失败:", err);
+      });
+    });
 
     // 获取随机一言作为占位符
     scheduleInit(() => {
-      fetch("https://v1.hitokoto.cn/", {
-        signal: AbortSignal.timeout(3000),
-      })
-        .then((r) => r.json())
-        .then((d) => {
-          if (els.input)
-            els.input.placeholder = `${d.hitokoto} —— 「${d.from}」`;
-        })
-        .catch(() => {
-          if (els.input) els.input.placeholder = "永远相信美好的事情即将发生";
-        });
+      fetchHitokoto(els.input);
     });
 
     // 检测URL状态
     scheduleInit(() => {
-      checkAllUrls(client);
+      checkAllUrls();
     });
   </script>
 </Layout>

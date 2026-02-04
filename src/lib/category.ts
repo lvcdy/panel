@@ -13,7 +13,8 @@ const setCategoryCollapsed = (catElement: Element, collapsed: boolean) => {
     const label = category.querySelector(SELECTOR_CATEGORY_TOGGLE_LABEL) as HTMLElement | null;
     const icon = category.querySelector(SELECTOR_CATEGORY_TOGGLE_ICON) as HTMLElement | null;
 
-    if (content) content.classList.toggle("hidden", collapsed);
+    // We rely on CSS grid transition now, so no need to toggle 'hidden'
+    // if (content) content.classList.toggle("hidden", collapsed);
     category.classList.toggle("category-collapsed", collapsed);
     category.setAttribute("data-collapsed", collapsed ? "true" : "false");
 

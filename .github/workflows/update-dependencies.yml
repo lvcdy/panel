@@ -37,9 +37,26 @@ jobs:
       - name: Update dependencies
         run: pnpm update --interactive=false
 
+      - name: Run linting and type checking
+        id: lint
+        run: |
+          pnpm astro check || true
+          echo "✅ Type checking completed"
+
       - name: Run build to verify
         id: build
         run: pnpm build
+        
+      - name: Verify build output
+        id: verify-build
+        run: |
+          if [ -d "dist" ] && [ "$(find dist -type f | wc -l)" -gt 0 ]; then
+            echo "✅ Build output verified"
+            find dist -type f | wc -l | xargs echo "📊 Total files:"
+          else
+            echo "❌ Build failed - no output files"
+            exit 1
+          fi
 
       - name: Check if there are changes
         id: verify-changes
