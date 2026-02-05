@@ -64,7 +64,8 @@ export const CATEGORIES: Category[] = [
       { name: "举个栗子", url: "https://www.alcy.cc/", icon: "fas fa-chestnut", color: "#27ae60", useIcon: true },
       { name: "中国科学技术大学测速网站", url: "https://test.ustc.edu.cn/", icon: "fas fa-gauge-high", color: "#004098", useIcon: true },
       { name: "ip测漏", url: "https://ipcelou.com", icon: "fas fa-shield-alt", color: "#2c3e50", useIcon: true },
-      { name: "双子星", url: "https://v2-dev.xsyd.top/", icon: "fas fa-star", color: "#f1c40f", useIcon: true }
+      { name: "双子星", url: "https://v2-dev.xsyd.top/", icon: "fas fa-star", color: "#f1c40f", useIcon: true },
+      { name: "魔搭社区", url: "https://www.modelscope.cn/", icon: "fas fa-globe", color: "#16a085", useIcon: true }
     ]
   },
   {
