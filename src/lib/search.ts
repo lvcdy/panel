@@ -80,7 +80,7 @@ export const setupEngineItemHandlers = (
 
     // 使用事件委托而不是逐个添加监听器
     menu.addEventListener("click", (e) => {
-        const target = (e.target as HTMLElement).closest(".engine-item");
+        const target = (e.target as HTMLElement).closest(".engine-item") as HTMLElement | null;
         if (!target) return;
 
         const url = target.dataset.url || DEFAULT_SEARCH_URL;
