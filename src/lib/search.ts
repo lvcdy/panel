@@ -32,25 +32,19 @@ const debounce = <T extends (...args: Parameters<T>) => void>(fn: T, delay: numb
 
 export const filterLinks = (query: string) => {
     const lowerQuery = query.toLowerCase();
-
-    // Ensure categories are visible when filtering
     toggleCategoryVisibility(true);
 
     getCategories().forEach((catElement) => {
-        const cards = catElement.querySelectorAll(SELECTOR_CARD);
         let hasVisibleCard = false;
-
-        cards.forEach((card: Element) => {
-            const cardElement = card as HTMLElement;
-            const textDiv = cardElement.querySelector(SELECTOR_CARD_TEXT) as HTMLElement;
+        catElement.querySelectorAll(SELECTOR_CARD).forEach((card: Element) => {
+            const cardEl = card as HTMLElement;
+            const textDiv = cardEl.querySelector(SELECTOR_CARD_TEXT) as HTMLElement;
             const text = textDiv?.textContent?.toLowerCase() || "";
-            const url = cardElement.getAttribute("data-url")?.toLowerCase() || cardElement.getAttribute("href")?.toLowerCase() || "";
+            const url = (cardEl.getAttribute("data-url") || cardEl.getAttribute("href") || "").toLowerCase();
             const matches = text.includes(lowerQuery) || url.includes(lowerQuery);
 
-            cardElement.style.display = matches ? "" : "none";
-            if (matches) {
-                hasVisibleCard = true;
-            }
+            cardEl.style.display = matches ? "" : "none";
+            if (matches) hasVisibleCard = true;
         });
 
         const title = catElement.querySelector(SELECTOR_CATEGORY_TITLE) as HTMLElement;
@@ -82,15 +76,18 @@ export const setupEngineItemHandlers = (
     input: HTMLInputElement | null,
     onEngineSelect: (url: string, iconClass: string) => void
 ) => {
-    document.querySelectorAll(".engine-item").forEach((item) => {
-        (item as HTMLElement).addEventListener("click", (e) => {
-            const target = e.currentTarget as HTMLElement;
-            const url = target.dataset.url || DEFAULT_SEARCH_URL;
-            const iconClass = target.dataset.icon || "";
-            onEngineSelect(url, iconClass);
-            menu?.classList.add("hidden");
-            input?.focus();
-        });
+    if (!menu) return;
+
+    // 使用事件委托而不是逐个添加监听器
+    menu.addEventListener("click", (e) => {
+        const target = (e.target as HTMLElement).closest(".engine-item");
+        if (!target) return;
+
+        const url = target.dataset.url || DEFAULT_SEARCH_URL;
+        const iconClass = target.dataset.icon || "";
+        onEngineSelect(url, iconClass);
+        menu.classList.add("hidden");
+        input?.focus();
     });
 };
 
@@ -103,13 +100,10 @@ const toggleCategoryVisibility = (visible: boolean) => {
 export const hideAllIcons = () => toggleCategoryVisibility(false);
 export const showAllIcons = () => {
     toggleCategoryVisibility(true);
-    // Reset all display styles potentially set by filterLinks
     getCategories().forEach((catElement) => {
         const title = catElement.querySelector(SELECTOR_CATEGORY_TITLE) as HTMLElement;
         if (title) title.style.display = "";
-
-        const cards = catElement.querySelectorAll(SELECTOR_CARD);
-        cards.forEach((card) => {
+        catElement.querySelectorAll(SELECTOR_CARD).forEach((card) => {
             (card as HTMLElement).style.display = "";
         });
     });
@@ -181,17 +175,18 @@ export const setupFloatingButtonHandler = (
 export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
     if (!floatingBtn) return;
 
+    let isVisible = false;
     let scrollTimeout: TimeoutId | null = null;
+
     window.addEventListener("scroll", () => {
         if (scrollTimeout) return;
-
         scrollTimeout = setTimeout(() => {
-            if (window.scrollY > SCROLL_THRESHOLD) {
-                floatingBtn.style.opacity = "1";
-                floatingBtn.style.pointerEvents = "auto";
-            } else {
-                floatingBtn.style.opacity = "0";
-                floatingBtn.style.pointerEvents = "none";
+            const shouldShow = window.scrollY > SCROLL_THRESHOLD;
+            if (shouldShow !== isVisible) {
+                isVisible = shouldShow;
+                floatingBtn.classList.toggle("opacity-0", !shouldShow);
+                floatingBtn.classList.toggle("opacity-100", shouldShow);
+                floatingBtn.style.pointerEvents = shouldShow ? "auto" : "none";
             }
             scrollTimeout = null;
         }, 100);

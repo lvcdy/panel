@@ -37,33 +37,12 @@ import "../styles/global.css";
 
   <script>
     import { fetchAndDetectProvider } from "../lib/provider";
-    import {
-      createElementCache,
-      filterLinks,
-      showSearchTip,
-      updateTime,
-      setupEngineButtonHandler,
-      setupEngineItemHandlers,
-      setupInputHandlers,
-      setupSearchButtonHandler,
-      setupFloatingButtonHandler,
-      setupScrollListener,
-      setupDocumentClickHandler,
-      setupIPInfoHandler,
-      setupCategoryCollapse,
-      scheduleInit,
-      DEFAULT_SEARCH_URL,
-      loadCachedIcons,
-      setupIconCaching,
-      checkAllUrls,
-      fetchIpInfo,
-      fetchHitokoto,
-    } from "../lib/main";
+    import * as UI from "../lib/main";
 
-    const els = createElementCache();
-    let searchUrl = DEFAULT_SEARCH_URL;
+    const els = UI.createElementCache();
+    let searchUrl = UI.DEFAULT_SEARCH_URL;
 
-    setupIPInfoHandler(els.ipBox);
+    UI.setupIPInfoHandler(els.ipBox);
 
     // 搜索功能
     const doSearch = () => {
@@ -73,44 +52,48 @@ import "../styles/global.css";
           "_blank",
         );
       } else {
-        showSearchTip(els.searchTip);
+        UI.showSearchTip(els.searchTip);
       }
     };
 
     // 初始化时间显示
-    updateTime(els.clock, els.date);
-    setInterval(() => updateTime(els.clock, els.date), 1000);
+    UI.updateTime(els.clock, els.date);
+    setInterval(() => UI.updateTime(els.clock, els.date), 1000);
 
     // 初始化UI事件
-    setupEngineButtonHandler(els.engineBtn, els.menu);
-    setupEngineItemHandlers(els.menu, els.input, (url: string, iconClass: string) => {
-      searchUrl = url as typeof DEFAULT_SEARCH_URL;
-      if (els.icon) {
-        els.icon.className = `${iconClass} text-xl text-white/80 transition-all`;
-      }
-    });
+    UI.setupEngineButtonHandler(els.engineBtn, els.menu);
+    UI.setupEngineItemHandlers(
+      els.menu,
+      els.input,
+      (url: string, iconClass: string) => {
+        searchUrl = url as typeof UI.DEFAULT_SEARCH_URL;
+        if (els.icon) {
+          els.icon.className = `${iconClass} text-xl text-white/80 transition-all`;
+        }
+      },
+    );
 
-    setupInputHandlers(
+    UI.setupInputHandlers(
       els.input,
       els.searchTip,
       () => doSearch(),
-      (query) => filterLinks(query),
+      (query) => UI.filterLinks(query),
     );
 
-    setupSearchButtonHandler(els.searchBtn, () => doSearch());
-    setupFloatingButtonHandler(els.floatingSearchBtn, els.input);
-    setupScrollListener(els.floatingSearchBtn);
-    setupDocumentClickHandler(els.menu);
-    setupCategoryCollapse();
+    UI.setupSearchButtonHandler(els.searchBtn, () => doSearch());
+    UI.setupFloatingButtonHandler(els.floatingSearchBtn, els.input);
+    UI.setupScrollListener(els.floatingSearchBtn);
+    UI.setupDocumentClickHandler(els.menu);
+    UI.setupCategoryCollapse();
 
     // 初始化图标缓存
-    loadCachedIcons();
-    setupIconCaching();
+    UI.loadCachedIcons();
+    UI.setupIconCaching();
 
     // 异步加载网络信息和URL状态检测
-    scheduleInit(() => {
+    UI.scheduleInit(() => {
       const initNetworkData = async () => {
-        await fetchIpInfo(els.ip, els.ipBox);
+        await UI.fetchIpInfo(els.ip, els.ipBox);
         await fetchAndDetectProvider(els.proName, els.proBox);
       };
 
@@ -120,13 +103,13 @@ import "../styles/global.css";
     });
 
     // 获取随机一言作为占位符
-    scheduleInit(() => {
-      fetchHitokoto(els.input);
+    UI.scheduleInit(() => {
+      UI.fetchHitokoto(els.input);
     });
 
     // 检测URL状态
-    scheduleInit(() => {
-      checkAllUrls();
+    UI.scheduleInit(() => {
+      UI.checkAllUrls();
     });
   </script>
 </Layout>

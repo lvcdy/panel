@@ -10,6 +10,13 @@
 }
 
 @layer components {
+  :root {
+    --transition-fast: 150ms ease-out;
+    --transition-base: 300ms ease-out;
+    --easing-smooth: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --easing-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   .glass {
     @apply border border-white/10 shadow-2xl;
     background: rgba(255, 255, 255, 0.08);
@@ -20,10 +27,10 @@
   .sun-card {
     @apply will-change-transform relative overflow-hidden;
     contain: layout style;
-    transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      background-color 200ms ease-out,
-      border-color 200ms ease-out,
-      box-shadow 300ms ease-out;
+    transition: transform var(--easing-smooth) 300ms,
+      background-color var(--transition-base),
+      border-color var(--transition-base),
+      box-shadow var(--transition-base);
   }
 
   .sun-card:hover {
@@ -41,8 +48,7 @@
 
   .category-section {
     @apply will-change-transform;
-    transition: opacity 300ms ease-out,
-      transform 300ms ease-out;
+    transition: opacity var(--transition-base), transform var(--transition-base);
   }
 
   .category-section.hidden-icons {
@@ -50,12 +56,10 @@
     transform: translateY(1rem);
   }
 
-  /* 抽屉收起动画 */
   .category-section[data-collapsed="true"] .category-wrapper {
     grid-template-rows: 0fr;
   }
 
-  /* 确保收起状态下内容不可见且不占位 */
   .category-section[data-collapsed="true"] .category-content {
     padding-bottom: 0;
   }
@@ -69,8 +73,7 @@
     backdrop-filter: blur(24px) saturate(180%);
   }
 
-  /* 优化的搜索引擎菜单动画 */
-  @keyframes slideDownFade {
+  @keyframes slideDown {
     from {
       opacity: 0;
       transform: translateY(-10px) scale(0.95);
@@ -82,19 +85,14 @@
     }
   }
 
-  @keyframes slideUpFade {
-    from {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-
+  @keyframes slideUp {
     to {
       opacity: 0;
       transform: translateY(-10px) scale(0.95);
     }
   }
 
-  @keyframes fadeInUp {
+  @keyframes fadeUp {
     from {
       opacity: 0;
       transform: translateY(20px);
@@ -107,7 +105,7 @@
   }
 
   .animate-fade-in-up {
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeUp 600ms var(--easing-entrance) forwards;
     opacity: 0;
   }
 
@@ -117,11 +115,11 @@
   }
 
   #engineMenu:not(.hidden) {
-    animation: slideDownFade 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideDown 180ms var(--easing-entrance) forwards;
   }
 
   #engineMenu.hidden {
-    animation: slideUpFade 120ms ease-in forwards;
+    animation: slideUp 120ms ease-in forwards;
     pointer-events: none;
   }
 
