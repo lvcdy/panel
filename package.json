@@ -17,9 +17,9 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
-    "@types/node": "^25.2.0",
+    "@types/node": "^25.2.2",
     "lightningcss": "^1.31.1",
     "terser": "^5.46.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   }
 }
