@@ -11,7 +11,6 @@ export interface LinkItem {
   url: string;
   icon: string;
   color: string;
-  /** 是否使用远程 API 获取图标，默认为 true，设为 false 则直接使用 FontAwesome 图标 */
   useIcon?: boolean;
 }
 

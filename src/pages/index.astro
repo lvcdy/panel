@@ -5,25 +5,10 @@ import Search from "../components/Search.astro";
 import LinkList from "../components/LinkList.astro";
 import FloatingCtrl from "../components/FloatingCtrl.astro";
 import Footer from "../components/Footer.astro";
-import { BG_URL } from "../lib/config";
 import "../styles/global.css";
 ---
 
 <Layout>
-  <script is:inline define:vars={{ BG_URL }}>
-    const img = new Image();
-    img.fetchPriority = "high";
-    img.decoding = "async";
-    img.src = BG_URL;
-    img.onload = () => {
-      document.documentElement.style.setProperty(
-        "--bg-url",
-        `url("${BG_URL}")`,
-      );
-      document.body.classList.add("bg-loaded");
-    };
-  </script>
-
   <main
     class="flex flex-col items-center min-h-screen relative z-10 text-white"
   >
@@ -38,6 +23,9 @@ import "../styles/global.css";
   <script>
     import { fetchAndDetectProvider } from "../lib/provider";
     import * as UI from "../lib/main";
+    import { initBackgroundImage } from "../lib/background";
+
+    initBackgroundImage();
 
     const els = UI.createElementCache();
     let searchUrl = UI.DEFAULT_SEARCH_URL;

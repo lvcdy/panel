@@ -69,7 +69,6 @@ panel/
 │   │   ├── search.ts       # 搜索与筛选逻辑
 │   │   ├── status.ts       # 链接状态检测（带并发控制）
 │   │   ├── time.ts         # 时间更新
-│   │   └── uapi.ts         # UAPI SDK 客户端
 │   ├── pages/
 │   │   └── index.astro     # 首页入口（组装组件）
 │   └── styles/
@@ -135,7 +134,7 @@ const profileConfig = {
 
 ### IP 地址显示
 
-项目默认启用 IP 地址和地理位置显示，使用 UAPI SDK：
+项目默认启用 IP 地址和地理位置显示，使用公网 IP 查询接口：
 - 显示公网 IP 和城市位置信息
 - 如果 API 无法访问，显示"欢迎回来"
 
@@ -145,9 +144,9 @@ const profileConfig = {
 |------|------|
 | [Astro](https://astro.build) | 现代静态站点生成框架 |
 | [Tailwind CSS](https://tailwindcss.com) | 实用优先的 CSS 框架 |
-| [Font Awesome](https://fontawesome.com) | 丰富的图标库 |
+| [Font Awesome Free](https://fontawesome.com) | 本地 npm 图标库（@fortawesome/fontawesome-free） |
 | [TypeScript](https://www.typescriptlang.org) | 类型安全的 JavaScript |
-| [UAPI SDK](https://uapi.cc) | 通用 API 工具包 |
+| Fetch API | 浏览器原生请求能力 |
 
 ## 📦 npm 脚本
 

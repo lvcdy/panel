@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-02-14T04:37:45.817Z",
+  "files": [
+    {
+      "file": "_assets/index@_@astro.knkOsDqj.css",
+      "raw": 97354,
+      "gzip": 30626
+    },
+    {
+      "file": "index.html",
+      "raw": 57306,
+      "gzip": 5532
+    },
+    {
+      "file": "_assets/index.astro_astro_type_script_index_0_lang.BkbzKwGa.js",
+      "raw": 9167,
+      "gzip": 4034
+    }
+  ],
+  "totalRaw": 163827,
+  "totalGzip": 40192
+}

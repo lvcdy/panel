@@ -1,4 +1,6 @@
 ---
+import { BG_URL } from "../lib/config";
+
 interface Props {
   title?: string;
   description?: string;
@@ -18,18 +20,14 @@ const { title = "Panel", description = "" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="image" href={BG_URL} fetchpriority="high" />
 
-    <link rel="preconnect" href="https://uapis.cn" />
-    <link rel="preconnect" href="https://v1.hitokoto.cn" />
-    <link rel="preconnect" href="https://api.afmax.cn" crossorigin />
+    <link rel="preconnect" href="https://api.lvcdy.cn" crossorigin />
+    <link rel="preconnect" href="https://ipapi.xxlb.org" crossorigin />
     <link rel="preconnect" href="https://t.alcy.cc" crossorigin />
-    <link rel="dns-prefetch" href="https://api.afmax.cn" />
-    <link rel="dns-prefetch" href="https://cdn.bootcdn.net" />
-
-    <link
-      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-      rel="stylesheet"
-    />
+    <link rel="dns-prefetch" href="https://api.lvcdy.cn" />
+    <link rel="dns-prefetch" href="https://ipapi.xxlb.org" />
+    <link rel="dns-prefetch" href="https://t.alcy.cc" />
   </head>
   <body
     class="relative min-h-screen antialiased bg-[#1a1a1a] overflow-x-hidden selection:bg-white/20"
