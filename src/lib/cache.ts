@@ -1,6 +1,11 @@
-import { CACHE_KEY, ICON_CACHE_KEY, CACHE_DURATION, type CacheData, type IconCacheData } from "./config";
+import { CACHE_KEY, ICON_CACHE_KEY, CACHE_DURATION, CACHE_ENABLED, type CacheData, type IconCacheData } from "./config";
 
 const getCacheData = <T extends CacheData | IconCacheData>(key: string): T | null => {
+    if (!CACHE_ENABLED) {
+        localStorage.removeItem(key);
+        return null;
+    }
+
     try {
         const cached = localStorage.getItem(key);
         if (!cached) return null;
@@ -17,6 +22,11 @@ const getCacheData = <T extends CacheData | IconCacheData>(key: string): T | nul
 };
 
 const setCacheData = <T extends CacheData | IconCacheData>(key: string, data: T) => {
+    if (!CACHE_ENABLED) {
+        localStorage.removeItem(key);
+        return;
+    }
+
     try {
         localStorage.setItem(key, JSON.stringify(structuredClone(data)));
     } catch {

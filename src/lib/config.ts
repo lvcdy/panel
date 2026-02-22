@@ -28,6 +28,7 @@ export const SCROLL_DURATION = 600 as const;
 // Cache Configuration
 export const CACHE_KEY = "url_status_cache" as const;
 export const ICON_CACHE_KEY = "icon_cache" as const;
+export const CACHE_ENABLED = false as const;
 // Cache duration: 1 hour
 export const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
