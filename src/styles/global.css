@@ -1,8 +1,5 @@
 @import "@fortawesome/fontawesome-free/css/all.min.css";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   body {
@@ -67,7 +64,8 @@
   }
 
   .search-container {
-    @apply transition-all duration-300 ease-out border border-transparent;
+    @apply duration-300 ease-out border border-transparent;
+    transition-property: background-color, border-color, box-shadow, transform;
   }
 
   .search-container:focus-within {
@@ -109,6 +107,7 @@
   .animate-fade-in-up {
     animation: fadeUp 600ms var(--easing-entrance) forwards;
     opacity: 0;
+    will-change: transform, opacity;
   }
 
   #engineMenu {
@@ -135,7 +134,36 @@
   }
 
   .status-indicator {
-    @apply transition-all duration-300 ease-out;
+    @apply duration-300 ease-out;
+    transition-property: opacity, background-color, transform;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .sun-card,
+  .category-section,
+  .search-container,
+  .status-indicator,
+  .engine-item,
+  #engineMenu,
+  .animate-fade-in-up {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .animate-fade-in-up {
+    opacity: 1;
+    transform: none;
+  }
+
+  #engineMenu:not(.hidden),
+  #engineMenu.hidden {
+    animation: none;
   }
 }
 

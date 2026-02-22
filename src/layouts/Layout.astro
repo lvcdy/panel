@@ -71,6 +71,16 @@ const { title = "Panel", description = "" } = Astro.props;
     -webkit-tap-highlight-color: transparent;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    body::before {
+      transition-duration: 1ms;
+    }
+  }
+
   .category-toggle-btn {
     border: none;
     padding: 0;
