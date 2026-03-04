@@ -54,14 +54,13 @@ import { ICON_API } from "../lib/config";
                                                         src={
                                                             ICON_API + link.url
                                                         }
-                                                        alt=""
+                                                        alt={`${link.name} 图标`}
                                                         loading="lazy"
                                                         decoding="async"
                                                         fetchpriority="low"
                                                         crossorigin="anonymous"
-                                                        class="w-full h-full object-contain transition-opacity opacity-0"
-                                                        onload="this.style.opacity=1"
-                                                        onerror="this.nextElementSibling.classList.add('flex');this.nextElementSibling.classList.remove('hidden');this.style.display='none'"
+                                                        class="icon-img w-full h-full object-contain transition-opacity opacity-0"
+                                                        data-fallback-icon
                                                     />
                                                     <div
                                                         class="hidden w-full h-full items-center justify-center"
@@ -81,7 +80,10 @@ import { ICON_API } from "../lib/config";
                                                 </div>
                                             )}
                                         </div>
-                                        <span class="ml-4 overflow-hidden text-white/90 font-bold truncate">
+                                        <span
+                                            data-card-text
+                                            class="ml-4 overflow-hidden text-white/90 font-bold truncate"
+                                        >
                                             {link.name}
                                         </span>
                                         <span

@@ -30,10 +30,9 @@ export const updateStatusIndicator = (card: HTMLElement, status: number | string
     } as const;
 
     const numStatus = Number(status);
-    const config = (statusConfig as Record<number, { readonly bg: string; readonly title: string }>)[numStatus] || {
-        bg: "#ef4444",
-        title: "无法访问",
-    };
+    const config = numStatus in statusConfig
+        ? statusConfig[numStatus as keyof typeof statusConfig]
+        : { bg: "#ef4444", title: "无法访问" };
 
     indicator.style.backgroundColor = config.bg;
     indicator.style.boxShadow = `0 0 8px ${config.bg}`;
@@ -56,23 +55,27 @@ export const checkAllUrls = async () => {
         return;
     }
 
-    const urls = Array.from(cards).map((card) => (card as HTMLElement).getAttribute("data-url")).filter(Boolean);
+    // 预建 URL -> Card 映射，O(1) 查找代替 O(n) 遍历
+    const cardMap = new Map<string, HTMLElement>();
+    cards.forEach((card) => {
+        const url = (card as HTMLElement).getAttribute("data-url");
+        if (url) cardMap.set(url, card as HTMLElement);
+    });
 
+    const urls = Array.from(cardMap.keys());
     const newStatuses: Record<string, number | string> = {};
     const CONCURRENCY_LIMIT = 5;
     const results: Promise<void>[] = [];
     const pool: Promise<void>[] = [];
 
     for (const url of urls) {
-        if (!url) continue;
-
         const p = (async () => {
             try {
                 const result = await checkUrlStatus(url);
                 const status = result.status || "error";
                 newStatuses[url] = status;
-                const card = Array.from(cards).find((c) => (c as HTMLElement).getAttribute("data-url") === url);
-                if (card) updateStatusIndicator(card as HTMLElement, status);
+                const card = cardMap.get(url);
+                if (card) updateStatusIndicator(card, status);
             } catch {
                 newStatuses[url] = "error";
             }
@@ -80,14 +83,12 @@ export const checkAllUrls = async () => {
 
         results.push(p);
 
-        if (CONCURRENCY_LIMIT <= urls.length) {
-            const e = p.then(() => {
-                pool.splice(pool.indexOf(e), 1);
-            });
-            pool.push(e);
-            if (pool.length >= CONCURRENCY_LIMIT) {
-                await Promise.race(pool);
-            }
+        const e = p.then(() => {
+            pool.splice(pool.indexOf(e), 1);
+        });
+        pool.push(e);
+        if (pool.length >= CONCURRENCY_LIMIT) {
+            await Promise.race(pool);
         }
     }
 

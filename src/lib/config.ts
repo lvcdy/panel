@@ -5,7 +5,7 @@ export const SELECTOR_CATEGORY_TOGGLE_BTN = ".category-toggle-btn" as const;
 export const SELECTOR_CATEGORY_TOGGLE_ICON = ".category-toggle-icon" as const;
 export const SELECTOR_CATEGORY_TOGGLE_LABEL = ".category-toggle-label" as const;
 export const SELECTOR_CARD = ".sun-card" as const;
-export const SELECTOR_CARD_TEXT = ".ml-4.overflow-hidden" as const;
+export const SELECTOR_CARD_TEXT = "[data-card-text]" as const;
 export const SELECTOR_CATEGORY_TITLE = "h2.text-2xl" as const;
 
 export const ICON_API = "https://api.veyn.cn/favicon?url=" as const;
@@ -30,7 +30,7 @@ export const CACHE_KEY = "url_status_cache" as const;
 export const ICON_CACHE_KEY = "icon_cache" as const;
 export const CACHE_ENABLED = false as const;
 // Cache duration: 1 hour
-export const CACHE_DURATION = 3600000; // 1 hour in milliseconds
+export const CACHE_DURATION = 3600000 as const; // 1 hour in milliseconds
 
 export interface CacheData {
     timestamp: number;

@@ -13,9 +13,8 @@ export const updateTime = (clockEl: HTMLElement | null, dateEl: HTMLElement | nu
 };
 
 export const scheduleInit = (cb: () => void) => {
-    const ric = (window as any).requestIdleCallback;
-    if (ric) {
-        ric(cb, { timeout: 1200 });
+    if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(cb, { timeout: 1200 });
     } else {
         setTimeout(cb, 200);
     }

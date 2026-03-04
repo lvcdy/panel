@@ -199,8 +199,15 @@ export const setupDocumentClickHandler = (menu: HTMLElement | null) => {
 
 export const setupIPInfoHandler = (ipBox: HTMLElement | null) => {
     if (!ipBox) return;
-    ipBox.addEventListener("click", (e) => {
+    const openIpInfo = (e: Event) => {
         e.stopPropagation();
         window.open(IP_INFO_URL, "_blank");
+    };
+    ipBox.addEventListener("click", openIpInfo);
+    ipBox.addEventListener("keydown", (e) => {
+        if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
+            e.preventDefault();
+            openIpInfo(e);
+        }
     });
 };

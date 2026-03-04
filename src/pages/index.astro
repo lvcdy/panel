@@ -74,18 +74,41 @@ import "../styles/global.css";
     UI.setupDocumentClickHandler(els.menu);
     UI.setupCategoryCollapse();
 
+    // 初始化图标加载/错误处理（替代内联 onload/onerror，兼容 CSP）
+    document
+      .querySelectorAll<HTMLImageElement>("img[data-fallback-icon]")
+      .forEach((img) => {
+        img.addEventListener(
+          "load",
+          () => {
+            img.style.opacity = "1";
+          },
+          { once: true },
+        );
+        img.addEventListener(
+          "error",
+          () => {
+            const fallback = img.nextElementSibling as HTMLElement | null;
+            if (fallback) {
+              fallback.classList.add("flex");
+              fallback.classList.remove("hidden");
+            }
+            img.style.display = "none";
+          },
+          { once: true },
+        );
+      });
+
     // 初始化图标缓存
     UI.loadCachedIcons();
     UI.setupIconCaching();
 
     // 异步加载网络信息和URL状态检测
     UI.scheduleInit(() => {
-      const initNetworkData = async () => {
-        await UI.fetchIpInfo(els.ip, els.ipBox);
-        await fetchAndDetectProvider(els.proName, els.proBox);
-      };
-
-      initNetworkData().catch((err) => {
+      Promise.all([
+        UI.fetchIpInfo(els.ip, els.ipBox),
+        fetchAndDetectProvider(els.proName, els.proBox),
+      ]).catch((err) => {
         console.error("初始化网络数据失败:", err);
       });
     });

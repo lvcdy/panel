@@ -1,4 +1,11 @@
-export const SEARCH_ENGINES = [
+export interface SearchEngine {
+  id: string;
+  name: string;
+  url: string;
+  icon: string;
+}
+
+export const SEARCH_ENGINES: SearchEngine[] = [
   { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft' },
   { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw' },
   { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google' },
