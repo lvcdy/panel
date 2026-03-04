@@ -24,9 +24,9 @@ export const CATEGORIES: Category[] = [
     title: "我的网站",
     links: [
       { name: "Blog", url: "https://blog.lvcdy.cn", icon: "fas fa-blog", color: "#ff5722", useIcon: false },
-      { name: "Certd", url: "https://certd.lvcdy.cn", icon: "fas fa-certificate", color: "#2196f3", useIcon: false },
+      { name: "Certd", url: "https://certd.veyn.cn", icon: "fas fa-certificate", color: "#2196f3", useIcon: false },
       { name: "Toolbox", url: "https://toolbox.lvcdy.cn", icon: "fas fa-toolbox", color: "#9c27b0", useIcon: false },
-      { name: "api", url: "https://api.lvcdy.cn", icon: "fas fa-server", color: "#4caf50", useIcon: true }
+      { name: "api", url: "https://api.veyn.cn", icon: "fas fa-server", color: "#4caf50", useIcon: true }
     ]
   },
   {

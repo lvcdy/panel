@@ -7,7 +7,7 @@ interface UrlStatusResult {
 
 export const checkUrlStatus = async (url: string): Promise<UrlStatusResult> => {
     try {
-        const res = await fetch(`https://api.lvcdy.cn/uptime?url=${encodeURIComponent(url)}`, {
+        const res = await fetch(`https://api.veyn.cn/uptime?url=${encodeURIComponent(url)}`, {
             signal: AbortSignal.timeout(5000),
         });
         const data = await res.json();
