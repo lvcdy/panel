@@ -87,38 +87,72 @@
     filter: blur(4px);
   }
 
+  /* ─────── 搜索统一布局模式 ─────── */
+  /* 搜索时：隐藏分类标题和折叠按钮，所有分类合并为连续流式布局 */
+  .is-searching .category-section {
+    margin-bottom: 0;
+  }
+
+  .is-searching .category-header {
+    @apply hidden;
+  }
+
+  .is-searching .category-wrapper {
+    grid-template-rows: 1fr;
+  }
+
+  .is-searching .category-content {
+    padding-top: 0;
+    padding-bottom: 0;
+    /* 搜索模式下统一使用flex wrap，让所有匹配卡片平铺 */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .is-searching .category-content {
+      gap: 1rem;
+    }
+  }
+
+  .is-searching .category-content > li {
+    /* 统一卡片宽度 */
+    width: calc(50% - 0.5rem);
+  }
+
+  @media (min-width: 1024px) {
+    .is-searching .category-content > li {
+      width: calc(33.333% - 0.7rem);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .is-searching .category-content > li {
+      width: calc(25% - 0.75rem);
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .is-searching .category-content > li {
+      width: calc(20% - 0.8rem);
+    }
+  }
+
   /* 搜索过滤：无匹配结果的分类 */
   .category-section.search-no-results {
-    @apply opacity-0 pointer-events-none;
-    transform: translateY(0.5rem);
-    max-height: 0;
-    overflow: hidden;
-    margin-bottom: 0;
-    transition:
-      opacity var(--dur-base) var(--ease-smooth),
-      transform var(--dur-base) var(--ease-smooth),
-      max-height var(--dur-slow) var(--ease-out-expo),
-      margin-bottom var(--dur-slow) var(--ease-out-expo);
-  }
-
-  /* 搜索过滤：隐藏不匹配的卡片 */
-  .sun-card.search-hidden {
-    @apply opacity-0 pointer-events-none;
-    transform: scale(0.95);
-    max-height: 0;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-    border: 0;
-    transition:
-      opacity var(--dur-fast) var(--ease-smooth),
-      transform var(--dur-fast) var(--ease-smooth),
-      max-height var(--dur-base) var(--ease-out-expo);
-  }
-
-  .sun-card.search-hidden+li,
-  li:has(> .sun-card.search-hidden) {
     @apply hidden;
+  }
+
+  /* 搜索过滤：隐藏不匹配的卡片（直接由 JS 切换 class） */
+  li.search-hidden-item {
+    @apply hidden;
+  }
+
+  /* 搜索模式下：跳过 reveal 动画，让所有卡片立即可见 */
+  .is-searching .animate-fade-in-up {
+    opacity: 1;
+    animation: none;
   }
 
   /* 搜索高亮样式 */
@@ -140,6 +174,8 @@
   }
 
   .category-content {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 0.75rem;
     padding-top: 0.75rem;
     padding-bottom: 0.25rem;
@@ -151,7 +187,26 @@
 
   @media (min-width: 640px) {
     .category-content {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1.25rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .category-content {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .category-content {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .category-content {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
     }
   }
 

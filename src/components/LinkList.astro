@@ -37,7 +37,7 @@ import { ICON_API } from "../lib/config";
                 <div class="category-wrapper grid transition-[grid-template-rows] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]">
                     <ul
                         id={`category-content-${catIndex}`}
-                        class="category-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 list-none p-0 m-0"
+                        class="category-content list-none p-0 m-0"
                     >
                         {cat.links.map((link, index) => {
                             const shouldFetchIcon = link.useIcon !== false;

@@ -33,9 +33,6 @@ const debounce = <T extends (...args: Parameters<T>) => void>(fn: T, delay: numb
     };
 };
 
-/** 安全地转义正则特殊字符 */
-const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
 /** 高亮匹配文本 */
 const highlightText = (el: HTMLElement, query: string) => {
     if (!originalTexts.has(el)) {
@@ -46,21 +43,26 @@ const highlightText = (el: HTMLElement, query: string) => {
         el.textContent = original;
         return;
     }
-    const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
-    // 使用 textContent 构建安全的 HTML（仅高亮标签，文本内容已转义）
-    const parts = original.split(regex);
+    const lowerOriginal = original.toLowerCase();
+    const lowerQuery = query.toLowerCase();
     el.innerHTML = "";
-    for (const part of parts) {
-        if (regex.test(part)) {
-            const mark = document.createElement("mark");
-            mark.className = "search-highlight";
-            mark.textContent = part;
-            el.appendChild(mark);
-        } else {
-            el.appendChild(document.createTextNode(part));
+    let cursor = 0;
+    let idx: number;
+    while ((idx = lowerOriginal.indexOf(lowerQuery, cursor)) !== -1) {
+        // 匹配前的文本
+        if (idx > cursor) {
+            el.appendChild(document.createTextNode(original.slice(cursor, idx)));
         }
-        // reset regex lastIndex
-        regex.lastIndex = 0;
+        // 高亮匹配文本（保留原始大小写）
+        const mark = document.createElement("mark");
+        mark.className = "search-highlight";
+        mark.textContent = original.slice(idx, idx + query.length);
+        el.appendChild(mark);
+        cursor = idx + query.length;
+    }
+    // 剩余文本
+    if (cursor < original.length) {
+        el.appendChild(document.createTextNode(original.slice(cursor)));
     }
 };
 
@@ -97,9 +99,23 @@ const updateSearchFeedback = (matchCount: number, query: string) => {
     }
 };
 
+/** 获取链接导航容器 */
+const getNavContainer = () => document.querySelector<HTMLElement>("nav[aria-label]");
+
+/** 搜索模式下强制所有 section 可见（跳过未触发 IntersectionObserver 的 reveal 动画） */
+const forceRevealAll = () => {
+    getCategories().forEach((cat) => {
+        (cat as HTMLElement).classList.add("revealed");
+    });
+};
+
 export const filterLinks = (query: string) => {
     const lowerQuery = query.toLowerCase();
     toggleCategoryVisibility(true);
+
+    // 进入搜索模式：统一布局
+    getNavContainer()?.classList.add("is-searching");
+    forceRevealAll();
 
     let totalMatches = 0;
 
@@ -112,12 +128,15 @@ export const filterLinks = (query: string) => {
 
         catElement.querySelectorAll(SELECTOR_CARD).forEach((card: Element) => {
             const cardEl = card as HTMLElement;
+            const li = cardEl.closest("li");
             const textDiv = cardEl.querySelector(SELECTOR_CARD_TEXT) as HTMLElement;
-            const text = textDiv?.textContent?.toLowerCase() || "";
+            // 优先从缓存读取原始文本，避免读到高亮残留
+            const text = (originalTexts.get(textDiv) ?? textDiv?.textContent ?? "").toLowerCase();
             const url = (cardEl.getAttribute("data-url") || cardEl.getAttribute("href") || "").toLowerCase();
             const matches = categoryMatches || text.includes(lowerQuery) || url.includes(lowerQuery);
 
-            cardEl.classList.toggle("search-hidden", !matches);
+            // 直接控制 li 显隐，不依赖 CSS :has()
+            li?.classList.toggle("search-hidden-item", !matches);
             if (textDiv) {
                 highlightText(textDiv, matches && !categoryMatches ? query : "");
             }
@@ -232,10 +251,12 @@ export const hideAllIcons = () => toggleCategoryVisibility(false);
 export const showAllIcons = () => {
     toggleCategoryVisibility(true);
     clearAllHighlights();
+    // 退出搜索模式
+    getNavContainer()?.classList.remove("is-searching");
     getCategories().forEach((catElement) => {
         (catElement as HTMLElement).classList.remove("search-no-results");
-        catElement.querySelectorAll(SELECTOR_CARD).forEach((card) => {
-            (card as HTMLElement).classList.remove("search-hidden");
+        catElement.querySelectorAll("li").forEach((li) => {
+            li.classList.remove("search-hidden-item");
         });
     });
     updateSearchFeedback(0, "");
