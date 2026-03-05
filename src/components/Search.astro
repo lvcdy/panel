@@ -3,47 +3,48 @@ import { SEARCH_ENGINES } from "../data/links";
 ---
 
 <search
-    class="mt-10 sm:mt-12 w-full max-w-[650px] px-4 sm:px-6 relative animate-fade-in-up z-20"
+    class="mt-10 sm:mt-12 w-full max-w-[680px] px-4 sm:px-6 relative animate-fade-in-up z-20"
     style="animation-delay: 200ms"
 >
     <div
-        class="search-container glass flex items-center h-16 rounded-2xl px-2 shadow-2xl"
+        class="search-container flex items-center h-14 rounded-full px-1.5"
         role="search"
     >
         <button
             type="button"
             id="engineBtn"
-            class="w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer hover:bg-white/10 transition-all"
+            class="search-engine-btn w-10 h-10 flex items-center justify-center rounded-full cursor-pointer shrink-0"
             aria-label="选择搜索引擎"
             aria-haspopup="listbox"
             aria-expanded="false"
         >
             <i
                 id="currentIcon"
-                class="fab fa-microsoft text-xl transition-all"
+                class="fab fa-microsoft text-lg transition-all"
                 style="color: #00a4ef"
                 aria-hidden="true"></i>
         </button>
+        <div class="search-divider"></div>
         <input
             type="search"
             id="searchInput"
-            placeholder="正在思考..."
-            class="bg-transparent flex-grow h-full px-4 outline-none placeholder-white/40 font-medium"
+            placeholder="搜索一下..."
+            class="bg-transparent flex-grow h-full px-3 outline-none placeholder-white/30 text-sm font-medium tracking-wide"
             autocomplete="off"
             aria-label="搜索"
         />
         <button
             type="button"
             id="searchBtn"
-            class="mr-4 p-2 opacity-40 cursor-pointer hover:opacity-70 transition-opacity"
+            class="search-go-btn w-10 h-10 flex items-center justify-center rounded-full cursor-pointer shrink-0"
             aria-label="执行搜索"
         >
-            <i class="fas fa-search" aria-hidden="true"></i>
+            <i class="fas fa-arrow-right text-sm" aria-hidden="true"></i>
         </button>
     </div>
     <div
         id="searchTip"
-        class="mt-2 text-center text-red-400 text-sm opacity-0 transition-opacity duration-300"
+        class="mt-2.5 text-center text-red-400/80 text-xs opacity-0 transition-opacity duration-300"
         role="alert"
         aria-live="polite"
     >
@@ -53,7 +54,7 @@ import { SEARCH_ENGINES } from "../data/links";
     </div>
     <div
         id="engineMenu"
-        class="engine-menu absolute top-full left-4 sm:left-0 w-48 rounded-2xl hidden flex-col z-50 overflow-hidden mt-3 p-1.5"
+        class="engine-menu absolute top-full left-4 sm:left-6 w-52 rounded-2xl hidden flex-col z-50 overflow-hidden mt-3 p-1.5"
         role="listbox"
         aria-label="搜索引擎列表"
     >

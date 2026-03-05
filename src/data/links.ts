@@ -10,7 +10,8 @@ export const SEARCH_ENGINES: SearchEngine[] = [
   { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft', color: '#00a4ef' },
   { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw', color: '#2932e1' },
   { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google', color: '#4285f4' },
-  { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github', color: '#f0f6fc' }
+  { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github', color: '#f0f6fc' },
+  { id: 'zhihu', name: '知乎', url: 'https://www.zhihu.com/search?type=content&q=', icon: 'fab fa-zhihu', color: '#0084ff' }
 ];
 
 // 链接配置类型

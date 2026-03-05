@@ -323,7 +323,13 @@
 
   /* ─────── Search ─────── */
   .search-container {
-    @apply border border-transparent;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
     transition:
       background-color var(--dur-base) var(--ease-smooth),
       border-color var(--dur-base) var(--ease-smooth),
@@ -332,12 +338,62 @@
   }
 
   .search-container:focus-within {
-    @apply bg-white/10 border-white/20 scale-[1.01];
-    backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
     box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(255, 255, 255, 0.1),
-      0 0 80px -20px rgba(255, 255, 255, 0.06);
+      0 8px 40px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 0 60px -10px rgba(255, 255, 255, 0.04);
+    transform: scale(1.01);
+  }
+
+  .search-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    flex-shrink: 0;
+    transition: background var(--dur-base) var(--ease-smooth);
+  }
+
+  .search-container:focus-within .search-divider {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .search-engine-btn {
+    color: rgba(255, 255, 255, 0.7);
+    transition:
+      background-color var(--dur-fast) var(--ease-smooth),
+      transform var(--dur-fast) var(--ease-spring);
+  }
+
+  .search-engine-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.05);
+  }
+
+  .search-engine-btn:active {
+    transform: scale(0.95);
+  }
+
+  .search-go-btn {
+    color: rgba(255, 255, 255, 0.5);
+    transition:
+      color var(--dur-fast) var(--ease-smooth),
+      background-color var(--dur-fast) var(--ease-smooth),
+      transform var(--dur-fast) var(--ease-spring);
+  }
+
+  .search-go-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .search-go-btn:active {
+    transform: scale(0.9);
+  }
+
+  .search-container:focus-within .search-go-btn {
+    color: rgba(255, 255, 255, 0.8);
   }
 
   /* ━━━━━ Keyframes ━━━━━ */
@@ -425,13 +481,13 @@
 
   /* ─────── Engine Menu ─────── */
   .engine-menu {
-    background: rgba(28, 28, 30, 0.88);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(22, 22, 26, 0.92);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow:
-      0 20px 60px rgba(0, 0, 0, 0.45),
-      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      0 24px 64px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset;
     transform-origin: top left;
   }
 
