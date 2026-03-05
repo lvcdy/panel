@@ -38,7 +38,8 @@
 
   /* ─────── Card ─────── */
   .sun-card {
-    @apply relative;
+    @apply relative overflow-hidden;
+    --_accent: var(--card-color, #ffffff);
     contain: layout style;
     transition:
       transform var(--dur-base) var(--ease-spring),
@@ -48,28 +49,54 @@
   }
 
   .sun-card:hover {
-    @apply -translate-y-2 scale-[1.03] border-white/20;
+    @apply -translate-y-1.5 border-white/15;
     background: var(--glass-bg-hover);
     box-shadow:
-      0 14px 44px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-      0 1px 0 rgba(255, 255, 255, 0.06) inset;
+      0 8px 30px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+      0 20px 50px -15px color-mix(in srgb, var(--_accent) 18%, transparent);
   }
 
+  /* Bottom accent bar */
+  .sun-card::before {
+    content: '';
+    @apply absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-0 rounded-full;
+    background: var(--_accent);
+    transition: width var(--dur-base) var(--ease-spring);
+  }
+
+  .sun-card:hover::before {
+    width: 36%;
+  }
+
+  /* Shimmer overlay */
   .sun-card::after {
     content: '';
     @apply absolute inset-0 pointer-events-none rounded-[inherit];
     overflow: hidden;
-    background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        transparent 60%,
-        rgba(255, 255, 255, 0.03) 100%);
+    background: linear-gradient(120deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.06) 40%,
+        transparent 60%);
     opacity: 0;
     transition: opacity var(--dur-base) var(--ease-smooth);
   }
 
   .sun-card:hover::after {
     opacity: 1;
+  }
+
+  /* Icon container */
+  .card-icon {
+    background: color-mix(in srgb, var(--_accent) 10%, transparent);
+    transition:
+      transform var(--dur-base) var(--ease-spring),
+      background-color var(--dur-base) var(--ease-smooth);
+  }
+
+  .sun-card:hover .card-icon {
+    background: color-mix(in srgb, var(--_accent) 18%, transparent);
+    transform: scale(1.08);
   }
 
   /* ─────── Category ─────── */
@@ -116,25 +143,25 @@
     }
   }
 
-  .is-searching .category-content > li {
+  .is-searching .category-content>li {
     /* 统一卡片宽度 */
     width: calc(50% - 0.5rem);
   }
 
   @media (min-width: 1024px) {
-    .is-searching .category-content > li {
+    .is-searching .category-content>li {
       width: calc(33.333% - 0.7rem);
     }
   }
 
   @media (min-width: 1280px) {
-    .is-searching .category-content > li {
+    .is-searching .category-content>li {
       width: calc(25% - 0.75rem);
     }
   }
 
   @media (min-width: 1536px) {
-    .is-searching .category-content > li {
+    .is-searching .category-content>li {
       width: calc(20% - 0.8rem);
     }
   }
@@ -477,11 +504,11 @@
   }
 
   .sun-card {
-    @apply p-3.5;
+    @apply p-3;
   }
 
-  .sun-card .w-12 {
-    @apply w-10 h-10;
+  .sun-card .card-icon {
+    @apply w-9 h-9 text-base;
   }
 
   .category-section h2 {

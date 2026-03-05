@@ -21,7 +21,7 @@ export const updateStatusIndicator = (card: HTMLElement, status: number | string
     const indicator = card.querySelector(".status-indicator") as HTMLElement;
     if (!indicator) return;
 
-    indicator.classList.remove("opacity-50", "bg-gray-400");
+    indicator.classList.remove("bg-white/20");
 
     const statusConfig = {
         200: { bg: "#4ade80", title: "可用" },
