@@ -101,8 +101,8 @@
 
   /* ─────── Info Capsule ─────── */
   .info-capsule {
-    @apply inline-flex items-center gap-2.5 rounded-full text-xs cursor-pointer select-none;
-    padding: 7px 16px 7px 12px;
+    @apply inline-flex items-center gap-2 rounded-full text-xs cursor-pointer select-none;
+    padding: 5px 14px 5px 10px;
     background: rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(14px) saturate(150%);
     -webkit-backdrop-filter: blur(14px) saturate(150%);
@@ -271,9 +271,9 @@
   .category-content {
     display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 0.75rem;
-    padding-top: 0.75rem;
-    padding-bottom: 0.25rem;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.15rem;
     transition:
       gap var(--dur-slow) var(--ease-in-out),
       padding-top var(--dur-slow) var(--ease-in-out),
@@ -283,7 +283,7 @@
   @media (min-width: 640px) {
     .category-content {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1.25rem;
+      gap: 0.75rem;
     }
   }
 
@@ -624,24 +624,24 @@
 /* ━━━━━ Responsive ━━━━━ */
 @media (max-width: 640px) {
   #clock {
-    @apply text-5xl;
+    @apply text-4xl;
   }
 
   .sun-card {
-    @apply p-3;
+    @apply p-2.5;
   }
 
   .sun-card .card-icon {
-    @apply w-9 h-9 text-base;
+    @apply w-8 h-8 text-sm;
   }
 
   .category-section h2 {
-    @apply text-xl mb-4;
+    @apply text-lg mb-2;
   }
 }
 
 @media (max-width: 400px) {
   #clock {
-    @apply text-4xl;
+    @apply text-3xl;
   }
 }
