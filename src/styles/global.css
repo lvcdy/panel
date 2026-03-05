@@ -99,6 +99,74 @@
     transform: scale(1.08);
   }
 
+  /* ─────── Info Capsule ─────── */
+  .info-capsule {
+    @apply inline-flex items-center gap-2.5 rounded-full text-xs cursor-pointer select-none;
+    padding: 7px 16px 7px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    opacity: 0;
+    filter: blur(8px);
+    transition:
+      opacity 700ms var(--ease-out-expo),
+      filter 700ms var(--ease-out-expo),
+      background-color var(--dur-base) var(--ease-smooth),
+      border-color var(--dur-base) var(--ease-smooth),
+      box-shadow var(--dur-slow) var(--ease-smooth),
+      color var(--dur-base) var(--ease-smooth),
+      transform var(--dur-base) var(--ease-spring);
+  }
+
+  .info-capsule:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.2),
+      0 0 24px -6px rgba(255, 255, 255, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .info-capsule:active {
+    transform: scale(0.97);
+  }
+
+  .info-capsule .capsule-dot {
+    @apply w-1.5 h-1.5 rounded-full flex-shrink-0;
+    background: currentColor;
+    opacity: 0.45;
+    transition: opacity var(--dur-base) var(--ease-smooth);
+  }
+
+  .info-capsule:hover .capsule-dot {
+    opacity: 0.8;
+  }
+
+  .info-capsule .capsule-icon {
+    @apply flex-shrink-0 text-[11px];
+    opacity: 0.5;
+    transition:
+      opacity var(--dur-base) var(--ease-smooth),
+      transform var(--dur-base) var(--ease-spring);
+  }
+
+  .info-capsule:hover .capsule-icon {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  .info-capsule .capsule-text {
+    @apply truncate max-w-[280px] sm:max-w-none;
+    letter-spacing: 0.01em;
+  }
+
   /* ─────── Category ─────── */
   .category-section {
     transition:
