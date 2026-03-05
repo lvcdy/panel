@@ -248,7 +248,6 @@ const toggleCategoryVisibility = (visible: boolean) => {
     });
 };
 
-export const hideAllIcons = () => toggleCategoryVisibility(false);
 export const showAllIcons = () => {
     toggleCategoryVisibility(true);
     clearAllHighlights();
