@@ -55,8 +55,9 @@ import "../styles/global.css";
     UI.setupEngineItemHandlers(
       els.menu,
       els.input,
-      (url: string, iconClass: string, color: string) => {
+      (url: string, iconClass: string, color: string, placeholder: string) => {
         searchUrl = url;
+        if (placeholder) UI.setEnginePlaceholder(placeholder);
         if (els.icon) {
           // Google uses inline SVG
           if (iconClass === "fab fa-google") {

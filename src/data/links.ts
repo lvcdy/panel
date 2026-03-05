@@ -4,14 +4,15 @@ export interface SearchEngine {
   url: string;
   icon: string;
   color: string;
+  placeholder: string;
 }
 
 export const SEARCH_ENGINES: SearchEngine[] = [
-  { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft', color: '#00a4ef' },
-  { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw', color: '#2932e1' },
-  { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google', color: '#4285f4' },
-  { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github', color: '#f0f6fc' },
-  { id: 'zhihu', name: '知乎', url: 'https://www.zhihu.com/search?type=content&q=', icon: 'fab fa-zhihu', color: '#0084ff' }
+  { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft', color: '#00a4ef', placeholder: '🔍 必应一下，你就知道！' },
+  { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw', color: '#2932e1', placeholder: '🐾 百度一下，世界尽在掌握！' },
+  { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google', color: '#4285f4', placeholder: '🌐 Google it，探索无限可能！' },
+  { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github', color: '#f0f6fc', placeholder: '🐙 在 GitHub 的代码海洋中探险！' },
+  { id: 'zhihu', name: '知乎', url: 'https://www.zhihu.com/search?type=content&q=', icon: 'fab fa-zhihu', color: '#0084ff', placeholder: '💡 有问题？知乎上总有答案！' }
 ];
 
 // 链接配置类型

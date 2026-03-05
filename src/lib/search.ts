@@ -215,7 +215,7 @@ export const setupEngineButtonHandler = (engineBtn: HTMLElement | null, menu: HT
 export const setupEngineItemHandlers = (
     menu: HTMLElement | null,
     input: HTMLInputElement | null,
-    onEngineSelect: (url: string, iconClass: string, color: string) => void
+    onEngineSelect: (url: string, iconClass: string, color: string, placeholder: string) => void
 ) => {
     if (!menu) return;
 
@@ -235,7 +235,8 @@ export const setupEngineItemHandlers = (
         const url = target.dataset.url || DEFAULT_SEARCH_URL;
         const iconClass = target.dataset.icon || "";
         const color = target.dataset.color || "";
-        onEngineSelect(url, iconClass, color);
+        const placeholder = target.dataset.placeholder || "";
+        onEngineSelect(url, iconClass, color, placeholder);
         menu.classList.add("hidden");
         input?.focus();
     });
@@ -262,6 +263,12 @@ export const showAllIcons = () => {
     updateSearchFeedback(0, "");
 };
 
+let currentEnginePlaceholder = "🔍 必应一下，你就知道！";
+
+export const setEnginePlaceholder = (placeholder: string) => {
+    currentEnginePlaceholder = placeholder;
+};
+
 export const setupInputHandlers = (
     input: HTMLInputElement | null,
     searchTip: HTMLElement | null,
@@ -279,7 +286,7 @@ export const setupInputHandlers = (
 
     input.addEventListener("focus", () => {
         originalPlaceholder = input.placeholder;
-        input.placeholder = "输入关键词搜索站内链接…";
+        input.placeholder = currentEnginePlaceholder;
         if (searchTip) searchTip.style.opacity = "0";
         // 不再在 focus 时隐藏所有卡片，仅当已有输入内容时才过滤
         if (input.value.trim()) {
