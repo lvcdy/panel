@@ -51,7 +51,7 @@ export const updateProviderDisplay = (
         const openProvider = (e: Event) => {
             e.stopPropagation();
             if (currentProviderUrl) {
-                window.open(currentProviderUrl, "_blank");
+                window.open(currentProviderUrl, "_blank", "noopener,noreferrer");
             }
         };
         proBox.addEventListener("click", openProvider);
@@ -64,6 +64,7 @@ export const updateProviderDisplay = (
     }
 
     proBox.style.opacity = "1";
+    proBox.style.filter = "blur(0px)";
 };
 
 export const fetchAndDetectProvider = async (

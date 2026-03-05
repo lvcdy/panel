@@ -1,7 +1,9 @@
-import { SELECTOR_CARD } from "./config";
+import { SELECTOR_CARD, CACHE_ENABLED } from "./config";
 import { getIconCache, setIconCache } from "./cache";
 
 export const loadCachedIcons = () => {
+    if (!CACHE_ENABLED) return;
+
     const iconCache = getIconCache();
     if (!iconCache) return;
 
@@ -29,16 +31,20 @@ const convertImageToDataURL = (img: HTMLImageElement): string | null => {
 };
 
 export const setupIconCaching = () => {
-    // 批量收集所有图标数据，最终一次写入 localStorage
-    const pendingIcons: Record<string, string> = {};
-    let pendingCount = 0;
-    let totalCount = 0;
+    if (!CACHE_ENABLED) return;
 
-    const flushIconCache = () => {
+    const pendingIcons: Record<string, string> = {};
+    let settled = 0;
+    let total = 0;
+    let flushed = false;
+
+    const flush = () => {
+        if (flushed) return;
+        flushed = true;
         if (Object.keys(pendingIcons).length === 0) return;
-        const existingCache = getIconCache() || {};
-        Object.assign(existingCache, pendingIcons);
-        setIconCache(existingCache);
+        const existing = getIconCache() || {};
+        Object.assign(existing, pendingIcons);
+        setIconCache(existing);
     };
 
     const cards = document.querySelectorAll(SELECTOR_CARD);
@@ -48,31 +54,27 @@ export const setupIconCaching = () => {
         const img = card.querySelector("img") as HTMLImageElement;
         if (!url || !img) return;
 
-        totalCount++;
+        total++;
 
-        const collectIcon = () => {
+        const collect = () => {
             if (img.complete && img.naturalWidth > 0) {
                 const dataUrl = convertImageToDataURL(img);
                 if (dataUrl) pendingIcons[url] = dataUrl;
             }
-            pendingCount++;
-            // 所有图标处理完毕后，一次性写入缓存
-            if (pendingCount >= totalCount) {
-                flushIconCache();
-            }
+            settled++;
+            if (settled >= total) flush();
         };
 
         if (img.complete) {
-            collectIcon();
+            collect();
         } else {
-            img.setAttribute("crossorigin", "anonymous");
-            img.addEventListener("load", collectIcon, { once: true });
-            img.addEventListener("error", () => { pendingCount++; if (pendingCount >= totalCount) flushIconCache(); }, { once: true });
+            img.addEventListener("load", collect, { once: true });
+            img.addEventListener("error", () => { settled++; if (settled >= total) flush(); }, { once: true });
         }
     });
 
     // 兜底：10 秒后强制写入
-    if (totalCount > 0) {
-        setTimeout(flushIconCache, 10000);
+    if (total > 0) {
+        setTimeout(flush, 10000);
     }
 };

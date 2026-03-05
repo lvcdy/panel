@@ -3,13 +3,14 @@ export interface SearchEngine {
   name: string;
   url: string;
   icon: string;
+  color: string;
 }
 
 export const SEARCH_ENGINES: SearchEngine[] = [
-  { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft' },
-  { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw' },
-  { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google' },
-  { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github' }
+  { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft', color: '#00a4ef' },
+  { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw', color: '#2932e1' },
+  { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google', color: '#4285f4' },
+  { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github', color: '#f0f6fc' }
 ];
 
 // 链接配置类型

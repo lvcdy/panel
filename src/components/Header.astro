@@ -1,18 +1,23 @@
-<header class="mt-24 text-center select-none animate-fade-in-up">
-    <h1
+<header class="mt-16 sm:mt-24 text-center select-none">
+    <h1 class="sr-only">Panel - 个人导航页</h1>
+    <div
         id="clock"
-        class="text-7xl font-bold tracking-tight drop-shadow-2xl"
-        aria-live="polite"
+        class="text-7xl font-bold tracking-tight drop-shadow-2xl animate-fade-in-up"
         aria-label="当前时间"
+        role="timer"
     >
         --:--:--
-    </h1>
-    <p id="date" class="text-xl font-medium opacity-90 mt-1" aria-live="polite">
+    </div>
+    <p
+        id="date"
+        class="text-xl font-medium opacity-90 mt-1 animate-fade-in-up"
+        style="animation-delay: 120ms"
+    >
         载入中...
     </p>
     <div
         id="ip-info"
-        class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 transition-opacity duration-1000 cursor-pointer hover:border-white/30 hover:text-white transition-colors"
+        class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 blur-sm transition-all duration-700 cursor-pointer hover:border-white/30 hover:text-white"
         role="button"
         tabindex="0"
         aria-label="点击查看 IP 详情"

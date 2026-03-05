@@ -23,7 +23,7 @@ export const fetchIpInfo = async (ipEl: HTMLElement | null, ipBoxEl: HTMLElement
         try {
             const res = await fetch(IP_API_PRIMARY, {
                 cache: "no-store",
-                signal: AbortSignal.timeout(1500),
+                signal: AbortSignal.timeout(30000),
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             data = await res.json();
@@ -44,6 +44,22 @@ export const fetchIpInfo = async (ipEl: HTMLElement | null, ipBoxEl: HTMLElement
             let type = "";
 
             ip = data.ip || "";
+
+            // 隐私保护：遮蔽 IP 中间段
+            if (ip.includes(":")) {
+                // IPv6: 保留首尾组，中间替换为 *
+                const groups = ip.split(":");
+                if (groups.length > 2) {
+                    ip = groups[0] + ":*:*:" + groups[groups.length - 1];
+                }
+            } else if (ip.includes(".")) {
+                // IPv4: 遮蔽中间两段
+                const octets = ip.split(".");
+                if (octets.length === 4) {
+                    ip = `${octets[0]}.***.***.${octets[3]}`;
+                }
+            }
+
             operator = data.as?.info || data.as?.name || "";
 
             const countryData = data.country;
@@ -89,5 +105,6 @@ export const fetchIpInfo = async (ipEl: HTMLElement | null, ipBoxEl: HTMLElement
         ipEl.innerText = "Enjoy your day";
     } finally {
         ipBoxEl.style.opacity = "1";
+        ipBoxEl.style.filter = "blur(0px)";
     }
 };

@@ -1,12 +1,11 @@
 ---
-import { BG_URL } from "../lib/config";
-
 interface Props {
   title?: string;
   description?: string;
 }
 
-const { title = "Panel", description = "Panel - 个人导航页" } = Astro.props;
+const { title = "Panel - 个人导航页", description = "Panel - 个人导航页" } =
+  Astro.props;
 ---
 
 <!doctype html>
@@ -18,9 +17,14 @@ const { title = "Panel", description = "Panel - 个人导航页" } = Astro.props
     <meta name="theme-color" content="#1a1a1a" />
     <meta name="color-scheme" content="dark" />
     <meta name="generator" content={Astro.generator} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preload" as="image" href={BG_URL} fetchpriority="high" />
 
     <link rel="preconnect" href="https://api.veyn.cn" crossorigin />
     <link rel="preconnect" href="https://ipapi.xxlb.org" crossorigin />
@@ -51,13 +55,17 @@ const { title = "Panel", description = "Panel - 个人导航页" } = Astro.props
     inset: 0;
     background: var(--bg-url) center/cover no-repeat fixed;
     opacity: 0;
+    transform: scale(1.05);
     z-index: -2;
-    transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: opacity;
+    transition:
+      opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
   }
 
   body.bg-loaded::before {
     opacity: 1;
+    transform: scale(1);
   }
 
   .scrollbar-hide::-webkit-scrollbar {
@@ -78,6 +86,7 @@ const { title = "Panel", description = "Panel - 个人导航页" } = Astro.props
 
     body::before {
       transition-duration: 1ms;
+      transform: none;
     }
   }
 

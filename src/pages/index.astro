@@ -24,11 +24,12 @@ import "../styles/global.css";
     import { fetchAndDetectProvider } from "../lib/provider";
     import * as UI from "../lib/main";
     import { initBackgroundImage } from "../lib/background";
+    import { GOOGLE_SVG_ICON } from "../lib/config";
 
     initBackgroundImage();
 
     const els = UI.createElementCache();
-    let searchUrl = UI.DEFAULT_SEARCH_URL;
+    let searchUrl: string = UI.DEFAULT_SEARCH_URL;
 
     UI.setupIPInfoHandler(els.ipBox);
 
@@ -38,6 +39,7 @@ import "../styles/global.css";
         window.open(
           searchUrl + encodeURIComponent(els.input.value.trim()),
           "_blank",
+          "noopener,noreferrer",
         );
       } else {
         UI.showSearchTip(els.searchTip);
@@ -53,10 +55,19 @@ import "../styles/global.css";
     UI.setupEngineItemHandlers(
       els.menu,
       els.input,
-      (url: string, iconClass: string) => {
-        searchUrl = url as typeof UI.DEFAULT_SEARCH_URL;
+      (url: string, iconClass: string, color: string) => {
+        searchUrl = url;
         if (els.icon) {
-          els.icon.className = `${iconClass} text-xl text-white/80 transition-all`;
+          // Google uses inline SVG
+          if (iconClass === "fab fa-google") {
+            els.icon.className = "";
+            els.icon.style.color = "";
+            els.icon.innerHTML = GOOGLE_SVG_ICON;
+          } else {
+            els.icon.innerHTML = "";
+            els.icon.className = `${iconClass} text-xl transition-all`;
+            els.icon.style.color = color;
+          }
         }
       },
     );
@@ -73,6 +84,56 @@ import "../styles/global.css";
     UI.setupScrollListener(els.floatingSearchBtn);
     UI.setupDocumentClickHandler(els.menu);
     UI.setupCategoryCollapse();
+
+    // Global keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement === document.body) {
+        e.preventDefault();
+        els.input?.focus();
+      }
+    });
+
+    // Scroll-triggered reveals for category sections & footer
+    document
+      .querySelectorAll<HTMLElement>(".will-reveal")
+      .forEach((section) => {
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              section.classList.add("revealed");
+              observer.disconnect();
+            }
+          },
+          { threshold: 0.05, rootMargin: "0px 0px 80px 0px" },
+        );
+        observer.observe(section);
+      });
+
+    // Tooltip viewport-aware positioning
+    const updateTooltipPositions = () => {
+      document.querySelectorAll<HTMLElement>("[data-tooltip]").forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        // If the element is within the top 80px of viewport, show tooltip below
+        if (rect.top < 80) {
+          el.setAttribute("data-tooltip-pos", "bottom");
+        } else {
+          el.removeAttribute("data-tooltip-pos");
+        }
+      });
+    };
+
+    document.addEventListener("mouseover", (e) => {
+      const target = (e.target as HTMLElement).closest?.<HTMLElement>(
+        "[data-tooltip]",
+      );
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
+      if (rect.top < 80) {
+        target.setAttribute("data-tooltip-pos", "bottom");
+      } else {
+        target.removeAttribute("data-tooltip-pos");
+      }
+    });
 
     // 初始化图标加载/错误处理（替代内联 onload/onerror，兼容 CSP）
     document

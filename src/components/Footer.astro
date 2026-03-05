@@ -1,18 +1,21 @@
 ---
 const profileConfig = { name: "与众不同的糖" };
-const currentYear = new Date().getFullYear();
 ---
 
-<div class="border-t border-white/10 my-10 border-dashed mx-10 lg:mx-32"></div>
+<div
+  class="border-t border-white/10 my-8 border-dashed mx-4 sm:mx-10 lg:mx-32 will-reveal"
+>
+  <div class="animate-fade-in-up"></div>
+</div>
 
 <footer
-  class="mb-12 flex flex-col items-center justify-center px-6 py-8 select-none"
+  class="mb-12 flex flex-col items-center justify-center px-4 sm:px-6 py-8 select-none will-reveal"
 >
   <div
-    class="text-white/60 text-[11px] sm:text-xs text-center leading-relaxed [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]"
+    class="text-white/60 text-[11px] sm:text-xs text-center leading-relaxed [text-shadow:0_1px_4px_rgba(0,0,0,0.5)] animate-fade-in-up"
   >
     <div class="mb-1">
-      &copy; {currentYear}
+      &copy; <span id="footerYear"></span>
       <a
         href="https://blog.lvcdy.cn"
         target="_blank"
@@ -72,7 +75,7 @@ const currentYear = new Date().getFullYear();
 
     <div
       id="pro-info"
-      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 transition-opacity duration-1000 cursor-pointer hover:text-white hover:border-white/30 transition-colors"
+      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-xs text-white/70 opacity-0 blur-sm transition-all duration-700 cursor-pointer hover:text-white hover:border-white/30"
       role="button"
       tabindex="0"
       aria-label="点击查看服务提供商详情"
@@ -82,3 +85,9 @@ const currentYear = new Date().getFullYear();
     </div>
   </div>
 </footer>
+
+<script>
+  document.getElementById("footerYear")!.textContent = String(
+    new Date().getFullYear(),
+  );
+</script>

@@ -1,58 +1,110 @@
-@import "@fortawesome/fontawesome-free/css/all.min.css";
+@import "@fortawesome/fontawesome-free/css/fontawesome.min.css";
+@import "@fortawesome/fontawesome-free/css/solid.min.css";
+@import "@fortawesome/fontawesome-free/css/brands.min.css";
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'MiSans', 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+}
+
 @layer base {
-  body {
-    @apply bg-[#1a1a1a] text-white overflow-x-hidden antialiased;
-    font-family: 'Inter', 'PingFang SC', system-ui, sans-serif;
+  :root {
+    /* ── Timing ── */
+    --dur-fast: 150ms;
+    --dur-base: 280ms;
+    --dur-slow: 480ms;
+    --dur-entrance: 700ms;
+
+    /* ── Easing (spring-inspired) ── */
+    --ease-spring: cubic-bezier(0.22, 1.2, 0.36, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+    /* ── Glass ── */
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glass-bg-hover: rgba(255, 255, 255, 0.14);
+    --glass-blur: blur(20px) saturate(180%);
   }
 }
 
 @layer components {
-  :root {
-    --transition-fast: 150ms ease-out;
-    --transition-base: 300ms ease-out;
-    --easing-smooth: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --easing-entrance: cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
   .glass {
     @apply border border-white/10 shadow-2xl;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
   }
 
+  /* ─────── Card ─────── */
   .sun-card {
-    @apply will-change-transform relative overflow-hidden;
+    @apply relative;
     contain: layout style;
-    transition: transform var(--easing-smooth) 300ms,
-      background-color var(--transition-base),
-      border-color var(--transition-base),
-      box-shadow var(--transition-base);
+    transition:
+      transform var(--dur-base) var(--ease-spring),
+      background-color var(--dur-base) var(--ease-smooth),
+      border-color var(--dur-base) var(--ease-smooth),
+      box-shadow var(--dur-slow) var(--ease-smooth);
   }
 
   .sun-card:hover {
-    @apply -translate-y-1.5 scale-[1.02] bg-white/20 border-white/30 shadow-xl shadow-black/10;
+    @apply -translate-y-2 scale-[1.03] border-white/20;
+    background: var(--glass-bg-hover);
+    box-shadow:
+      0 14px 44px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      0 1px 0 rgba(255, 255, 255, 0.06) inset;
   }
 
   .sun-card::after {
     content: '';
-    @apply absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none bg-gradient-to-tr from-white/10 to-transparent;
+    @apply absolute inset-0 pointer-events-none rounded-[inherit];
+    overflow: hidden;
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 60%,
+        rgba(255, 255, 255, 0.03) 100%);
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-smooth);
   }
 
   .sun-card:hover::after {
-    @apply opacity-100;
+    opacity: 1;
   }
 
+  /* ─────── Category ─────── */
   .category-section {
-    @apply will-change-transform;
-    transition: opacity var(--transition-base), transform var(--transition-base);
+    transition:
+      opacity var(--dur-base) var(--ease-smooth),
+      transform var(--dur-base) var(--ease-smooth),
+      filter var(--dur-base) var(--ease-smooth);
   }
 
   .category-section.hidden-icons {
     @apply opacity-0 pointer-events-none;
     transform: translateY(1rem);
+    filter: blur(4px);
+  }
+
+  .category-content {
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.25rem;
+    transition:
+      gap var(--dur-slow) var(--ease-in-out),
+      padding-top var(--dur-slow) var(--ease-in-out),
+      padding-bottom var(--dur-slow) var(--ease-in-out);
+  }
+
+  @media (min-width: 640px) {
+    .category-content {
+      gap: 1.25rem;
+    }
+  }
+
+  .category-wrapper {
+    grid-template-rows: 1fr;
+    transition: grid-template-rows var(--dur-slow) var(--ease-out-expo);
   }
 
   .category-section[data-collapsed="true"] .category-wrapper {
@@ -60,85 +112,223 @@
   }
 
   .category-section[data-collapsed="true"] .category-content {
+    padding-top: 0;
     padding-bottom: 0;
+    gap: 0;
+    overflow: hidden;
   }
 
+  /* ─────── Search ─────── */
   .search-container {
-    @apply duration-300 ease-out border border-transparent;
-    transition-property: background-color, border-color, box-shadow, transform;
+    @apply border border-transparent;
+    transition:
+      background-color var(--dur-base) var(--ease-smooth),
+      border-color var(--dur-base) var(--ease-smooth),
+      box-shadow var(--dur-slow) var(--ease-smooth),
+      transform var(--dur-base) var(--ease-spring);
   }
 
   .search-container:focus-within {
-    @apply bg-white/10 border-white/20 shadow-lg scale-[1.01];
+    @apply bg-white/10 border-white/20 scale-[1.01];
     backdrop-filter: blur(24px) saturate(180%);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 0 80px -20px rgba(255, 255, 255, 0.06);
   }
 
-  @keyframes slideDown {
+  /* ━━━━━ Keyframes ━━━━━ */
+
+  /* Entrance: blur dissolve + rise */
+  @keyframes entrance {
     from {
       opacity: 0;
-      transform: translateY(-10px) scale(0.95);
+      filter: blur(12px);
+      transform: translateY(30px);
     }
 
     to {
       opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  @keyframes slideUp {
-    to {
-      opacity: 0;
-      transform: translateY(-10px) scale(0.95);
-    }
-  }
-
-  @keyframes fadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    to {
-      opacity: 1;
+      filter: blur(0px);
       transform: translateY(0);
     }
   }
 
-  .animate-fade-in-up {
-    animation: fadeUp 600ms var(--easing-entrance) forwards;
-    opacity: 0;
-    will-change: transform, opacity;
+  /* Menu: spring open */
+  @keyframes menuOpen {
+    0% {
+      opacity: 0;
+      filter: blur(8px);
+      transform: scale(0.9) translateY(-6px);
+    }
+
+    60% {
+      opacity: 1;
+      filter: blur(0px);
+      transform: scale(1.03) translateY(1px);
+    }
+
+    100% {
+      opacity: 1;
+      filter: blur(0px);
+      transform: scale(1) translateY(0);
+    }
   }
 
-  #engineMenu {
-    @apply will-change-transform;
+  /* Menu: dismiss */
+  @keyframes menuClose {
+    from {
+      opacity: 1;
+      filter: blur(0px);
+      transform: scale(1) translateY(0);
+    }
+
+    to {
+      opacity: 0;
+      filter: blur(6px);
+      transform: scale(0.96) translateY(-4px);
+    }
+  }
+
+  /* Status: glow pulse */
+  @keyframes statusPulse {
+
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.7;
+      transform: scale(1.4);
+    }
+  }
+
+  /* ─────── Page Entrance ─────── */
+  .animate-fade-in-up {
+    opacity: 0;
+    animation: entrance var(--dur-entrance) var(--ease-out-expo) forwards;
+  }
+
+  /* Scroll-triggered: hold animations until section is revealed */
+  .will-reveal .animate-fade-in-up {
+    animation-play-state: paused;
+  }
+
+  .will-reveal.revealed .animate-fade-in-up {
+    animation-play-state: running;
+  }
+
+  /* ─────── Engine Menu ─────── */
+  .engine-menu {
+    background: rgba(28, 28, 30, 0.88);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
     transform-origin: top left;
   }
 
-  #engineMenu:not(.hidden) {
-    animation: slideDown 180ms var(--easing-entrance) forwards;
+  .engine-menu:not(.hidden) {
+    animation: menuOpen 280ms var(--ease-spring) forwards;
   }
 
-  #engineMenu.hidden {
-    animation: slideUp 120ms ease-in forwards;
+  .engine-menu.hidden {
+    animation: menuClose 160ms var(--ease-smooth) forwards;
     pointer-events: none;
   }
 
+  /* ─────── Engine Items ─────── */
   .engine-item {
-    @apply transition-colors duration-150 ease-out;
+    transition:
+      background-color var(--dur-fast) var(--ease-smooth),
+      color var(--dur-fast) var(--ease-smooth),
+      transform var(--dur-fast) var(--ease-spring);
   }
 
+  .engine-item:hover {
+    @apply bg-white/10 text-white;
+    transform: translateX(2px);
+  }
+
+  .engine-item.active {
+    @apply bg-white/8 text-white;
+  }
+
+  .engine-item.active .engine-check {
+    @apply opacity-100;
+  }
+
+  /* ─────── Clock ─────── */
   #clock {
     font-variant-numeric: tabular-nums;
     text-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   }
 
+  /* ─────── Status Indicator ─────── */
   .status-indicator {
-    @apply duration-300 ease-out;
-    transition-property: opacity, background-color, transform;
+    transition:
+      opacity var(--dur-base) var(--ease-smooth),
+      background-color var(--dur-base) var(--ease-smooth),
+      transform var(--dur-base) var(--ease-spring);
+  }
+
+  .status-indicator.opacity-100 {
+    animation: statusPulse 2s var(--ease-in-out) 1;
+  }
+
+  /* ─────── Custom Tooltip ─────── */
+  [data-tooltip] {
+    position: relative;
+  }
+
+  [data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%) translateY(4px);
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: rgba(20, 20, 22, 0.92);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 9999;
+    transition:
+      opacity var(--dur-fast) var(--ease-smooth),
+      transform var(--dur-fast) var(--ease-spring);
+  }
+
+  [data-tooltip]:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Tooltip below (for elements near viewport top) */
+  [data-tooltip-pos="bottom"]::before {
+    bottom: auto;
+    top: calc(100% + 8px);
+    transform: translateX(-50%) translateY(-4px);
+  }
+
+  [data-tooltip-pos="bottom"]:hover::before {
+    transform: translateX(-50%) translateY(0);
   }
 }
 
+/* ━━━━━ Reduced Motion ━━━━━ */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -149,7 +339,7 @@
   .search-container,
   .status-indicator,
   .engine-item,
-  #engineMenu,
+  .engine-menu,
   .animate-fade-in-up {
     transition-duration: 1ms !important;
     animation-duration: 1ms !important;
@@ -158,21 +348,41 @@
 
   .animate-fade-in-up {
     opacity: 1;
+    filter: none;
     transform: none;
   }
 
-  #engineMenu:not(.hidden),
-  #engineMenu.hidden {
+  .engine-menu:not(.hidden),
+  .engine-menu.hidden {
     animation: none;
+  }
+
+  .will-reveal .animate-fade-in-up {
+    animation-play-state: running;
   }
 }
 
+/* ━━━━━ Responsive ━━━━━ */
 @media (max-width: 640px) {
   #clock {
     @apply text-5xl;
   }
 
   .sun-card {
-    @apply p-4;
+    @apply p-3.5;
+  }
+
+  .sun-card .w-12 {
+    @apply w-10 h-10;
+  }
+
+  .category-section h2 {
+    @apply text-xl mb-4;
+  }
+}
+
+@media (max-width: 400px) {
+  #clock {
+    @apply text-4xl;
   }
 }

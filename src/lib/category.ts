@@ -16,7 +16,7 @@ const setCategoryCollapsed = (catElement: Element, collapsed: boolean) => {
 
     if (toggleBtn) toggleBtn.setAttribute("aria-expanded", String(!collapsed));
     if (label) label.textContent = collapsed ? "展开" : "收起";
-    if (icon) icon.style.transform = collapsed ? "rotate(-90deg)" : "none";
+    if (icon) icon.style.transform = collapsed ? "rotate(180deg)" : "rotate(0deg)";
 };
 
 export const setupCategoryCollapse = () => {

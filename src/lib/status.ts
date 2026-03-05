@@ -36,7 +36,7 @@ export const updateStatusIndicator = (card: HTMLElement, status: number | string
 
     indicator.style.backgroundColor = config.bg;
     indicator.style.boxShadow = `0 0 8px ${config.bg}`;
-    indicator.title = config.title;
+    indicator.dataset.tooltip = config.title;
     indicator.classList.add("opacity-100");
 };
 
@@ -44,55 +44,86 @@ export const checkAllUrls = async () => {
     const cards = document.querySelectorAll(SELECTOR_CARD);
     const cachedStatuses = getStatusCache();
 
-    // 使用缓存的状态，加快加载速度
-    if (cachedStatuses) {
-        cards.forEach((card) => {
-            const url = (card as HTMLElement).getAttribute("data-url");
-            if (url && cachedStatuses[url]) {
-                updateStatusIndicator(card as HTMLElement, cachedStatuses[url]);
-            }
-        });
-        return;
-    }
-
-    // 预建 URL -> Card 映射，O(1) 查找代替 O(n) 遍历
+    // 预建 URL -> Card 映射，O(1) 查找
     const cardMap = new Map<string, HTMLElement>();
     cards.forEach((card) => {
         const url = (card as HTMLElement).getAttribute("data-url");
         if (url) cardMap.set(url, card as HTMLElement);
     });
 
-    const urls = Array.from(cardMap.keys());
-    const newStatuses: Record<string, number | string> = {};
-    const CONCURRENCY_LIMIT = 5;
-    const results: Promise<void>[] = [];
-    const pool: Promise<void>[] = [];
+    // 已缓存的条目直接渲染，仅将缺失/过期的 URL 加入待检队列
+    const unchecked = new Set<string>();
 
-    for (const url of urls) {
-        const p = (async () => {
-            try {
-                const result = await checkUrlStatus(url);
-                const status = result.status || "error";
-                newStatuses[url] = status;
-                const card = cardMap.get(url);
-                if (card) updateStatusIndicator(card, status);
-            } catch {
-                newStatuses[url] = "error";
-            }
-        })();
-
-        results.push(p);
-
-        const e = p.then(() => {
-            pool.splice(pool.indexOf(e), 1);
-        });
-        pool.push(e);
-        if (pool.length >= CONCURRENCY_LIMIT) {
-            await Promise.race(pool);
+    for (const [url, card] of cardMap) {
+        if (cachedStatuses?.[url]) {
+            updateStatusIndicator(card, cachedStatuses[url]);
+        } else {
+            unchecked.add(url);
         }
     }
 
-    await Promise.all(results);
+    if (unchecked.size === 0) return;
+
+    // 使用 IntersectionObserver 将可视区域内的卡片优先检测
+    const visibleUrls: string[] = [];
+    const hiddenUrls: string[] = [];
+
+    await new Promise<void>((resolve) => {
+        let remaining = unchecked.size;
+        const observer = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+                const url = (entry.target as HTMLElement).getAttribute("data-url");
+                if (!url || !unchecked.has(url)) continue;
+                (entry.isIntersecting ? visibleUrls : hiddenUrls).push(url);
+                remaining--;
+            }
+            if (remaining <= 0) {
+                observer.disconnect();
+                resolve();
+            }
+        }, { threshold: 0 });
+
+        for (const url of unchecked) {
+            const card = cardMap.get(url);
+            if (card) observer.observe(card);
+        }
+
+        // Fallback: if observer doesn't fire for all cards
+        setTimeout(() => {
+            observer.disconnect();
+            for (const url of unchecked) {
+                if (!visibleUrls.includes(url) && !hiddenUrls.includes(url)) {
+                    hiddenUrls.push(url);
+                }
+            }
+            resolve();
+        }, 200);
+    });
+
+    // 先检测可视区域，再检测不可见的
+    const urlsToCheck = [...visibleUrls, ...hiddenUrls];
+
+    // 简洁的并发限制：信号量模式
+    const CONCURRENCY = 5;
+    const newStatuses: Record<string, number | string> = {};
+    let cursor = 0;
+
+    const next = async (): Promise<void> => {
+        while (cursor < urlsToCheck.length) {
+            const url = urlsToCheck[cursor++];
+            try {
+                const { status } = await checkUrlStatus(url);
+                const value = status || "error";
+                newStatuses[url] = value;
+                const card = cardMap.get(url);
+                if (card) updateStatusIndicator(card, value);
+            } catch {
+                newStatuses[url] = "error";
+            }
+        }
+    };
+
+    await Promise.all(Array.from({ length: CONCURRENCY }, () => next()));
 
     setStatusCache(newStatuses);
 };

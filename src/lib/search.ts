@@ -65,16 +65,56 @@ export const showSearchTip = (tipElement: HTMLElement | null) => {
 export const setupEngineButtonHandler = (engineBtn: HTMLElement | null, menu: HTMLElement | null) => {
     if (!engineBtn || !menu) return;
 
+    const syncExpanded = () => {
+        engineBtn.setAttribute("aria-expanded", String(!menu.classList.contains("hidden")));
+    };
+
     engineBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         menu.classList.toggle("hidden");
+        syncExpanded();
+        // Focus first/active item when opening
+        if (!menu.classList.contains("hidden")) {
+            const active = menu.querySelector(".engine-item.active") as HTMLElement
+                || menu.querySelector(".engine-item") as HTMLElement;
+            active?.focus();
+        }
+    });
+
+    // Keyboard navigation within the menu
+    menu.addEventListener("keydown", (e) => {
+        const items = Array.from(menu.querySelectorAll(".engine-item")) as HTMLElement[];
+        const current = document.activeElement as HTMLElement;
+        const idx = items.indexOf(current);
+
+        switch (e.key) {
+            case "ArrowDown":
+                e.preventDefault();
+                items[(idx + 1) % items.length]?.focus();
+                break;
+            case "ArrowUp":
+                e.preventDefault();
+                items[(idx - 1 + items.length) % items.length]?.focus();
+                break;
+            case "Escape":
+                e.preventDefault();
+                menu.classList.add("hidden");
+                syncExpanded();
+                engineBtn.focus();
+                break;
+            case "Enter":
+            case " ":
+                e.preventDefault();
+                current?.click();
+                break;
+        }
     });
 };
 
 export const setupEngineItemHandlers = (
     menu: HTMLElement | null,
     input: HTMLInputElement | null,
-    onEngineSelect: (url: string, iconClass: string) => void
+    onEngineSelect: (url: string, iconClass: string, color: string) => void
 ) => {
     if (!menu) return;
 
@@ -83,9 +123,18 @@ export const setupEngineItemHandlers = (
         const target = (e.target as HTMLElement).closest(".engine-item") as HTMLElement | null;
         if (!target) return;
 
+        // Update active state
+        menu.querySelectorAll(".engine-item").forEach((item) => {
+            item.classList.remove("active");
+            item.setAttribute("aria-selected", "false");
+        });
+        target.classList.add("active");
+        target.setAttribute("aria-selected", "true");
+
         const url = target.dataset.url || DEFAULT_SEARCH_URL;
         const iconClass = target.dataset.icon || "";
-        onEngineSelect(url, iconClass);
+        const color = target.dataset.color || "";
+        onEngineSelect(url, iconClass, color);
         menu.classList.add("hidden");
         input?.focus();
     });
@@ -194,14 +243,17 @@ export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
 };
 
 export const setupDocumentClickHandler = (menu: HTMLElement | null) => {
-    document.addEventListener("click", () => menu?.classList.add("hidden"));
+    document.addEventListener("click", () => {
+        menu?.classList.add("hidden");
+        document.getElementById("engineBtn")?.setAttribute("aria-expanded", "false");
+    });
 };
 
 export const setupIPInfoHandler = (ipBox: HTMLElement | null) => {
     if (!ipBox) return;
     const openIpInfo = (e: Event) => {
         e.stopPropagation();
-        window.open(IP_INFO_URL, "_blank");
+        window.open(IP_INFO_URL, "_blank", "noopener,noreferrer");
     };
     ipBox.addEventListener("click", openIpInfo);
     ipBox.addEventListener("keydown", (e) => {
