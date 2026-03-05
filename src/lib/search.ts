@@ -15,6 +15,9 @@ type TimeoutId = ReturnType<typeof setTimeout>;
 let cachedCategories: NodeListOf<Element> | null = null;
 let searchTipTimeout: TimeoutId | null = null;
 
+// 保存原始文本以便还原高亮
+const originalTexts = new WeakMap<HTMLElement, string>();
+
 const getCategories = () => {
     if (!cachedCategories) {
         cachedCategories = document.querySelectorAll(SELECTOR_CATEGORIES);
@@ -30,26 +33,105 @@ const debounce = <T extends (...args: Parameters<T>) => void>(fn: T, delay: numb
     };
 };
 
+/** 安全地转义正则特殊字符 */
+const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** 高亮匹配文本 */
+const highlightText = (el: HTMLElement, query: string) => {
+    if (!originalTexts.has(el)) {
+        originalTexts.set(el, el.textContent || "");
+    }
+    const original = originalTexts.get(el) || "";
+    if (!query) {
+        el.textContent = original;
+        return;
+    }
+    const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
+    // 使用 textContent 构建安全的 HTML（仅高亮标签，文本内容已转义）
+    const parts = original.split(regex);
+    el.innerHTML = "";
+    for (const part of parts) {
+        if (regex.test(part)) {
+            const mark = document.createElement("mark");
+            mark.className = "search-highlight";
+            mark.textContent = part;
+            el.appendChild(mark);
+        } else {
+            el.appendChild(document.createTextNode(part));
+        }
+        // reset regex lastIndex
+        regex.lastIndex = 0;
+    }
+};
+
+/** 清除所有高亮 */
+const clearAllHighlights = () => {
+    getCategories().forEach((catElement) => {
+        catElement.querySelectorAll(SELECTOR_CARD_TEXT).forEach((textEl) => {
+            const el = textEl as HTMLElement;
+            const original = originalTexts.get(el);
+            if (original !== undefined) {
+                el.textContent = original;
+            }
+        });
+    });
+};
+
+/** 更新搜索结果计数提示 */
+const updateSearchFeedback = (matchCount: number, query: string) => {
+    const feedback = document.getElementById("searchFeedback");
+    if (!feedback) return;
+
+    if (!query) {
+        feedback.classList.add("hidden");
+        return;
+    }
+
+    feedback.classList.remove("hidden");
+    if (matchCount > 0) {
+        feedback.textContent = `找到 ${matchCount} 个匹配结果`;
+        feedback.className = "search-feedback text-white/50";
+    } else {
+        feedback.textContent = "未找到匹配结果，回车可使用搜索引擎搜索";
+        feedback.className = "search-feedback text-white/40";
+    }
+};
+
 export const filterLinks = (query: string) => {
     const lowerQuery = query.toLowerCase();
     toggleCategoryVisibility(true);
 
+    let totalMatches = 0;
+
     getCategories().forEach((catElement) => {
         let hasVisibleCard = false;
+        const catTitle = catElement.querySelector(SELECTOR_CATEGORY_TITLE);
+        const catTitleText = catTitle?.textContent?.toLowerCase() || "";
+        // 如果分类名匹配，所有卡片都显示
+        const categoryMatches = catTitleText.includes(lowerQuery);
+
         catElement.querySelectorAll(SELECTOR_CARD).forEach((card: Element) => {
             const cardEl = card as HTMLElement;
             const textDiv = cardEl.querySelector(SELECTOR_CARD_TEXT) as HTMLElement;
             const text = textDiv?.textContent?.toLowerCase() || "";
             const url = (cardEl.getAttribute("data-url") || cardEl.getAttribute("href") || "").toLowerCase();
-            const matches = text.includes(lowerQuery) || url.includes(lowerQuery);
+            const matches = categoryMatches || text.includes(lowerQuery) || url.includes(lowerQuery);
 
-            cardEl.style.display = matches ? "" : "none";
-            if (matches) hasVisibleCard = true;
+            cardEl.classList.toggle("search-hidden", !matches);
+            if (textDiv) {
+                highlightText(textDiv, matches && !categoryMatches ? query : "");
+            }
+            if (matches) {
+                hasVisibleCard = true;
+                totalMatches++;
+            }
         });
 
-        const title = catElement.querySelector(SELECTOR_CATEGORY_TITLE) as HTMLElement;
-        if (title) title.style.display = hasVisibleCard ? "" : "none";
+        const sectionEl = catElement as HTMLElement;
+        sectionEl.classList.toggle("search-no-results", !hasVisibleCard);
     });
+
+    updateSearchFeedback(totalMatches, query);
 };
 
 export const showSearchTip = (tipElement: HTMLElement | null) => {
@@ -149,13 +231,14 @@ const toggleCategoryVisibility = (visible: boolean) => {
 export const hideAllIcons = () => toggleCategoryVisibility(false);
 export const showAllIcons = () => {
     toggleCategoryVisibility(true);
+    clearAllHighlights();
     getCategories().forEach((catElement) => {
-        const title = catElement.querySelector(SELECTOR_CATEGORY_TITLE) as HTMLElement;
-        if (title) title.style.display = "";
+        (catElement as HTMLElement).classList.remove("search-no-results");
         catElement.querySelectorAll(SELECTOR_CARD).forEach((card) => {
-            (card as HTMLElement).style.display = "";
+            (card as HTMLElement).classList.remove("search-hidden");
         });
     });
+    updateSearchFeedback(0, "");
 };
 
 export const setupInputHandlers = (
@@ -175,14 +258,15 @@ export const setupInputHandlers = (
 
     input.addEventListener("focus", () => {
         originalPlaceholder = input.placeholder;
-        input.placeholder = "";
-        input.value = "";
+        input.placeholder = "输入关键词搜索站内链接…";
         if (searchTip) searchTip.style.opacity = "0";
-        hideAllIcons();
+        // 不再在 focus 时隐藏所有卡片，仅当已有输入内容时才过滤
+        if (input.value.trim()) {
+            debouncedFilter(input.value.trim());
+        }
     });
 
     input.addEventListener("blur", () => {
-        // Only show all icons if input is empty, otherwise we want to keep the filtered results
         if (!input.value.trim()) {
             input.placeholder = originalPlaceholder;
             showAllIcons();

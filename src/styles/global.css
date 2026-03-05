@@ -77,13 +77,66 @@
     transition:
       opacity var(--dur-base) var(--ease-smooth),
       transform var(--dur-base) var(--ease-smooth),
-      filter var(--dur-base) var(--ease-smooth);
+      filter var(--dur-base) var(--ease-smooth),
+      max-height var(--dur-slow) var(--ease-out-expo);
   }
 
   .category-section.hidden-icons {
     @apply opacity-0 pointer-events-none;
     transform: translateY(1rem);
     filter: blur(4px);
+  }
+
+  /* 搜索过滤：无匹配结果的分类 */
+  .category-section.search-no-results {
+    @apply opacity-0 pointer-events-none;
+    transform: translateY(0.5rem);
+    max-height: 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    transition:
+      opacity var(--dur-base) var(--ease-smooth),
+      transform var(--dur-base) var(--ease-smooth),
+      max-height var(--dur-slow) var(--ease-out-expo),
+      margin-bottom var(--dur-slow) var(--ease-out-expo);
+  }
+
+  /* 搜索过滤：隐藏不匹配的卡片 */
+  .sun-card.search-hidden {
+    @apply opacity-0 pointer-events-none;
+    transform: scale(0.95);
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    transition:
+      opacity var(--dur-fast) var(--ease-smooth),
+      transform var(--dur-fast) var(--ease-smooth),
+      max-height var(--dur-base) var(--ease-out-expo);
+  }
+
+  .sun-card.search-hidden+li,
+  li:has(> .sun-card.search-hidden) {
+    @apply hidden;
+  }
+
+  /* 搜索高亮样式 */
+  .search-highlight {
+    background: rgba(250, 204, 21, 0.3);
+    color: #fbbf24;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  /* 搜索结果反馈 */
+  .search-feedback {
+    @apply text-center text-xs mt-2;
+    transition: opacity var(--dur-base) var(--ease-smooth);
+  }
+
+  .search-feedback.hidden {
+    @apply opacity-0;
   }
 
   .category-content {
