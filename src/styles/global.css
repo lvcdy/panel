@@ -162,6 +162,15 @@
     transform: scale(1.1);
   }
 
+  /* ─────── Provider Logo ─────── */
+  .provider-logo {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
   .info-capsule .capsule-text {
     @apply truncate max-w-[280px] sm:max-w-none;
     letter-spacing: 0.01em;
