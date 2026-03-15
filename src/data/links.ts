@@ -34,9 +34,9 @@ export const CATEGORIES: Category[] = [
     title: "我的网站",
     links: [
       { name: "Blog", url: "https://blog.lvcdy.cn", icon: "fas fa-blog", color: "#ff5722", useIcon: false },
-      { name: "Certd", url: "https://certd.veyn.cn", icon: "fas fa-certificate", color: "#2196f3", useIcon: false },
+      { name: "Certd", url: "https://certd.lvcdy.cn", icon: "fas fa-certificate", color: "#2196f3", useIcon: false },
       { name: "Toolbox", url: "https://toolbox.lvcdy.cn", icon: "fas fa-toolbox", color: "#9c27b0", useIcon: false },
-      { name: "api", url: "https://api.veyn.cn", icon: "fas fa-server", color: "#4caf50", useIcon: true }
+      { name: "api", url: "https://api.lvcdy.cn", icon: "fas fa-server", color: "#4caf50", useIcon: true }
     ]
   },
   {
@@ -83,7 +83,7 @@ export const CATEGORIES: Category[] = [
     links: [
       { name: "智慧职教", url: "https://www.icve.com.cn/", icon: "fas fa-graduation-cap", color: "#e74c3c", useIcon: true },
       { name: "超星", url: "https://www.chaoxing.com/", icon: "fas fa-book", color: "#f39c12", useIcon: true },
-      { name: "岗位实训综合管理平台", url: "https://lnsh.ipractice.com.cn/", icon: "fas fa-briefcase", color: "#34495e", useIcon: true },
+      { name: "岗位实训综合管理平台", url: "https://gwsx.lnpc.edu.cn/", icon: "fas fa-briefcase", color: "#34495e", useIcon: true },
       { name: "教务", url: "http://125.222.106.106/jsxsd/", icon: "fas fa-chalkboard-user", color: "#2980b9", useIcon: true },
       { name: "webvpn", url: "https://webvpn.lntu.edu.cn/", icon: "fas fa-lock", color: "#16a085", useIcon: true },
       { name: "智能化工虚拟仿真实训基地", url: "http://xnzypt.lnpc.edu.cn:8000/pc/#/login/account", icon: "fas fa-flask", color: "#27ae60", useIcon: true }
