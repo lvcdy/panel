@@ -68,7 +68,7 @@ export const CATEGORIES: Category[] = [
       { name: "ping0", url: "https://ping0.cc", icon: "fas fa-wifi", color: "#1abc9c", useIcon: true },
       { name: "雨云", url: "https://app.rainyun.com/dashboard", icon: "fas fa-cloud", color: "#34ace0", useIcon: true },
       { name: "七牛云", url: "https://portal.qiniu.com/home", icon: "fas fa-cloud-upload-alt", color: "#007fff", useIcon: true },
-      { name: "DNSPod", url: "https://console.dnspod.cn/", icon: "fas fa-network-wired", color: "#0052d9", useIcon: true },
+      { name: "腾讯云", url: "https://console.cloud.tencent.com/", icon: "fas fa-network-wired", color: "#0052d9", useIcon: true },
       { name: "阿里云", url: "https://home.console.aliyun.com/home/dashboard/ProductAndService", icon: "fab fa-alipay", color: "#ff6a00", useIcon: true },
       { name: "rls", url: "https://rls.ovh/", icon: "fas fa-terminal", color: "#ed1c24", useIcon: true },
       { name: "举个栗子", url: "https://www.alcy.cc/", icon: "fas fa-chestnut", color: "#27ae60", useIcon: true },
