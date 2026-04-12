@@ -24,7 +24,12 @@
     /* ── Glass ── */
     --glass-bg: rgba(255, 255, 255, 0.06);
     --glass-bg-hover: rgba(255, 255, 255, 0.14);
-    --glass-blur: blur(20px) saturate(180%);
+    --glass-blur-value: 18px;
+    --glass-saturate-value: 165%;
+    --glass-blur: blur(var(--glass-blur-value)) saturate(var(--glass-saturate-value));
+    --card-glass-blur-value: 18px;
+    --card-glass-saturate-value: 165%;
+    --card-glass-filter: blur(var(--card-glass-blur-value)) saturate(var(--card-glass-saturate-value));
   }
 }
 
@@ -41,6 +46,8 @@
     @apply relative overflow-hidden;
     --_accent: var(--card-color, #ffffff);
     contain: layout style;
+    backdrop-filter: var(--card-glass-filter);
+    -webkit-backdrop-filter: var(--card-glass-filter);
     transition:
       transform var(--dur-base) var(--ease-spring),
       background-color var(--dur-base) var(--ease-smooth),

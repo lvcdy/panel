@@ -1,0 +1,453 @@
+---
+// 设置面板组件
+---
+
+<div class="settings-container">
+  <!-- 设置图标 -->
+  <button
+    id="settings-toggle"
+    class="settings-btn"
+    aria-label="打开设置"
+    aria-expanded="false"
+    aria-controls="settings-panel"
+  >
+    <i class="fas fa-gear" aria-hidden="true"></i>
+  </button>
+
+  <!-- 设置面板 -->
+  <div
+    id="settings-panel"
+    class="settings-panel"
+    role="dialog"
+    aria-labelledby="settings-title"
+    aria-hidden="true"
+  >
+    <div class="settings-content">
+      <div class="settings-header">
+        <h2 id="settings-title" class="settings-title">设置</h2>
+        <button
+          id="settings-close"
+          class="settings-close-btn"
+          aria-label="关闭设置"
+        >
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="settings-body">
+        <div class="setting-item">
+          <label for="blur-slider" class="setting-label"> 毛玻璃强弱 </label>
+          <div class="slider-container">
+            <input
+              id="blur-slider"
+              type="range"
+              min="0"
+              max="100"
+              value="18"
+              class="blur-slider"
+              aria-label="调节毛玻璃强弱"
+            />
+            <span id="blur-value" class="blur-value">18px</span>
+          </div>
+          <div class="slider-description">
+            <span>弱</span>
+            <span>强</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="saturate-slider" class="setting-label"> 饱和度 </label>
+          <div class="slider-container">
+            <input
+              id="saturate-slider"
+              type="range"
+              min="100"
+              max="200"
+              value="165"
+              class="saturate-slider"
+              aria-label="调节饱和度"
+            />
+            <span id="saturate-value" class="saturate-value">165%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 背景遮罩 -->
+  <div id="settings-overlay" class="settings-overlay" aria-hidden="true"></div>
+</div>
+
+<style>
+  .settings-container {
+    --glass-blur-value: 18px;
+    --glass-saturate-value: 165%;
+  }
+
+  .settings-btn {
+    position: fixed;
+    top: 2.5rem;
+    right: 2.5rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    color: white;
+    cursor: pointer;
+    font-size: 1.25rem;
+    z-index: 40;
+    transition: all var(--dur-base) var(--ease-spring);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    i {
+      transition: transform var(--dur-base) var(--ease-spring);
+    }
+
+    &.active i {
+      transform: rotate(90deg);
+    }
+  }
+
+  .settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-base) var(--ease-smooth);
+    z-index: 30;
+
+    &.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  .settings-panel {
+    position: fixed;
+    top: 5rem;
+    right: 2.5rem;
+    width: 22rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    pointer-events: none;
+    transition: all var(--dur-base) var(--ease-spring);
+    z-index: 35;
+
+    &.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+  }
+
+  .settings-content {
+    padding: 1.5rem;
+  }
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .settings-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+  }
+
+  .settings-close-btn {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    font-size: 1rem;
+    transition:
+      color var(--dur-base) var(--ease-smooth),
+      transform var(--dur-base) var(--ease-spring);
+
+    &:hover {
+      color: white;
+      transform: rotate(90deg);
+    }
+  }
+
+  .settings-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .setting-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    display: block;
+  }
+
+  .slider-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .blur-slider,
+  .saturate-slider {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.4)
+    );
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition:
+        transform var(--dur-fast) var(--ease-spring),
+        box-shadow var(--dur-fast) var(--ease-smooth);
+
+      &:hover {
+        transform: scale(1.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      &:active {
+        transform: scale(1.08);
+      }
+    }
+
+    &::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition:
+        transform var(--dur-fast) var(--ease-spring),
+        box-shadow var(--dur-fast) var(--ease-smooth);
+
+      &:hover {
+        transform: scale(1.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      &:active {
+        transform: scale(1.08);
+      }
+    }
+
+    &::-moz-range-track {
+      background: transparent;
+      border: none;
+    }
+
+    &::-moz-range-progress {
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.8)
+      );
+      height: 6px;
+      border-radius: 3px;
+    }
+  }
+
+  .blur-value,
+  .saturate-value {
+    min-width: 50px;
+    text-align: right;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .slider-description {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: -0.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .settings-btn {
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 2.75rem;
+      height: 2.75rem;
+      font-size: 1.125rem;
+    }
+
+    .settings-panel {
+      top: auto;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      left: 1.5rem;
+      width: auto;
+    }
+  }
+</style>
+
+<script>
+  // 初始化设置面板
+  function initSettings() {
+    const toggleBtn = document.getElementById("settings-toggle");
+    const closeBtn = document.getElementById("settings-close");
+    const panel = document.getElementById("settings-panel");
+    const overlay = document.getElementById("settings-overlay");
+    const blurSlider = document.getElementById(
+      "blur-slider",
+    ) as HTMLInputElement;
+    const blurValue = document.getElementById("blur-value");
+    const saturateSlider = document.getElementById(
+      "saturate-slider",
+    ) as HTMLInputElement;
+    const saturateValue = document.getElementById("saturate-value");
+
+    // 更新毛玻璃强弱
+    const updateBlur = (value: number) => {
+      const blurPx = value;
+      document.documentElement.style.setProperty(
+        "--card-glass-blur-value",
+        `${blurPx}px`,
+      );
+      if (blurValue) {
+        blurValue.textContent = `${blurPx}px`;
+      }
+      localStorage.setItem("card-glass-blur-value", String(value));
+    };
+
+    // 更新饱和度
+    const updateSaturate = (value: number) => {
+      document.documentElement.style.setProperty(
+        "--card-glass-saturate-value",
+        `${value}%`,
+      );
+      if (saturateValue) {
+        saturateValue.textContent = `${value}%`;
+      }
+      localStorage.setItem("card-glass-saturate-value", String(value));
+    };
+
+    // 打开/关闭设置面板
+    const togglePanel = () => {
+      const isActive = panel!.classList.contains("active");
+      if (isActive) {
+        closePanel();
+      } else {
+        openPanel();
+      }
+    };
+
+    const openPanel = () => {
+      panel!.classList.add("active");
+      overlay!.classList.add("active");
+      toggleBtn!.classList.add("active");
+      toggleBtn!.setAttribute("aria-expanded", "true");
+      panel!.setAttribute("aria-hidden", "false");
+    };
+
+    const closePanel = () => {
+      panel!.classList.remove("active");
+      overlay!.classList.remove("active");
+      toggleBtn!.classList.remove("active");
+      toggleBtn!.setAttribute("aria-expanded", "false");
+      panel!.setAttribute("aria-hidden", "true");
+    };
+
+    // 从 localStorage 恢复设置
+    const savedBlur = localStorage.getItem("card-glass-blur-value");
+    const savedSaturate = localStorage.getItem("card-glass-saturate-value");
+
+    if (savedBlur) {
+      blurSlider.value = savedBlur;
+      updateBlur(parseInt(savedBlur));
+    }
+
+    if (savedSaturate) {
+      saturateSlider.value = savedSaturate;
+      updateSaturate(parseInt(savedSaturate));
+    }
+
+    // 事件监听
+    toggleBtn!.addEventListener("click", togglePanel);
+    closeBtn!.addEventListener("click", closePanel);
+    overlay!.addEventListener("click", closePanel);
+
+    blurSlider!.addEventListener("input", (e) => {
+      const value = parseInt((e.target as HTMLInputElement).value);
+      updateBlur(value);
+    });
+
+    saturateSlider!.addEventListener("input", (e) => {
+      const value = parseInt((e.target as HTMLInputElement).value);
+      updateSaturate(value);
+    });
+
+    // 按 Escape 关闭面板
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && panel!.classList.contains("active")) {
+        closePanel();
+      }
+    });
+  }
+
+  // DOM 加载完成后初始化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSettings);
+  } else {
+    initSettings();
+  }
+</script>
