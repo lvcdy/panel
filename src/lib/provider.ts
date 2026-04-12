@@ -261,13 +261,15 @@ export const updateProviderDisplay = (
                 window.open(currentProviderUrl, "_blank", "noopener,noreferrer");
             }
         };
-        proBox.addEventListener("click", openProvider);
-        proBox.addEventListener("keydown", (e) => {
-            if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
+        const onProviderKeydown = (e: KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 openProvider(e);
             }
-        });
+        };
+
+        proBox.addEventListener("click", openProvider);
+        proBox.addEventListener("keydown", onProviderKeydown);
     }
 
     proBox.style.opacity = "1";

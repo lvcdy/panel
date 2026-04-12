@@ -5,11 +5,16 @@ interface UrlStatusResult {
     status: number | string;
 }
 
+const STATUS_API_URL = "https://api.lvcdy.cn/uptime?url=";
+
 export const checkUrlStatus = async (url: string): Promise<UrlStatusResult> => {
     try {
-        const res = await fetch(`https://api.lvcdy.cn/uptime?url=${encodeURIComponent(url)}`, {
+        const res = await fetch(`${STATUS_API_URL}${encodeURIComponent(url)}`, {
             signal: AbortSignal.timeout(5000),
         });
+        if (!res.ok) {
+            return { status: "error" };
+        }
         const data = await res.json();
         return { status: data.code ?? "error" };
     } catch {
@@ -65,21 +70,32 @@ export const checkAllUrls = async () => {
     if (unchecked.size === 0) return;
 
     // 使用 IntersectionObserver 将可视区域内的卡片优先检测
-    const visibleUrls: string[] = [];
-    const hiddenUrls: string[] = [];
+    const visibleUrls = new Set<string>();
+    const hiddenUrls = new Set<string>();
+    const classifiedUrls = new Set<string>();
 
     await new Promise<void>((resolve) => {
         let remaining = unchecked.size;
+        let settled = false;
+
+        const finish = () => {
+            if (settled) return;
+            settled = true;
+            observer.disconnect();
+            resolve();
+        };
+
         const observer = new IntersectionObserver((entries) => {
             for (const entry of entries) {
                 const url = (entry.target as HTMLElement).getAttribute("data-url");
-                if (!url || !unchecked.has(url)) continue;
-                (entry.isIntersecting ? visibleUrls : hiddenUrls).push(url);
+                if (!url || !unchecked.has(url) || classifiedUrls.has(url)) continue;
+
+                classifiedUrls.add(url);
+                (entry.isIntersecting ? visibleUrls : hiddenUrls).add(url);
                 remaining--;
             }
             if (remaining <= 0) {
-                observer.disconnect();
-                resolve();
+                finish();
             }
         }, { threshold: 0 });
 
@@ -90,13 +106,14 @@ export const checkAllUrls = async () => {
 
         // Fallback: if observer doesn't fire for all cards
         setTimeout(() => {
-            observer.disconnect();
+            if (settled) return;
+
             for (const url of unchecked) {
-                if (!visibleUrls.includes(url) && !hiddenUrls.includes(url)) {
-                    hiddenUrls.push(url);
+                if (!classifiedUrls.has(url)) {
+                    hiddenUrls.add(url);
                 }
             }
-            resolve();
+            finish();
         }, 200);
     });
 

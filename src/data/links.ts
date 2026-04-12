@@ -1,35 +1,70 @@
 export interface SearchEngine {
-  id: string;
-  name: string;
-  url: string;
-  icon: string;
-  color: string;
-  placeholder: string;
+  readonly id: string;
+  readonly name: string;
+  readonly url: string;
+  readonly icon: string;
+  readonly color: string;
+  readonly placeholder: string;
 }
 
-export const SEARCH_ENGINES: SearchEngine[] = [
-  { id: 'bing', name: 'Bing', url: 'https://cn.bing.com/search?q=', icon: 'fab fa-microsoft', color: '#00a4ef', placeholder: '🔍 必应一下，你就知道！' },
-  { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'fas fa-paw', color: '#2932e1', placeholder: '🐾 百度一下，世界尽在掌握！' },
-  { id: 'google', name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fab fa-google', color: '#4285f4', placeholder: '🌐 Google it，探索无限可能！' },
-  { id: 'github', name: 'GitHub', url: 'https://github.com/search?q=', icon: 'fab fa-github', color: '#f0f6fc', placeholder: '🐙 在 GitHub 的代码海洋中探险！' },
-  { id: 'zhihu', name: '知乎', url: 'https://www.zhihu.com/search?type=content&q=', icon: 'fab fa-zhihu', color: '#0084ff', placeholder: '💡 有问题？知乎上总有答案！' }
-];
+export const SEARCH_ENGINES = [
+  {
+    id: "bing",
+    name: "Bing",
+    url: "https://cn.bing.com/search?q=",
+    icon: "fab fa-microsoft",
+    color: "#00a4ef",
+    placeholder: "🔍 必应一下，你就知道！",
+  },
+  {
+    id: "baidu",
+    name: "Baidu",
+    url: "https://www.baidu.com/s?wd=",
+    icon: "fas fa-paw",
+    color: "#2932e1",
+    placeholder: "🐾 百度一下，世界尽在掌握！",
+  },
+  {
+    id: "google",
+    name: "Google",
+    url: "https://www.google.com/search?q=",
+    icon: "fab fa-google",
+    color: "#4285f4",
+    placeholder: "🌐 Google it，探索无限可能！",
+  },
+  {
+    id: "github",
+    name: "GitHub",
+    url: "https://github.com/search?q=",
+    icon: "fab fa-github",
+    color: "#f0f6fc",
+    placeholder: "🐙 在 GitHub 的代码海洋中探险！",
+  },
+  {
+    id: "zhihu",
+    name: "知乎",
+    url: "https://www.zhihu.com/search?type=content&q=",
+    icon: "fab fa-zhihu",
+    color: "#0084ff",
+    placeholder: "💡 有问题？知乎上总有答案！",
+  },
+] as const satisfies readonly SearchEngine[];
 
 // 链接配置类型
 export interface LinkItem {
-  name: string;
-  url: string;
-  icon: string;
-  color: string;
-  useIcon?: boolean;
+  readonly name: string;
+  readonly url: string;
+  readonly icon: string;
+  readonly color: string;
+  readonly useIcon?: boolean;
 }
 
 export interface Category {
-  title: string;
-  links: LinkItem[];
+  readonly title: string;
+  readonly links: readonly LinkItem[];
 }
 
-export const CATEGORIES: Category[] = [
+export const CATEGORIES = [
   {
     title: "我的网站",
     links: [
@@ -96,4 +131,4 @@ export const CATEGORIES: Category[] = [
       { name: "知网", url: "https://cnki.net/", icon: "fas fa-book-open", color: "#2c3e50", useIcon: true }
     ]
   }
-];
+] as const satisfies readonly Category[];

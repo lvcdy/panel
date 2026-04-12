@@ -112,19 +112,6 @@ import "../styles/global.css";
         observer.observe(section);
       });
 
-    // Tooltip viewport-aware positioning
-    const updateTooltipPositions = () => {
-      document.querySelectorAll<HTMLElement>("[data-tooltip]").forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        // If the element is within the top 80px of viewport, show tooltip below
-        if (rect.top < 80) {
-          el.setAttribute("data-tooltip-pos", "bottom");
-        } else {
-          el.removeAttribute("data-tooltip-pos");
-        }
-      });
-    };
-
     document.addEventListener("mouseover", (e) => {
       const target = (e.target as HTMLElement).closest?.<HTMLElement>(
         "[data-tooltip]",

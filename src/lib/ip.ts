@@ -14,6 +14,30 @@ interface IpApiResponse {
     readonly regions?: readonly string[];
 }
 
+const getRegionName = (region?: { readonly name?: string; readonly code?: string } | string) => {
+    if (!region) return "";
+    return typeof region === "object" ? (region.name || region.code || "") : region;
+};
+
+const maskIp = (rawIp: string) => {
+    if (rawIp.includes(":")) {
+        const groups = rawIp.split(":");
+        if (groups.length > 2) {
+            return `${groups[0]}:*:*:${groups[groups.length - 1]}`;
+        }
+        return rawIp;
+    }
+
+    if (rawIp.includes(".")) {
+        const octets = rawIp.split(".");
+        if (octets.length === 4) {
+            return `${octets[0]}.***.***.${octets[3]}`;
+        }
+    }
+
+    return rawIp;
+};
+
 export const fetchIpInfo = async (ipEl: HTMLElement | null, ipBoxEl: HTMLElement | null) => {
     if (!ipEl || !ipBoxEl) return;
 
@@ -35,46 +59,13 @@ export const fetchIpInfo = async (ipEl: HTMLElement | null, ipBoxEl: HTMLElement
         let displayText = "";
 
         if (data) {
-            let ip = "";
-            let operator = "";
-            let country = "";
-            let province = "";
-            let city = "";
-            let district = "";
-            let type = "";
-
-            ip = data.ip || "";
-
-            // 隐私保护：遮蔽 IP 中间段
-            if (ip.includes(":")) {
-                // IPv6: 保留首尾组，中间替换为 *
-                const groups = ip.split(":");
-                if (groups.length > 2) {
-                    ip = groups[0] + ":*:*:" + groups[groups.length - 1];
-                }
-            } else if (ip.includes(".")) {
-                // IPv4: 遮蔽中间两段
-                const octets = ip.split(".");
-                if (octets.length === 4) {
-                    ip = `${octets[0]}.***.***.${octets[3]}`;
-                }
-            }
-
-            operator = data.as?.info || data.as?.name || "";
-
-            const countryData = data.country;
-            country = typeof countryData === "object" ? (countryData?.name || countryData?.code || "") : (countryData || "");
-
-            const provinceData = data.province;
-            province = typeof provinceData === "object" ? (provinceData?.name || provinceData?.code || "") : (provinceData || "");
-
-            const cityData = data.city;
-            city = typeof cityData === "object" ? (cityData?.name || cityData?.code || "") : (cityData || "");
-
-            const districtData = data.district;
-            district = typeof districtData === "object" ? (districtData?.name || districtData?.code || "") : (districtData || "");
-
-            type = data.type || data.net || "";
+            let ip = maskIp(data.ip || data.IP || "");
+            const operator = data.as?.info || data.as?.name || data.isp || "";
+            const country = getRegionName(data.country);
+            let province = getRegionName(data.province);
+            let city = getRegionName(data.city);
+            let district = getRegionName(data.district);
+            const type = data.type || data.net || "";
 
             // Fallback to regions if specific fields are missing
             if (!province && data.regions?.[0]) province = data.regions[0];

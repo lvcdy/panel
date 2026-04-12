@@ -25,9 +25,9 @@ const getCategories = () => {
     return cachedCategories;
 };
 
-const debounce = <T extends (...args: Parameters<T>) => void>(fn: T, delay: number) => {
+const debounce = <Args extends unknown[]>(fn: (...args: Args) => void, delay: number) => {
     let timeoutId: TimeoutId;
-    return (...args: Parameters<T>) => {
+    return (...args: Args) => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => fn(...args), delay);
     };
@@ -110,6 +110,11 @@ const forceRevealAll = () => {
 };
 
 export const filterLinks = (query: string) => {
+    if (!query) {
+        showAllIcons();
+        return;
+    }
+
     const lowerQuery = query.toLowerCase();
     toggleCategoryVisibility(true);
 
@@ -129,9 +134,9 @@ export const filterLinks = (query: string) => {
         catElement.querySelectorAll(SELECTOR_CARD).forEach((card: Element) => {
             const cardEl = card as HTMLElement;
             const li = cardEl.closest("li");
-            const textDiv = cardEl.querySelector(SELECTOR_CARD_TEXT) as HTMLElement;
+            const textDiv = cardEl.querySelector<HTMLElement>(SELECTOR_CARD_TEXT);
             // 优先从缓存读取原始文本，避免读到高亮残留
-            const text = (originalTexts.get(textDiv) ?? textDiv?.textContent ?? "").toLowerCase();
+            const text = (textDiv ? (originalTexts.get(textDiv) ?? textDiv.textContent ?? "") : "").toLowerCase();
             const url = (cardEl.getAttribute("data-url") || cardEl.getAttribute("href") || "").toLowerCase();
             const matches = categoryMatches || text.includes(lowerQuery) || url.includes(lowerQuery);
 
@@ -166,6 +171,8 @@ export const showSearchTip = (tipElement: HTMLElement | null) => {
 export const setupEngineButtonHandler = (engineBtn: HTMLElement | null, menu: HTMLElement | null) => {
     if (!engineBtn || !menu) return;
 
+    const getEngineItems = () => Array.from(menu.querySelectorAll<HTMLElement>(".engine-item"));
+
     const syncExpanded = () => {
         engineBtn.setAttribute("aria-expanded", String(!menu.classList.contains("hidden")));
     };
@@ -184,7 +191,9 @@ export const setupEngineButtonHandler = (engineBtn: HTMLElement | null, menu: HT
 
     // Keyboard navigation within the menu
     menu.addEventListener("keydown", (e) => {
-        const items = Array.from(menu.querySelectorAll(".engine-item")) as HTMLElement[];
+        const items = getEngineItems();
+        if (items.length === 0) return;
+
         const current = document.activeElement as HTMLElement;
         const idx = items.indexOf(current);
 
@@ -206,7 +215,9 @@ export const setupEngineButtonHandler = (engineBtn: HTMLElement | null, menu: HT
             case "Enter":
             case " ":
                 e.preventDefault();
-                current?.click();
+                if (items.includes(current)) {
+                    current.click();
+                }
                 break;
         }
     });
@@ -362,15 +373,19 @@ export const setupDocumentClickHandler = (menu: HTMLElement | null) => {
 
 export const setupIPInfoHandler = (ipBox: HTMLElement | null) => {
     if (!ipBox) return;
+
     const openIpInfo = (e: Event) => {
         e.stopPropagation();
         window.open(IP_INFO_URL, "_blank", "noopener,noreferrer");
     };
-    ipBox.addEventListener("click", openIpInfo);
-    ipBox.addEventListener("keydown", (e) => {
-        if ((e as KeyboardEvent).key === "Enter" || (e as KeyboardEvent).key === " ") {
+
+    const onKeydown = (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             openIpInfo(e);
         }
-    });
+    };
+
+    ipBox.addEventListener("click", openIpInfo);
+    ipBox.addEventListener("keydown", onKeydown);
 };

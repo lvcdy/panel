@@ -5,7 +5,7 @@ export const SELECTOR_CATEGORY_TOGGLE_ICON = ".category-toggle-icon" as const;
 export const SELECTOR_CATEGORY_TOGGLE_LABEL = ".category-toggle-label" as const;
 export const SELECTOR_CARD = ".sun-card" as const;
 export const SELECTOR_CARD_TEXT = "[data-card-text]" as const;
-export const SELECTOR_CATEGORY_TITLE = "h2.text-2xl" as const;
+export const SELECTOR_CATEGORY_TITLE = ".category-title" as const;
 
 export const ICON_API = "https://api.lvcdy.cn/favicon?url=" as const;
 export const BG_URL = "https://t.alcy.cc/ycy" as const;
