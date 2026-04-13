@@ -1,12 +1,18 @@
 import { BG_URL } from "./config";
 
-export const initBackgroundImage = () => {
+export const CUSTOM_BG_URL_KEY = "custom-bg-url" as const;
+
+const getCurrentBackgroundUrl = (): string => {
+    const savedUrl = localStorage.getItem(CUSTOM_BG_URL_KEY)?.trim();
+    return savedUrl || BG_URL;
+};
+
+const applyBackgroundByUrl = (url: string) => {
     const img = new Image();
     img.decoding = "async";
-    img.src = BG_URL;
+    img.src = url;
 
     const applyBackground = () => {
-        // Use the actual loaded image src to set the background
         document.documentElement.style.setProperty("--bg-url", `url("${img.src}")`);
         document.body.classList.add("bg-loaded");
     };
@@ -16,9 +22,28 @@ export const initBackgroundImage = () => {
     } else {
         img.onload = applyBackground;
         img.onerror = () => {
-            // Fallback: set background directly via URL (CSS bg-image has looser CORS)
-            document.documentElement.style.setProperty("--bg-url", `url("${BG_URL}")`);
+            document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
             document.body.classList.add("bg-loaded");
         };
     }
+};
+
+export const getSavedBackgroundUrl = (): string => {
+    return localStorage.getItem(CUSTOM_BG_URL_KEY)?.trim() || "";
+};
+
+export const setCustomBackgroundUrl = (url: string) => {
+    const normalized = url.trim();
+    if (normalized) {
+        localStorage.setItem(CUSTOM_BG_URL_KEY, normalized);
+        applyBackgroundByUrl(normalized);
+        return;
+    }
+
+    localStorage.removeItem(CUSTOM_BG_URL_KEY);
+    applyBackgroundByUrl(BG_URL);
+};
+
+export const initBackgroundImage = () => {
+    applyBackgroundByUrl(getCurrentBackgroundUrl());
 };

@@ -70,6 +70,56 @@
             <span id="saturate-value" class="saturate-value">165%</span>
           </div>
         </div>
+
+        <div class="setting-item">
+          <label for="bg-url-input" class="setting-label">
+            自定义背景图 URL
+          </label>
+          <input
+            id="bg-url-input"
+            type="url"
+            class="bg-url-input"
+            placeholder="https://example.com/background.jpg"
+            aria-label="输入自定义背景图 URL"
+          />
+          <div class="bg-actions">
+            <button id="bg-url-apply" type="button" class="bg-action-btn">
+              应用
+            </button>
+            <button
+              id="bg-url-reset"
+              type="button"
+              class="bg-action-btn bg-action-btn-secondary"
+            >
+              恢复默认
+            </button>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="hitokoto-api-input" class="setting-label">
+            自定义一言 API
+          </label>
+          <input
+            id="hitokoto-api-input"
+            type="url"
+            class="bg-url-input"
+            placeholder="https://example.com/hitokoto"
+            aria-label="输入自定义一言 API"
+          />
+          <div class="bg-actions">
+            <button id="hitokoto-api-apply" type="button" class="bg-action-btn">
+              应用
+            </button>
+            <button
+              id="hitokoto-api-reset"
+              type="button"
+              class="bg-action-btn bg-action-btn-secondary"
+            >
+              恢复默认
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -304,6 +354,63 @@
     }
   }
 
+  .bg-url-input {
+    width: 100%;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border-radius: 0.625rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 0.95);
+    outline: none;
+    transition:
+      border-color var(--dur-base) var(--ease-smooth),
+      box-shadow var(--dur-base) var(--ease-smooth);
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    &:focus {
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  .bg-actions {
+    display: flex;
+    gap: 0.625rem;
+  }
+
+  .bg-action-btn {
+    flex: 1;
+    height: 2.25rem;
+    border-radius: 0.625rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition:
+      background var(--dur-base) var(--ease-smooth),
+      transform var(--dur-base) var(--ease-spring),
+      border-color var(--dur-base) var(--ease-smooth);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .bg-action-btn-secondary {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
   .blur-value,
   .saturate-value {
     min-width: 50px;
@@ -341,6 +448,17 @@
 </style>
 
 <script>
+  import {
+    getSavedBackgroundUrl,
+    setCustomBackgroundUrl,
+  } from "../lib/background";
+  import { isValidHttpUrl } from "../lib/url";
+  import {
+    fetchHitokoto,
+    getSavedHitokotoApi,
+    setCustomHitokotoApi,
+  } from "../lib/hitokoto";
+
   // 初始化设置面板
   function initSettings() {
     const toggleBtn = document.getElementById("settings-toggle");
@@ -355,6 +473,19 @@
       "saturate-slider",
     ) as HTMLInputElement;
     const saturateValue = document.getElementById("saturate-value");
+    const bgUrlInput = document.getElementById(
+      "bg-url-input",
+    ) as HTMLInputElement;
+    const bgApplyBtn = document.getElementById("bg-url-apply");
+    const bgResetBtn = document.getElementById("bg-url-reset");
+    const hitokotoApiInput = document.getElementById(
+      "hitokoto-api-input",
+    ) as HTMLInputElement;
+    const hitokotoApplyBtn = document.getElementById("hitokoto-api-apply");
+    const hitokotoResetBtn = document.getElementById("hitokoto-api-reset");
+    const searchInput = document.getElementById(
+      "searchInput",
+    ) as HTMLInputElement;
 
     // 更新毛玻璃强弱
     const updateBlur = (value: number) => {
@@ -421,6 +552,16 @@
       updateSaturate(parseInt(savedSaturate));
     }
 
+    const savedBgUrl = getSavedBackgroundUrl();
+    if (savedBgUrl) {
+      bgUrlInput.value = savedBgUrl;
+    }
+
+    const savedHitokotoApi = getSavedHitokotoApi();
+    if (savedHitokotoApi) {
+      hitokotoApiInput.value = savedHitokotoApi;
+    }
+
     // 事件监听
     toggleBtn!.addEventListener("click", togglePanel);
     closeBtn!.addEventListener("click", closePanel);
@@ -434,6 +575,63 @@
     saturateSlider!.addEventListener("input", (e) => {
       const value = parseInt((e.target as HTMLInputElement).value);
       updateSaturate(value);
+    });
+
+    bgApplyBtn?.addEventListener("click", () => {
+      const value = bgUrlInput.value.trim();
+      if (!value) {
+        setCustomBackgroundUrl("");
+        return;
+      }
+
+      if (!isValidHttpUrl(value)) {
+        window.alert("请输入有效的 http/https 图片 URL");
+        return;
+      }
+
+      setCustomBackgroundUrl(value);
+    });
+
+    bgResetBtn?.addEventListener("click", () => {
+      bgUrlInput.value = "";
+      setCustomBackgroundUrl("");
+    });
+
+    bgUrlInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        bgApplyBtn?.dispatchEvent(new MouseEvent("click"));
+      }
+    });
+
+    hitokotoApplyBtn?.addEventListener("click", async () => {
+      const value = hitokotoApiInput.value.trim();
+      if (!value) {
+        setCustomHitokotoApi("");
+        await fetchHitokoto(searchInput);
+        return;
+      }
+
+      if (!isValidHttpUrl(value)) {
+        window.alert("请输入有效的 http/https 一言 API URL");
+        return;
+      }
+
+      setCustomHitokotoApi(value);
+      await fetchHitokoto(searchInput);
+    });
+
+    hitokotoResetBtn?.addEventListener("click", async () => {
+      hitokotoApiInput.value = "";
+      setCustomHitokotoApi("");
+      await fetchHitokoto(searchInput);
+    });
+
+    hitokotoApiInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        hitokotoApplyBtn?.dispatchEvent(new MouseEvent("click"));
+      }
     });
 
     // 按 Escape 关闭面板

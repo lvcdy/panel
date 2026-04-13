@@ -27,11 +27,141 @@ import "../styles/global.css";
     import * as UI from "../lib/main";
     import { initBackgroundImage } from "../lib/background";
     import { GOOGLE_SVG_ICON } from "../lib/config";
+    import {
+      buildSearchUrl,
+      clearCustomSearchEngine,
+      getSavedCustomSearchEngine,
+      setCustomSearchEngine,
+    } from "../lib/custom-engine";
+    import { isValidHttpUrl } from "../lib/url";
 
     initBackgroundImage();
 
     const els = UI.createElementCache();
+    const customEngineItem = document.getElementById(
+      "custom-engine-item",
+    ) as HTMLElement | null;
+    const customEngineName = document.getElementById(
+      "custom-engine-menu-name",
+    ) as HTMLElement | null;
+    const addCustomEngineBtn = document.getElementById(
+      "add-custom-engine-btn",
+    ) as HTMLButtonElement | null;
+    const addCustomEngineLabel = document.getElementById(
+      "add-custom-engine-label",
+    ) as HTMLElement | null;
+    const customEngineModal = document.getElementById(
+      "custom-engine-modal",
+    ) as HTMLElement | null;
+    const customEngineModalOverlay = document.getElementById(
+      "custom-engine-modal-overlay",
+    ) as HTMLElement | null;
+    const customEngineModalClose = document.getElementById(
+      "custom-engine-modal-close",
+    ) as HTMLButtonElement | null;
+    const customEngineNameInput = document.getElementById(
+      "custom-engine-name-input",
+    ) as HTMLInputElement | null;
+    const customEngineUrlInput = document.getElementById(
+      "custom-engine-url-input",
+    ) as HTMLInputElement | null;
+    const customEnginePlaceholderInput = document.getElementById(
+      "custom-engine-placeholder-input",
+    ) as HTMLInputElement | null;
+    const customEngineSaveBtn = document.getElementById(
+      "custom-engine-save-btn",
+    ) as HTMLButtonElement | null;
+    const customEngineClearBtn = document.getElementById(
+      "custom-engine-clear-btn",
+    ) as HTMLButtonElement | null;
     let searchUrl: string = UI.DEFAULT_SEARCH_URL;
+
+    const applyEngineVisual = (
+      iconClass: string,
+      color: string,
+      placeholder: string,
+    ) => {
+      if (placeholder) UI.setEnginePlaceholder(placeholder);
+      if (!els.icon) return;
+
+      if (iconClass === "fab fa-google") {
+        els.icon.className = "";
+        els.icon.style.color = "";
+        els.icon.innerHTML = GOOGLE_SVG_ICON;
+        return;
+      }
+
+      els.icon.innerHTML = "";
+      els.icon.className = `${iconClass} text-xl transition-all`;
+      els.icon.style.color = color;
+    };
+
+    const syncCustomEngineItem = () => {
+      if (!customEngineItem || !els.menu) return;
+
+      const config = getSavedCustomSearchEngine();
+
+      if (!config) {
+        const isActive = customEngineItem.classList.contains("active");
+        customEngineItem.classList.add("hidden");
+        customEngineItem.dataset.url = "";
+        customEngineItem.dataset.placeholder = "";
+        if (customEngineName) {
+          customEngineName.textContent = "自定义";
+        }
+        if (addCustomEngineLabel) {
+          addCustomEngineLabel.textContent = "添加搜索引擎";
+        }
+
+        if (isActive) {
+          const firstEngine = els.menu.querySelector(
+            ".engine-item:not(.hidden)",
+          ) as HTMLElement | null;
+          firstEngine?.click();
+        }
+        return;
+      }
+
+      customEngineItem.classList.remove("hidden");
+      customEngineItem.dataset.url = config.url;
+      customEngineItem.dataset.placeholder = config.placeholder;
+      if (customEngineName) {
+        customEngineName.textContent = config.name;
+      }
+      if (addCustomEngineLabel) {
+        addCustomEngineLabel.textContent = "编辑搜索引擎";
+      }
+    };
+
+    const openCustomEngineModal = () => {
+      const config = getSavedCustomSearchEngine();
+      if (customEngineNameInput) {
+        customEngineNameInput.value = config?.name || "";
+      }
+      if (customEngineUrlInput) {
+        customEngineUrlInput.value = config?.url || "";
+      }
+      if (customEnginePlaceholderInput) {
+        customEnginePlaceholderInput.value = config?.placeholder || "";
+      }
+
+      if (customEngineModal) {
+        customEngineModal.classList.remove("hidden");
+        customEngineModal.setAttribute("aria-hidden", "false");
+      }
+      customEngineUrlInput?.focus();
+    };
+
+    const closeCustomEngineModal = () => {
+      if (customEngineModal) {
+        customEngineModal.classList.add("hidden");
+        customEngineModal.setAttribute("aria-hidden", "true");
+      }
+    };
+
+    const emitCustomEngineUpdated = () => {
+      window.dispatchEvent(new CustomEvent("custom-search-engine:updated"));
+    };
 
     UI.setupIPInfoHandler(els.ipBox);
 
@@ -39,7 +169,7 @@ import "../styles/global.css";
     const doSearch = () => {
       if (els.input?.value.trim()) {
         window.open(
-          searchUrl + encodeURIComponent(els.input.value.trim()),
+          buildSearchUrl(searchUrl, els.input.value.trim()),
           "_blank",
           "noopener,noreferrer",
         );
@@ -53,25 +183,78 @@ import "../styles/global.css";
     setInterval(() => UI.updateTime(els.clock, els.date), 1000);
 
     // 初始化UI事件
+    syncCustomEngineItem();
+    window.addEventListener(
+      "custom-search-engine:updated",
+      syncCustomEngineItem,
+    );
+
+    addCustomEngineBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      els.menu?.classList.add("hidden");
+      els.engineBtn?.setAttribute("aria-expanded", "false");
+      openCustomEngineModal();
+    });
+
+    customEngineModalClose?.addEventListener("click", closeCustomEngineModal);
+    customEngineModalOverlay?.addEventListener("click", closeCustomEngineModal);
+
+    customEngineSaveBtn?.addEventListener("click", () => {
+      const name = customEngineNameInput?.value.trim() || "";
+      const url = customEngineUrlInput?.value.trim() || "";
+      const placeholder = customEnginePlaceholderInput?.value.trim() || "";
+
+      if (!url) {
+        window.alert("请输入自定义搜索引擎 URL");
+        return;
+      }
+
+      if (!isValidHttpUrl(url)) {
+        window.alert("请输入有效的 http/https 搜索引擎 URL");
+        return;
+      }
+
+      setCustomSearchEngine({
+        name: name || "自定义",
+        url,
+        placeholder: placeholder || "🔎 输入关键词开始搜索...",
+      });
+
+      emitCustomEngineUpdated();
+      closeCustomEngineModal();
+    });
+
+    customEngineClearBtn?.addEventListener("click", () => {
+      clearCustomSearchEngine();
+      emitCustomEngineUpdated();
+      closeCustomEngineModal();
+    });
+
+    [
+      customEngineNameInput,
+      customEngineUrlInput,
+      customEnginePlaceholderInput,
+    ].forEach((el) => {
+      el?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          customEngineSaveBtn?.click();
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeCustomEngineModal();
+        }
+      });
+    });
+
     UI.setupEngineButtonHandler(els.engineBtn, els.menu);
     UI.setupEngineItemHandlers(
       els.menu,
       els.input,
       (url: string, iconClass: string, color: string, placeholder: string) => {
         searchUrl = url;
-        if (placeholder) UI.setEnginePlaceholder(placeholder);
-        if (els.icon) {
-          // Google uses inline SVG
-          if (iconClass === "fab fa-google") {
-            els.icon.className = "";
-            els.icon.style.color = "";
-            els.icon.innerHTML = GOOGLE_SVG_ICON;
-          } else {
-            els.icon.innerHTML = "";
-            els.icon.className = `${iconClass} text-xl transition-all`;
-            els.icon.style.color = color;
-          }
-        }
+        applyEngineVisual(iconClass, color, placeholder);
       },
     );
 

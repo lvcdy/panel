@@ -5,6 +5,7 @@
 ## ✨ 主要功能
 
 - 🔍 **多搜索引擎快速切换** - 支持 Bing、百度、Google、GitHub、知乎，内置智能防抖搜索（150ms）与实时过滤高亮
+- 🧩 **自定义搜索引擎** - 支持在界面中添加/编辑/清除自定义搜索引擎，支持 `{q}` 模板占位符
 - 🌐 **分类导航** - 可折叠的分类卡片，支持按名称/URL/分类标题搜索，搜索模式下统一布局
 - 🟢 **链接状态检测** - 并发信号量控制（最大 5 并发）实时探测各链接可用性，IntersectionObserver 优先检测可见链接，颜色编码状态指示（可用/限流/禁止/不可达）
 - 🎨 **毛玻璃 UI** - 基于 Tailwind CSS v4 的 Glass Morphism 设计，动态背景图片加载与平滑过渡动画
@@ -13,6 +14,7 @@
 - 🌍 **网络仪表盘** - 实时时钟、IPv4/IPv6 地址（隐私脱敏显示）、运营商、地理位置（至区县）及网络类型
 - 🏷️ **服务商检测** - 自动识别阿里云 ESA / Cloudflare Edge 等 CDN 服务商
 - 💬 **一言（Hitokoto）** - 随机名言作为搜索框占位符，附作者归属
+- ⚙️ **设置面板** - 可调毛玻璃强度与饱和度，支持自定义背景图 URL 与自定义一言 API
 - ⌨️ **键盘快捷键** - `/` 聚焦搜索、`Escape` 清除搜索、方向键导航引擎菜单
 - ♿ **无障碍支持** - ARIA 标签、键盘导航、`prefers-reduced-motion` 适配
 
@@ -54,7 +56,8 @@ panel/
 │   │   ├── Footer.astro       # 页脚（版权、备案、服务商信息）
 │   │   ├── Header.astro       # 头部（实时时钟/日期/IP 胶囊/服务商胶囊）
 │   │   ├── LinkList.astro     # 分类链接网格（可折叠、状态指示）
-│   │   └── Search.astro       # 搜索栏（引擎选择器/输入框/反馈提示）
+│   │   ├── Search.astro       # 搜索栏（引擎选择器/输入框/反馈提示）
+│   │   └── Settings.astro     # 设置面板（玻璃参数/背景图/一言 API）
 │   ├── data/
 │   │   └── links.ts        # 导航链接与搜索引擎配置
 │   ├── layouts/
@@ -64,6 +67,7 @@ panel/
 │   │   ├── cache.ts        # 智能缓存（状态 30min TTL / 图标 24h TTL / 2MB 限制）
 │   │   ├── category.ts     # 分类折叠/展开动画逻辑
 │   │   ├── config.ts       # 全局配置常量与 API 端点
+│   │   ├── custom-engine.ts # 自定义搜索引擎配置持久化与 URL 构建
 │   │   ├── dom.ts          # DOM 元素选择器封装
 │   │   ├── hitokoto.ts     # 一言 API 封装（随机名言）
 │   │   ├── icons.ts        # 图标动态获取、Canvas 缓存与回退处理
@@ -72,7 +76,8 @@ panel/
 │   │   ├── provider.ts     # CDN 服务商检测（阿里云/Cloudflare）
 │   │   ├── search.ts       # 搜索过滤、高亮、引擎切换、键盘交互
 │   │   ├── status.ts       # 链接可用性检测（信号量并发控制）
-│   │   └── time.ts         # 实时时钟更新（zh-CN 本地化）
+│   │   ├── time.ts         # 实时时钟更新（zh-CN 本地化）
+│   │   └── url.ts          # 通用 URL 校验工具
 │   ├── pages/
 │   │   └── index.astro     # 首页入口
 │   └── styles/
@@ -140,6 +145,16 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 | `SCROLL_THRESHOLD` | 300 px | 回顶按钮出现的滚动阈值 |
 | `SEARCH_TIP_SHOW_TIME` | 2000 ms | 搜索提示显示时长 |
 
+### 本地自定义设置（localStorage）
+
+| 键名 | 说明 |
+|------|------|
+| `custom-search-engine` | 自定义搜索引擎配置（名称/URL/占位符） |
+| `custom-bg-url` | 自定义背景图 URL |
+| `custom-hitokoto-api` | 自定义一言 API 地址 |
+| `card-glass-blur-value` | 毛玻璃强弱值 |
+| `card-glass-saturate-value` | 饱和度值 |
+
 ### IP 地址显示
 
 - 自动获取 IPv4/IPv6 公网地址并进行隐私脱敏（如 `1.***.***.4`）
@@ -162,11 +177,11 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 
 | 技术 | 版本 | 描述 |
 |------|------|------|
-| [Astro](https://astro.build) | 6.0.0-beta | 现代静态站点生成框架 |
-| [Tailwind CSS](https://tailwindcss.com) | 4.2 | 实用优先的 CSS 框架（Vite 插件集成） |
+| [Astro](https://astro.build) | 6.1.1 | 现代静态站点生成框架 |
+| [Tailwind CSS](https://tailwindcss.com) | 4.2.2 | 实用优先的 CSS 框架（Vite 插件集成） |
 | [Font Awesome Free](https://fontawesome.com) | 7.2 | 图标库（@fortawesome/fontawesome-free） |
-| [TypeScript](https://www.typescriptlang.org) | 5.9 | 类型安全的 JavaScript |
-| [Lightning CSS](https://lightningcss.dev) | 1.31 | 高性能 CSS 编译器 |
+| [TypeScript](https://www.typescriptlang.org) | 6.0.2 | 类型安全的 JavaScript |
+| [Lightning CSS](https://lightningcss.dev) | 1.32.0 | 高性能 CSS 编译器 |
 | [Terser](https://terser.org) | 5.46 | JavaScript 压缩工具 |
 
 ## 📦 npm 脚本
@@ -176,6 +191,16 @@ pnpm dev       # 启动开发服务器（http://localhost:4321）
 pnpm build     # 类型检查 + 构建生产版本
 pnpm preview   # 预览构建结果
 pnpm astro     # 运行 Astro CLI 命令
+```
+
+## 🧹 清理工作区
+
+```bash
+# 清理构建产物与 Astro 缓存
+rm -rf dist .astro
+
+# 重新生成构建产物（可选）
+pnpm build
 ```
 
 ## 🎨 自定义示例

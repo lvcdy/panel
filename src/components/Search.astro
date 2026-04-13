@@ -116,5 +116,115 @@ import { SEARCH_ENGINES } from "@/data/links";
                 </div>
             ))
         }
+        <div
+            id="custom-engine-item"
+            class="engine-item group relative hidden items-center gap-3 px-3.5 py-2.5 rounded-xl cursor-pointer text-sm font-medium text-white/80"
+            data-custom-engine="true"
+            data-url=""
+            data-icon="fas fa-magnifying-glass"
+            data-color="#f59e0b"
+            data-placeholder="🔎 输入关键词开始搜索..."
+            role="option"
+            tabindex="0"
+            aria-selected="false"
+        >
+            <span
+                class="engine-icon-wrap w-8 h-8 flex items-center justify-center rounded-lg transition-colors duration-200"
+                style="background: #f59e0b15"
+            >
+                <i
+                    class="fas fa-magnifying-glass text-sm"
+                    style="color: #f59e0b"
+                    aria-hidden="true"
+                ></i>
+            </span>
+            <span id="custom-engine-menu-name" class="flex-1 truncate">自定义</span>
+            <i
+                class="fas fa-check text-[10px] opacity-0 transition-opacity duration-150 engine-check"
+                aria-hidden="true"
+            />
+        </div>
+        <button
+            id="add-custom-engine-btn"
+            type="button"
+            class="engine-action-item mt-1 flex items-center gap-3 px-3.5 py-2.5 rounded-xl cursor-pointer text-sm font-medium text-white/70 hover:text-white transition-colors"
+            aria-label="添加搜索引擎"
+        >
+            <span
+                class="engine-icon-wrap w-8 h-8 flex items-center justify-center rounded-lg transition-colors duration-200"
+                style="background: rgba(255, 255, 255, 0.1)"
+            >
+                <i class="fas fa-plus text-sm" aria-hidden="true"></i>
+            </span>
+            <span id="add-custom-engine-label" class="flex-1 text-left">添加搜索引擎</span>
+            <i class="fas fa-chevron-right text-[10px] opacity-70" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <div
+        id="custom-engine-modal"
+        class="fixed inset-0 z-50 hidden"
+        aria-hidden="true"
+    >
+        <div id="custom-engine-modal-overlay" class="absolute inset-0 bg-transparent"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div
+                class="w-full max-w-md rounded-2xl border border-white/15 bg-black/65 backdrop-blur-xl p-5 shadow-2xl"
+                role="dialog"
+                aria-labelledby="custom-engine-modal-title"
+            >
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="custom-engine-modal-title" class="text-base font-semibold text-white">
+                        配置搜索引擎
+                    </h3>
+                    <button
+                        id="custom-engine-modal-close"
+                        type="button"
+                        class="h-8 w-8 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                        aria-label="关闭"
+                    >
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <input
+                        id="custom-engine-name-input"
+                        type="text"
+                        class="h-10 w-full rounded-lg border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/40"
+                        placeholder="引擎名称（可选）"
+                    />
+                    <input
+                        id="custom-engine-url-input"
+                        type="url"
+                        class="h-10 w-full rounded-lg border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/40"
+                        placeholder="https://example.com/search?q= 或 https://example.com/search?q={q}"
+                    />
+                    <input
+                        id="custom-engine-placeholder-input"
+                        type="text"
+                        class="h-10 w-full rounded-lg border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/40"
+                        placeholder="搜索框提示语（可选）"
+                    />
+                </div>
+
+                <div class="mt-4 flex gap-2">
+                    <button
+                        id="custom-engine-save-btn"
+                        type="button"
+                        class="flex-1 h-9 rounded-lg border border-white/20 bg-white/15 text-white text-sm font-medium hover:bg-white/25 transition-colors"
+                    >
+                        保存
+                    </button>
+                    <button
+                        id="custom-engine-clear-btn"
+                        type="button"
+                        class="h-9 px-3 rounded-lg border border-white/20 bg-white/5 text-white/90 text-sm hover:bg-white/10 transition-colors"
+                    >
+                        恢复默认
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </search>

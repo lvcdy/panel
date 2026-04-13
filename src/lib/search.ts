@@ -171,7 +171,7 @@ export const showSearchTip = (tipElement: HTMLElement | null) => {
 export const setupEngineButtonHandler = (engineBtn: HTMLElement | null, menu: HTMLElement | null) => {
     if (!engineBtn || !menu) return;
 
-    const getEngineItems = () => Array.from(menu.querySelectorAll<HTMLElement>(".engine-item"));
+    const getEngineItems = () => Array.from(menu.querySelectorAll<HTMLElement>(".engine-item, .engine-action-item"));
 
     const syncExpanded = () => {
         engineBtn.setAttribute("aria-expanded", String(!menu.classList.contains("hidden")));
