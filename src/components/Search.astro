@@ -135,14 +135,14 @@ import { SEARCH_ENGINES } from "@/data/links";
                 <i
                     class="fas fa-magnifying-glass text-sm"
                     style="color: #f59e0b"
-                    aria-hidden="true"
-                ></i>
+                    aria-hidden="true"></i>
             </span>
-            <span id="custom-engine-menu-name" class="flex-1 truncate">自定义</span>
+            <span id="custom-engine-menu-name" class="flex-1 truncate"
+                >自定义</span
+            >
             <i
                 class="fas fa-check text-[10px] opacity-0 transition-opacity duration-150 engine-check"
-                aria-hidden="true"
-            />
+                aria-hidden="true"></i>
         </div>
         <button
             id="add-custom-engine-btn"
@@ -156,8 +156,12 @@ import { SEARCH_ENGINES } from "@/data/links";
             >
                 <i class="fas fa-plus text-sm" aria-hidden="true"></i>
             </span>
-            <span id="add-custom-engine-label" class="flex-1 text-left">添加搜索引擎</span>
-            <i class="fas fa-chevron-right text-[10px] opacity-70" aria-hidden="true"></i>
+            <span id="add-custom-engine-label" class="flex-1 text-left"
+                >添加搜索引擎</span
+            >
+            <i
+                class="fas fa-chevron-right text-[10px] opacity-70"
+                aria-hidden="true"></i>
         </button>
     </div>
 
@@ -166,7 +170,11 @@ import { SEARCH_ENGINES } from "@/data/links";
         class="fixed inset-0 z-50 hidden"
         aria-hidden="true"
     >
-        <div id="custom-engine-modal-overlay" class="absolute inset-0 bg-transparent"></div>
+        <div
+            id="custom-engine-modal-overlay"
+            class="absolute inset-0 bg-transparent"
+        >
+        </div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
             <div
                 class="w-full max-w-md rounded-2xl border border-white/15 bg-black/65 backdrop-blur-xl p-5 shadow-2xl"
@@ -174,7 +182,10 @@ import { SEARCH_ENGINES } from "@/data/links";
                 aria-labelledby="custom-engine-modal-title"
             >
                 <div class="flex items-center justify-between mb-4">
-                    <h3 id="custom-engine-modal-title" class="text-base font-semibold text-white">
+                    <h3
+                        id="custom-engine-modal-title"
+                        class="text-base font-semibold text-white"
+                    >
                         配置搜索引擎
                     </h3>
                     <button
