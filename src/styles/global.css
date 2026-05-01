@@ -30,15 +30,25 @@
     --card-glass-blur-value: 18px;
     --card-glass-saturate-value: 165%;
     --card-glass-filter: blur(var(--card-glass-blur-value)) saturate(var(--card-glass-saturate-value));
+    --surface-border: rgba(255, 255, 255, 0.1);
+    --surface-border-strong: rgba(255, 255, 255, 0.18);
+    --surface-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+    --surface-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.18);
+    --accent-cyan: #38bdf8;
+    --accent-violet: #a78bfa;
   }
 }
 
 @layer components {
   .glass {
-    @apply border border-white/10 shadow-2xl;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
+    @apply border;
+    border-color: var(--surface-border);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.035)),
+      var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--surface-shadow-soft);
   }
 
   /* ─────── Card ─────── */
@@ -46,8 +56,9 @@
     @apply relative overflow-hidden;
     --_accent: var(--card-color, #ffffff);
     contain: layout style;
-    backdrop-filter: var(--card-glass-filter);
+    border-color: rgba(255, 255, 255, 0.08);
     -webkit-backdrop-filter: var(--card-glass-filter);
+    backdrop-filter: var(--card-glass-filter);
     transition:
       transform var(--dur-base) var(--ease-spring),
       background-color var(--dur-base) var(--ease-smooth),
@@ -57,11 +68,13 @@
 
   .sun-card:hover {
     @apply -translate-y-1.5 border-white/15;
-    background: var(--glass-bg-hover);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.05)),
+      var(--glass-bg-hover);
     box-shadow:
-      0 8px 30px rgba(0, 0, 0, 0.25),
+      var(--surface-shadow),
       0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-      0 20px 50px -15px color-mix(in srgb, var(--_accent) 18%, transparent);
+      0 24px 60px -18px color-mix(in srgb, var(--_accent) 22%, transparent);
   }
 
   /* Bottom accent bar */
@@ -81,10 +94,12 @@
     content: '';
     @apply absolute inset-0 pointer-events-none rounded-[inherit];
     overflow: hidden;
-    background: linear-gradient(120deg,
+    background:
+      radial-gradient(circle at top left, rgba(255, 255, 255, 0.1), transparent 38%),
+      linear-gradient(120deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.06) 40%,
-        transparent 60%);
+        rgba(255, 255, 255, 0.07) 42%,
+        transparent 64%);
     opacity: 0;
     transition: opacity var(--dur-base) var(--ease-smooth);
   }
@@ -109,15 +124,17 @@
   /* ─────── Info Capsule ─────── */
   .info-capsule {
     @apply inline-flex items-center gap-2 rounded-full text-xs cursor-pointer select-none;
-    padding: 5px 14px 5px 10px;
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(14px) saturate(150%);
-    -webkit-backdrop-filter: blur(14px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.6);
+    padding: 7px 16px 7px 11px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.045)),
+      rgba(255, 255, 255, 0.04);
+    -webkit-backdrop-filter: blur(18px) saturate(165%);
+    backdrop-filter: blur(18px) saturate(165%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
     box-shadow:
-      0 2px 8px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      0 12px 28px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
     opacity: 0;
     filter: blur(8px);
     transition:
@@ -131,11 +148,13 @@
   }
 
   .info-capsule:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.065)),
+      rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.22);
     color: rgba(255, 255, 255, 0.95);
     box-shadow:
-      0 4px 20px rgba(0, 0, 0, 0.2),
+      0 18px 42px rgba(0, 0, 0, 0.22),
       0 0 24px -6px rgba(255, 255, 255, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
     transform: translateY(-1px);
@@ -183,6 +202,22 @@
     letter-spacing: 0.01em;
   }
 
+  .floating-action-btn {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)),
+      rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 18px 42px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .floating-action-btn:hover {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1)),
+      rgba(255, 255, 255, 0.14);
+  }
+
   /* ─────── Category ─────── */
   .category-section {
     transition:
@@ -190,6 +225,19 @@
       transform var(--dur-base) var(--ease-smooth),
       filter var(--dur-base) var(--ease-smooth),
       max-height var(--dur-slow) var(--ease-out-expo);
+  }
+
+  .category-section > .category-header {
+    padding: 0.15rem 0.2rem 0.1rem;
+  }
+
+  .category-title {
+    letter-spacing: 0.02em;
+    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+  }
+
+  .category-wrapper {
+    border-radius: 1.1rem;
   }
 
   .category-section.hidden-icons {
@@ -288,8 +336,7 @@
     display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 0.5rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.15rem;
+    padding: 0.55rem 0 0.15rem;
     transition:
       gap var(--dur-slow) var(--ease-in-out),
       padding-top var(--dur-slow) var(--ease-in-out),
@@ -339,13 +386,15 @@
 
   /* ─────── Search ─────── */
   .search-container {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045)),
+      rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    -webkit-backdrop-filter: blur(30px) saturate(175%);
+    backdrop-filter: blur(30px) saturate(175%);
     box-shadow:
-      0 4px 24px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      0 18px 48px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
     transition:
       background-color var(--dur-base) var(--ease-smooth),
       border-color var(--dur-base) var(--ease-smooth),
@@ -354,13 +403,15 @@
   }
 
   .search-container:focus-within {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06)),
+      rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.22);
     box-shadow:
-      0 8px 40px rgba(0, 0, 0, 0.2),
+      0 20px 60px rgba(0, 0, 0, 0.28),
       0 0 0 1px rgba(255, 255, 255, 0.08),
-      0 0 60px -10px rgba(255, 255, 255, 0.04);
-    transform: scale(1.01);
+      0 0 80px -18px rgba(56, 189, 248, 0.22);
+    transform: scale(1.015);
   }
 
   .search-divider {
@@ -383,7 +434,7 @@
   }
 
   .search-engine-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.1);
     transform: scale(1.05);
   }
 
@@ -401,7 +452,7 @@
 
   .search-go-btn:hover {
     color: #fff;
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(56, 189, 248, 0.18);
   }
 
   .search-go-btn:active {
@@ -409,7 +460,7 @@
   }
 
   .search-container:focus-within .search-go-btn {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.95);
   }
 
   /* ━━━━━ Keyframes ━━━━━ */
@@ -497,12 +548,12 @@
 
   /* ─────── Engine Menu ─────── */
   .engine-menu {
-    background: rgba(22, 22, 26, 0.92);
-    backdrop-filter: blur(32px) saturate(180%);
-    -webkit-backdrop-filter: blur(32px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 14, 24, 0.92);
+    -webkit-backdrop-filter: blur(36px) saturate(180%);
+    backdrop-filter: blur(36px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow:
-      0 24px 64px rgba(0, 0, 0, 0.5),
+      0 24px 64px rgba(0, 0, 0, 0.55),
       0 0 0 1px rgba(255, 255, 255, 0.04) inset;
     transform-origin: top left;
   }
@@ -540,7 +591,13 @@
   /* ─────── Clock ─────── */
   #clock {
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.05em;
+    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.42);
+  }
+
+  #date {
+    letter-spacing: 0.01em;
+    text-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
   }
 
   /* ─────── Status Indicator ─────── */
@@ -568,11 +625,11 @@
     transform: translateX(-50%) translateY(4px);
     padding: 6px 12px;
     border-radius: 10px;
-    background: rgba(20, 20, 22, 0.92);
-    backdrop-filter: blur(16px) saturate(150%);
-    -webkit-backdrop-filter: blur(16px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    background: rgba(8, 12, 20, 0.94);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.36);
     color: rgba(255, 255, 255, 0.9);
     font-size: 0.75rem;
     font-weight: 500;
@@ -643,8 +700,12 @@
     @apply text-4xl;
   }
 
+  .search-container {
+    border-radius: 1.25rem;
+  }
+
   .sun-card {
-    @apply p-2.5;
+    @apply p-3;
   }
 
   .sun-card .card-icon {
@@ -653,6 +714,10 @@
 
   .category-section h2 {
     @apply text-lg mb-2;
+  }
+
+  .info-capsule {
+    max-width: calc(100vw - 2rem);
   }
 }
 

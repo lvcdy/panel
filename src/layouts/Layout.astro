@@ -14,7 +14,7 @@ const { title = "Panel", description = "Panel" } =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#1a1a1a" />
+    <meta name="theme-color" content="#0b1220" />
     <meta name="color-scheme" content="dark" />
     <meta name="generator" content={Astro.generator} />
     <meta property="og:title" content={title} />
@@ -34,12 +34,10 @@ const { title = "Panel", description = "Panel" } =
     <link rel="dns-prefetch" href="https://t.alcy.cc" />
   </head>
   <body
-    class="relative min-h-screen antialiased bg-[#1a1a1a] overflow-x-hidden selection:bg-white/20"
+    class="relative min-h-screen antialiased bg-[#0b1220] overflow-x-hidden selection:bg-white/20"
   >
-    <div
-      class="fixed inset-0 bg-black/40 backdrop-blur-[1px] pointer-events-none z-[-1]"
-    >
-    </div>
+    <div class="page-aurora" aria-hidden="true"></div>
+    <div class="page-vignette" aria-hidden="true"></div>
     <slot />
   </body>
 </html>
@@ -47,6 +45,17 @@ const { title = "Panel", description = "Panel" } =
 <style is:global>
   :root {
     --bg-url: none;
+    --page-bg: #0b1220;
+    --page-tint: rgba(15, 23, 42, 0.72);
+    --page-line: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.16), transparent 28%),
+      radial-gradient(circle at 80% 0%, rgba(167, 139, 250, 0.14), transparent 24%),
+      radial-gradient(circle at 85% 82%, rgba(251, 191, 36, 0.08), transparent 20%),
+      linear-gradient(180deg, #0b1220 0%, #0f172a 42%, #090f1c 100%);
   }
 
   body::before {
@@ -61,6 +70,48 @@ const { title = "Panel", description = "Panel" } =
       opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1),
       transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: opacity, transform;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, rgba(11, 18, 32, 0.2), rgba(11, 18, 32, 0.55)),
+      repeating-linear-gradient(
+        135deg,
+        transparent 0,
+        transparent 22px,
+        rgba(255, 255, 255, 0.02) 22px,
+        rgba(255, 255, 255, 0.02) 23px
+      );
+    opacity: 0.85;
+  }
+
+  .page-aurora {
+    position: fixed;
+    inset: -10% -10% auto;
+    height: 56vh;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      radial-gradient(circle at 20% 35%, rgba(56, 189, 248, 0.22), transparent 28%),
+      radial-gradient(circle at 55% 25%, rgba(168, 85, 247, 0.18), transparent 30%),
+      radial-gradient(circle at 82% 40%, rgba(244, 114, 182, 0.12), transparent 24%);
+    filter: blur(32px);
+    opacity: 0.8;
+  }
+
+  .page-vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      radial-gradient(circle at center, transparent 58%, rgba(0, 0, 0, 0.42) 100%),
+      linear-gradient(180deg, rgba(11, 18, 32, 0.08), rgba(11, 18, 32, 0.4));
   }
 
   body.bg-loaded::before {
@@ -95,10 +146,17 @@ const { title = "Panel", description = "Panel" } =
     padding: 0;
     color: inherit;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
   }
 
   .category-toggle-btn:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline: 2px solid rgba(255, 255, 255, 0.28);
     outline-offset: 4px;
+  }
+
+  main {
+    width: 100%;
   }
 </style>
