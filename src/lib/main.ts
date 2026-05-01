@@ -6,6 +6,6 @@ export * from "./category";
 export * from "./cache";
 export * from "./status";
 export * from "./icons";
-export * from "./ip";
+export * from "./weather";
 export * from "./hitokoto";
 export * from "./custom-engine";

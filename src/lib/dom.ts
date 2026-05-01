@@ -5,8 +5,8 @@ const qs = <T extends HTMLElement>(selector: string): T | null =>
 export const createElementCache = () => ({
     clock: qs<HTMLElement>("#clock"),
     date: qs<HTMLElement>("#date"),
-    ip: qs<HTMLElement>("#ip-address"),
-    ipBox: qs<HTMLElement>("#ip-info"),
+    weather: qs<HTMLElement>("#weather-text"),
+    weatherBox: qs<HTMLElement>("#weather-info"),
     input: qs<HTMLInputElement>("#searchInput"),
     engineBtn: qs<HTMLElement>("#engineBtn"),
     menu: qs<HTMLElement>("#engineMenu"),

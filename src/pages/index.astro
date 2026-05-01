@@ -163,7 +163,7 @@ import "../styles/global.css";
       window.dispatchEvent(new CustomEvent("custom-search-engine:updated"));
     };
 
-    UI.setupIPInfoHandler(els.ipBox);
+    UI.setupWeatherInfoHandler(els.weather, els.weatherBox);
 
     // 搜索功能
     const doSearch = () => {
@@ -340,7 +340,7 @@ import "../styles/global.css";
     // 异步加载网络信息和URL状态检测
     UI.scheduleInit(() => {
       Promise.all([
-        UI.fetchIpInfo(els.ip, els.ipBox),
+        UI.fetchWeatherInfo(els.weather, els.weatherBox),
         fetchAndDetectProvider(els.proName, els.proBox),
       ]).catch((err) => {
         console.error("初始化网络数据失败:", err);

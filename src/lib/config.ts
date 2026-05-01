@@ -14,6 +14,10 @@ export const BG_URL = "https://t.alcy.cc/ycy" as const;
 export const DEFAULT_SEARCH_URL = "https://cn.bing.com/search?q=" as const;
 export const IP_INFO_URL = "https://ip.xxir.com/" as const;
 export const IP_API_PRIMARY = "https://ipapi.xxlb.org/" as const;
+export const WEATHER_API_URL = "https://api.seniverse.com/v3/weather/now.json" as const;
+export const WEATHER_API_KEY = "SUnfUoGPmINHHfYrc" as const;
+export const WEATHER_DEFAULT_LOCATION = "beijing" as const;
+export const WEATHER_DEFAULT_LABEL = "北京" as const;
 export const HITOKOTO_APIS = [
     "https://api.lvcdy.cn/hitokoto",
 ] as const satisfies readonly string[];
