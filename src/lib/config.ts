@@ -7,7 +7,8 @@ export const SELECTOR_CARD = ".sun-card" as const;
 export const SELECTOR_CARD_TEXT = "[data-card-text]" as const;
 export const SELECTOR_CATEGORY_TITLE = ".category-title" as const;
 
-export const ICON_API = "https://api.lvcdy.cn/favicon?url=" as const;
+export const ICON_API = "https://api.lvcdy.cn/icon?url=" as const;
+export const ICON_API_SIZE = "&size=32..64..120" as const;
 export const BG_URL = "https://t.alcy.cc/ycy" as const;
 
 // Search & API Configuration
@@ -31,26 +32,13 @@ export const SCROLL_THRESHOLD = 300 as const;
 export const SCROLL_DURATION = 600 as const;
 
 // Cache Configuration
-export const CACHE_KEY = "url_status_cache" as const;
 export const ICON_CACHE_KEY = "icon_cache" as const;
 export const CACHE_ENABLED = false as const;
 export const CACHE_VERSION = 1 as const;
-// Status cache: individual entry TTL (30 minutes)
-export const STATUS_CACHE_TTL = 1800000 as const;
 // Icon cache: longer TTL (24 hours)
 export const ICON_CACHE_TTL = 86400000 as const;
 // Icon cache max size in bytes (~2MB to stay safe within 5MB localStorage limit)
 export const ICON_CACHE_MAX_SIZE = 2097152 as const; // 2MB
-
-export interface StatusCacheEntry {
-    value: number | string;
-    ts: number;
-}
-
-export interface StatusCacheData {
-    version: number;
-    entries: Record<string, StatusCacheEntry>;
-}
 
 export interface IconCacheData {
     version: number;

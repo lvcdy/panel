@@ -1,13 +1,12 @@
 # Panel - 个人导航仪表板 🎯
 
-一个简洁高效的个人导航仪表板，用于快速访问常用网站、工具和服务。基于 Vite 7、TypeScript 和 Tailwind CSS v4 构建的现代化个人导航门户，支持多搜索引擎、实时链接状态检测、IP 地理信息展示等丰富功能。
+一个简洁高效的个人导航仪表板，用于快速访问常用网站、工具和服务。基于 Vite 7、TypeScript 和 Tailwind CSS v4 构建的现代化个人导航门户，支持多搜索引擎、IP 地理信息展示等丰富功能。
 
 ## ✨ 主要功能
 
 - 🔍 **多搜索引擎快速切换** - 支持 Bing、百度、Google、GitHub、知乎，内置智能防抖搜索（150ms）与实时过滤高亮
 - 🧩 **自定义搜索引擎** - 支持在界面中添加/编辑/清除自定义搜索引擎，支持 `{q}` 模板占位符
 - 🌐 **分类导航** - 可折叠的分类卡片，支持按名称/URL/分类标题搜索，搜索模式下统一布局
-- 🟢 **链接状态检测** - 并发信号量控制（最大 5 并发）实时探测各链接可用性，IntersectionObserver 优先检测可见链接，颜色编码状态指示（可用/限流/禁止/不可达）
 - 🎨 **毛玻璃 UI** - 基于 Tailwind CSS v4 的 Glass Morphism 设计，动态背景图片加载与平滑过渡动画
 - ⚡ **性能优化** - 图标懒加载与 Canvas 缓存、requestIdleCallback 延迟初始化、事件委托、debounce、WeakMap 文本缓存
 - 📱 **响应式布局** - 1-5 列自适应网格，完美适配桌面、平板和手机
@@ -56,18 +55,17 @@ panel/
 │   │   └── links.ts        # 导航链接与搜索引擎配置
 │   ├── lib/                # 工具函数库
 │   │   ├── background.ts   # 动态背景图片加载与过渡动画
-│   │   ├── cache.ts        # 智能缓存（状态 30min TTL / 图标 24h TTL / 2MB 限制）
+│   │   ├── cache.ts        # 智能缓存（图标 24h TTL / 2MB 限制）
 │   │   ├── category.ts     # 分类折叠/展开动画逻辑
 │   │   ├── config.ts       # 全局配置常量与 API 端点
 │   │   ├── custom-engine.ts # 自定义搜索引擎配置持久化与 URL 构建
 │   │   ├── dom.ts          # DOM 元素选择器封装
 │   │   ├── hitokoto.ts     # 一言 API 封装（随机名言）
-│   │   ├── icons.ts        # 图标动态获取、Canvas 缓存与回退处理
+│   │   ├── icons.ts        # 图标直接获取 favicon、Canvas 缓存与回退处理
 │   │   ├── ip.ts           # IP 信息获取、隐私脱敏与格式化
 │   │   ├── main.ts         # 浏览器工具模块聚合出口
 │   │   ├── provider.ts     # CDN 服务商检测（阿里云/Cloudflare）
 │   │   ├── search.ts       # 搜索过滤、高亮、引擎切换、键盘交互
-│   │   ├── status.ts       # 链接可用性检测（信号量并发控制）
 │   │   ├── time.ts         # 实时时钟更新（zh-CN 本地化）
 │   │   └── url.ts          # 通用 URL 校验工具
 │   ├── main.ts             # Vite 应用渲染与初始化入口
@@ -93,7 +91,7 @@ export const CATEGORIES: Category[] = [
         url: "https://example.com",
         icon: "fas fa-icon-name",
         color: "#3498db",
-        useIcon: true  // 可选：true 则自动获取网站 favicon
+        useIcon: true  // 可选：true 则自动通过 besticon /icon API 获取网站图标
       }
     ]
   }
@@ -107,7 +105,7 @@ export const CATEGORIES: Category[] = [
   - `url` - 链接地址
   - `icon` - [Font Awesome](https://fontawesome.com/icons) 图标类名（作为默认或回退图标）
   - `color` - 十六进制颜色值
-  - `useIcon` - 可选，设为 `true` 时自动获取网站 favicon 并缓存
+  - `useIcon` - 可选，设为 `true` 时自动通过 besticon 的 `/icon` 接口获取网站图标并缓存
 
 ### 配置搜索引擎
 
@@ -130,7 +128,6 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
 | `CACHE_ENABLED` | `false` | 是否启用 localStorage 缓存 |
-| `STATUS_CACHE_TTL` | 30 分钟 | 链接状态缓存过期时间 |
 | `ICON_CACHE_TTL` | 24 小时 | 图标缓存过期时间 |
 | `ICON_CACHE_MAX_SIZE` | 2 MB | 图标缓存最大占用空间 |
 | `SCROLL_THRESHOLD` | 300 px | 回顶按钮出现的滚动阈值 |
@@ -156,7 +153,6 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 
 | 模式 | 说明 |
 |------|------|
-| **信号量并发控制** | 链接状态检测最多 5 个并发请求，避免浏览器连接池耗尽 |
 | **IntersectionObserver** | 可见链接优先检测状态，分类/页脚入场动画触发 |
 | **WeakMap 文本缓存** | 搜索高亮时保留原始文本，精确还原无残留 |
 | **事件委托** | 引擎菜单使用单一事件监听器，减少内存占用 |

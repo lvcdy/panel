@@ -8,7 +8,7 @@ import {
   getSavedCustomSearchEngine,
   setCustomSearchEngine,
 } from "./lib/custom-engine";
-import { GOOGLE_SVG_ICON, ICON_API } from "./lib/config";
+import { GOOGLE_SVG_ICON, ICON_API, ICON_API_SIZE } from "./lib/config";
 import { fetchAndDetectProvider } from "./lib/provider";
 import { initSettings } from "./lib/settings";
 import { isValidHttpUrl } from "./lib/url";
@@ -25,6 +25,8 @@ const escapeHtml = (value: string) =>
     .replaceAll("'", "&#39;");
 
 const escapeAttr = escapeHtml;
+
+const getIconQueryUrl = (url: string) => `${ICON_API}${encodeURIComponent(url)}${ICON_API_SIZE}`;
 
 const renderHeader = () => `
   <header class="mt-10 sm:mt-14 text-center select-none">
@@ -298,7 +300,7 @@ const renderLinkIcon = (link: LinkItem) => {
 
   return `
     <img
-      src="${escapeAttr(ICON_API + link.url)}"
+      src="${escapeAttr(getIconQueryUrl(link.url))}"
       alt="${escapeAttr(`${link.name} 图标`)}"
       loading="lazy"
       decoding="async"
@@ -331,11 +333,6 @@ const renderLinkCard = (link: LinkItem, index: number) => `
       >
         ${escapeHtml(link.name)}
       </span>
-      <span
-        class="status-indicator absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-white/20 transition-all"
-        data-tooltip="检测中..."
-        aria-hidden="true"
-      ></span>
     </a>
   </li>
 `;
@@ -949,10 +946,6 @@ const initApp = () => {
 
   UI.scheduleInit(() => {
     UI.fetchHitokoto(els.input);
-  });
-
-  UI.scheduleInit(() => {
-    UI.checkAllUrls();
   });
 };
 
