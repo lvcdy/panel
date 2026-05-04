@@ -1,6 +1,6 @@
 # Panel - 个人导航仪表板 🎯
 
-一个简洁高效的个人导航仪表板，用于快速访问常用网站、工具和服务。基于 Astro 6 和 Tailwind CSS v4 构建的现代化个人导航门户，支持多搜索引擎、实时链接状态检测、IP 地理信息展示等丰富功能。
+一个简洁高效的个人导航仪表板，用于快速访问常用网站、工具和服务。基于 Vite 7、TypeScript 和 Tailwind CSS v4 构建的现代化个人导航门户，支持多搜索引擎、实时链接状态检测、IP 地理信息展示等丰富功能。
 
 ## ✨ 主要功能
 
@@ -35,7 +35,7 @@ cd panel
 # 安装依赖
 pnpm install
 
-# 本地开发（访问 http://localhost:4321）
+# 本地开发（访问 http://localhost:5173）
 pnpm dev
 
 # 生产构建
@@ -49,19 +49,11 @@ pnpm preview
 
 ```
 panel/
+├── index.html              # Vite HTML 入口
 ├── public/                  # 静态资源
 ├── src/
-│   ├── components/         # Astro 组件
-│   │   ├── FloatingCtrl.astro # 浮动回顶按钮（滚动 300px 后显示）
-│   │   ├── Footer.astro       # 页脚（版权、备案、服务商信息）
-│   │   ├── Header.astro       # 头部（实时时钟/日期/IP 胶囊/服务商胶囊）
-│   │   ├── LinkList.astro     # 分类链接网格（可折叠、状态指示）
-│   │   ├── Search.astro       # 搜索栏（引擎选择器/输入框/反馈提示）
-│   │   └── Settings.astro     # 设置面板（玻璃参数/背景图/一言 API）
 │   ├── data/
 │   │   └── links.ts        # 导航链接与搜索引擎配置
-│   ├── layouts/
-│   │   └── Layout.astro    # 页面布局（背景加载、全局脚本）
 │   ├── lib/                # 工具函数库
 │   │   ├── background.ts   # 动态背景图片加载与过渡动画
 │   │   ├── cache.ts        # 智能缓存（状态 30min TTL / 图标 24h TTL / 2MB 限制）
@@ -72,17 +64,16 @@ panel/
 │   │   ├── hitokoto.ts     # 一言 API 封装（随机名言）
 │   │   ├── icons.ts        # 图标动态获取、Canvas 缓存与回退处理
 │   │   ├── ip.ts           # IP 信息获取、隐私脱敏与格式化
-│   │   ├── main.ts         # 统一初始化入口
+│   │   ├── main.ts         # 浏览器工具模块聚合出口
 │   │   ├── provider.ts     # CDN 服务商检测（阿里云/Cloudflare）
 │   │   ├── search.ts       # 搜索过滤、高亮、引擎切换、键盘交互
 │   │   ├── status.ts       # 链接可用性检测（信号量并发控制）
 │   │   ├── time.ts         # 实时时钟更新（zh-CN 本地化）
 │   │   └── url.ts          # 通用 URL 校验工具
-│   ├── pages/
-│   │   └── index.astro     # 首页入口
+│   ├── main.ts             # Vite 应用渲染与初始化入口
 │   └── styles/
 │       └── global.css      # 全局样式（毛玻璃、动画、响应式）
-├── astro.config.mjs        # Astro 配置（静态输出、Tailwind v4 Vite 插件）
+├── vite.config.ts          # Vite 配置（Tailwind v4、压缩与资源目录）
 └── package.json
 ```
 
@@ -177,7 +168,7 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 
 | 技术 | 版本 | 描述 |
 |------|------|------|
-| [Astro](https://astro.build) | 6.1.1 | 现代静态站点生成框架 |
+| [Vite](https://vite.dev) | 7.3.2 | 前端开发服务器与生产打包工具 |
 | [Tailwind CSS](https://tailwindcss.com) | 4.2.2 | 实用优先的 CSS 框架（Vite 插件集成） |
 | [Font Awesome Free](https://fontawesome.com) | 7.2 | 图标库（@fortawesome/fontawesome-free） |
 | [TypeScript](https://www.typescriptlang.org) | 6.0.2 | 类型安全的 JavaScript |
@@ -187,17 +178,17 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 ## 📦 npm 脚本
 
 ```bash
-pnpm dev       # 启动开发服务器（http://localhost:4321）
+pnpm dev       # 启动开发服务器（http://localhost:5173）
 pnpm build     # 类型检查 + 构建生产版本
 pnpm preview   # 预览构建结果
-pnpm astro     # 运行 Astro CLI 命令
+pnpm typecheck # 仅执行 TypeScript 类型检查
 ```
 
 ## 🧹 清理工作区
 
 ```bash
-# 清理构建产物与 Astro 缓存
-rm -rf dist .astro
+# 清理构建产物
+rm -rf dist
 
 # 重新生成构建产物（可选）
 pnpm build
@@ -251,7 +242,7 @@ pnpm build
 
 1. 推送代码到 GitHub
 2. 访问 [Vercel](https://vercel.com) 导入项目
-3. 自动识别 Astro 框架
+3. 自动识别 Vite 框架
 4. 点击部署完成
 
 ### 其他平台
@@ -267,7 +258,7 @@ pnpm build
 - **版本**: 1.0.0
 - **类型**: 静态网站
 - **构建输出**: `./dist/`
-- **开发端口**: 4321
+- **开发端口**: 5173
 
 ## 📝 许可证
 

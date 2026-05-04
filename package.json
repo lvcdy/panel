@@ -3,23 +3,22 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "vite",
+    "start": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.2.0",
-    "astro": "6.2.1",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.9",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^25.6.0",
     "lightningcss": "^1.32.0",
     "terser": "^5.46.1",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.2",
+    "vite": "^7.3.2"
   }
 }
