@@ -1,4 +1,9 @@
 import { isValidHttpUrl } from "./url";
+import {
+    getStoredJson,
+    removeStoredValue,
+    setStoredJson,
+} from "./storage";
 
 export const CUSTOM_SEARCH_ENGINE_KEY = "custom-search-engine" as const;
 
@@ -15,25 +20,22 @@ export const isValidSearchEngineUrl = (value: string): boolean => {
 };
 
 export const getSavedCustomSearchEngine = (): CustomSearchEngineConfig | null => {
-    try {
-        const raw = localStorage.getItem(CUSTOM_SEARCH_ENGINE_KEY);
-        if (!raw) return null;
+    const parsed = getStoredJson<Partial<CustomSearchEngineConfig>>(
+        CUSTOM_SEARCH_ENGINE_KEY,
+    );
+    if (!parsed) return null;
 
-        const parsed = JSON.parse(raw) as Partial<CustomSearchEngineConfig>;
-        const name = normalize(parsed.name || "");
-        const url = normalize(parsed.url || "");
-        const placeholder = normalize(parsed.placeholder || "");
+    const name = normalize(parsed.name || "");
+    const url = normalize(parsed.url || "");
+    const placeholder = normalize(parsed.placeholder || "");
 
-        if (!url || !isValidSearchEngineUrl(url)) return null;
+    if (!url || !isValidSearchEngineUrl(url)) return null;
 
-        return {
-            name: name || "自定义",
-            url,
-            placeholder: placeholder || "🔎 输入关键词开始搜索...",
-        };
-    } catch {
-        return null;
-    }
+    return {
+        name: name || "自定义",
+        url,
+        placeholder: placeholder || "🔎 输入关键词开始搜索...",
+    };
 };
 
 export const setCustomSearchEngine = (config: CustomSearchEngineConfig) => {
@@ -43,11 +45,11 @@ export const setCustomSearchEngine = (config: CustomSearchEngineConfig) => {
         placeholder: normalize(config.placeholder) || "🔎 输入关键词开始搜索...",
     };
 
-    localStorage.setItem(CUSTOM_SEARCH_ENGINE_KEY, JSON.stringify(normalized));
+    setStoredJson(CUSTOM_SEARCH_ENGINE_KEY, normalized);
 };
 
 export const clearCustomSearchEngine = () => {
-    localStorage.removeItem(CUSTOM_SEARCH_ENGINE_KEY);
+    removeStoredValue(CUSTOM_SEARCH_ENGINE_KEY);
 };
 
 export const buildSearchUrl = (urlTemplate: string, query: string) => {

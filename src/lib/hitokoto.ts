@@ -1,24 +1,25 @@
 import { HITOKOTO_APIS } from "./config";
+import { getStoredText, removeStoredValue, setStoredText } from "./storage";
 
 export const CUSTOM_HITOKOTO_API_KEY = "custom-hitokoto-api" as const;
 
 const getHitokotoApiList = (): string[] => {
-    const customApi = localStorage.getItem(CUSTOM_HITOKOTO_API_KEY)?.trim();
+    const customApi = getStoredText(CUSTOM_HITOKOTO_API_KEY);
     return customApi ? [customApi, ...HITOKOTO_APIS] : [...HITOKOTO_APIS];
 };
 
 export const getSavedHitokotoApi = (): string => {
-    return localStorage.getItem(CUSTOM_HITOKOTO_API_KEY)?.trim() || "";
+    return getStoredText(CUSTOM_HITOKOTO_API_KEY);
 };
 
 export const setCustomHitokotoApi = (url: string) => {
     const normalized = url.trim();
     if (normalized) {
-        localStorage.setItem(CUSTOM_HITOKOTO_API_KEY, normalized);
+        setStoredText(CUSTOM_HITOKOTO_API_KEY, normalized);
         return;
     }
 
-    localStorage.removeItem(CUSTOM_HITOKOTO_API_KEY);
+    removeStoredValue(CUSTOM_HITOKOTO_API_KEY);
 };
 
 export const fetchHitokoto = async (inputEl: HTMLInputElement | null) => {

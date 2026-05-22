@@ -7,7 +7,6 @@ import {
     SCROLL_DURATION,
     SCROLL_THRESHOLD,
     DEFAULT_SEARCH_URL,
-    IP_INFO_URL,
 } from "./config";
 
 type TimeoutId = ReturnType<typeof setTimeout>;
@@ -369,23 +368,4 @@ export const setupDocumentClickHandler = (menu: HTMLElement | null) => {
         menu?.classList.add("hidden");
         document.getElementById("engineBtn")?.setAttribute("aria-expanded", "false");
     });
-};
-
-export const setupIPInfoHandler = (ipBox: HTMLElement | null) => {
-    if (!ipBox) return;
-
-    const openIpInfo = (e: Event) => {
-        e.stopPropagation();
-        window.open(IP_INFO_URL, "_blank", "noopener,noreferrer");
-    };
-
-    const onKeydown = (e: KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            openIpInfo(e);
-        }
-    };
-
-    ipBox.addEventListener("click", openIpInfo);
-    ipBox.addEventListener("keydown", onKeydown);
 };

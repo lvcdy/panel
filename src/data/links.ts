@@ -94,7 +94,7 @@ export const CATEGORIES = [
     links: [
       { name: "有道翻译", url: "https://fanyi.youdao.com/index.html#/TextTranslate", icon: "fas fa-language", color: "#e83e35", useIcon: true },
       { name: "Tsinghua Open Source", url: "https://mirrors.tuna.tsinghua.edu.cn", icon: "fas fa-server", color: "#663399", useIcon: true },
-      { name: "itdog", url: "https://www.itdog.cn/", icon: "fas fa-dog", color: "#f39c12", useIcon: true },
+      { name: "tcptest", url: "https://www.tcptest.cn/", icon: "fas fa-network-wired", color: "#f39c12", useIcon: true },
       { name: "Prosettings", url: "https://prosettings.net/", icon: "fas fa-sliders-h", color: "#27ae60", useIcon: true },
       { name: "二维码识别", url: "https://jiema.wwei.cn/", icon: "fas fa-qrcode", color: "#3498db", useIcon: true },
       { name: "系统库", url: "https://www.xitongku.com/", icon: "fas fa-compact-disc", color: "#9b59b6", useIcon: true },
@@ -110,7 +110,8 @@ export const CATEGORIES = [
       { name: "中国科学技术大学测速网站", url: "https://test.ustc.edu.cn/", icon: "fas fa-gauge-high", color: "#004098", useIcon: true },
       { name: "ip测漏", url: "https://ipcelou.com", icon: "fas fa-shield-alt", color: "#2c3e50", useIcon: true },
       { name: "双子星", url: "https://v2-dev.xsyd.top/", icon: "fas fa-star", color: "#f1c40f", useIcon: true },
-      { name: "魔搭社区", url: "https://www.modelscope.cn/", icon: "fas fa-globe", color: "#16a085", useIcon: true }
+      { name: "魔搭社区", url: "https://www.modelscope.cn/", icon: "fas fa-globe", color: "#16a085", useIcon: true },
+      { name: "免费IP归属地查询API", url: "https://www.ip9.com.cn", icon: "fas fa-map-marker-alt", color: "#8e44ad", useIcon: true }
     ]
   },
   {

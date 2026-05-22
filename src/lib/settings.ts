@@ -8,10 +8,16 @@ import {
     getSavedHitokotoApi,
     setCustomHitokotoApi,
 } from "./hitokoto";
+import { getStoredText, setStoredText } from "./storage";
 
 const STORAGE_KEYS = {
     blur: "card-glass-blur-value",
     saturate: "card-glass-saturate-value",
+} as const;
+
+const SETTING_RANGES = {
+    blur: { min: 0, max: 100 },
+    saturate: { min: 100, max: 200 },
 } as const;
 
 const setValueLabel = (
@@ -77,13 +83,23 @@ const createPanelState = () => {
 const syncBlurSetting = (value: number, blurValue: HTMLElement | null) => {
     document.documentElement.style.setProperty("--card-glass-blur-value", `${value}px`);
     setValueLabel(value, "px", blurValue);
-    localStorage.setItem(STORAGE_KEYS.blur, String(value));
+    setStoredText(STORAGE_KEYS.blur, String(value));
 };
 
 const syncSaturateSetting = (value: number, saturateValue: HTMLElement | null) => {
     document.documentElement.style.setProperty("--card-glass-saturate-value", `${value}%`);
     setValueLabel(value, "%", saturateValue);
-    localStorage.setItem(STORAGE_KEYS.saturate, String(value));
+    setStoredText(STORAGE_KEYS.saturate, String(value));
+};
+
+const getStoredRangeValue = (
+    key: string,
+    range: { readonly min: number; readonly max: number },
+) => {
+    const value = Number.parseInt(getStoredText(key), 10);
+    return Number.isInteger(value) && value >= range.min && value <= range.max
+        ? value
+        : null;
 };
 
 const openPanel = (panel: HTMLElement, overlay: HTMLElement, toggleBtn: HTMLElement) => {
@@ -134,15 +150,20 @@ export const initSettings = () => {
         searchInput,
     } = state;
 
-    const savedBlur = localStorage.getItem(STORAGE_KEYS.blur);
-    const savedSaturate = localStorage.getItem(STORAGE_KEYS.saturate);
+    const savedBlur = getStoredRangeValue(STORAGE_KEYS.blur, SETTING_RANGES.blur);
+    const savedSaturate = getStoredRangeValue(
+        STORAGE_KEYS.saturate,
+        SETTING_RANGES.saturate,
+    );
 
-    if (savedBlur) {
-        syncBlurSetting(parseInt(savedBlur), blurValue);
+    if (savedBlur !== null) {
+        blurSlider.value = String(savedBlur);
+        syncBlurSetting(savedBlur, blurValue);
     }
 
-    if (savedSaturate) {
-        syncSaturateSetting(parseInt(savedSaturate), saturateValue);
+    if (savedSaturate !== null) {
+        saturateSlider.value = String(savedSaturate);
+        syncSaturateSetting(savedSaturate, saturateValue);
     }
 
     const savedBgUrl = getSavedBackgroundUrl();

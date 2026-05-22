@@ -1,9 +1,10 @@
 import { BG_URL } from "./config";
+import { getStoredText, removeStoredValue, setStoredText } from "./storage";
 
 export const CUSTOM_BG_URL_KEY = "custom-bg-url" as const;
 
 const getCurrentBackgroundUrl = (): string => {
-    const savedUrl = localStorage.getItem(CUSTOM_BG_URL_KEY)?.trim();
+    const savedUrl = getStoredText(CUSTOM_BG_URL_KEY);
     return savedUrl || BG_URL;
 };
 
@@ -29,18 +30,18 @@ const applyBackgroundByUrl = (url: string) => {
 };
 
 export const getSavedBackgroundUrl = (): string => {
-    return localStorage.getItem(CUSTOM_BG_URL_KEY)?.trim() || "";
+    return getStoredText(CUSTOM_BG_URL_KEY);
 };
 
 export const setCustomBackgroundUrl = (url: string) => {
     const normalized = url.trim();
     if (normalized) {
-        localStorage.setItem(CUSTOM_BG_URL_KEY, normalized);
+        setStoredText(CUSTOM_BG_URL_KEY, normalized);
         applyBackgroundByUrl(normalized);
         return;
     }
 
-    localStorage.removeItem(CUSTOM_BG_URL_KEY);
+    removeStoredValue(CUSTOM_BG_URL_KEY);
     applyBackgroundByUrl(BG_URL);
 };
 

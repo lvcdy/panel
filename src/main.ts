@@ -8,7 +8,7 @@ import {
   getSavedCustomSearchEngine,
   setCustomSearchEngine,
 } from "./lib/custom-engine";
-import { GOOGLE_SVG_ICON, ICON_API, ICON_API_SIZE } from "./lib/config";
+import { GOOGLE_SVG_ICON, ICON_API } from "./lib/config";
 import { fetchAndDetectProvider } from "./lib/provider";
 import { initSettings } from "./lib/settings";
 import { isValidHttpUrl } from "./lib/url";
@@ -26,7 +26,17 @@ const escapeHtml = (value: string) =>
 
 const escapeAttr = escapeHtml;
 
-const getIconQueryUrl = (url: string) => `${ICON_API}${encodeURIComponent(url)}${ICON_API_SIZE}`;
+const getIconQueryTarget = (url: string) => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+};
+
+const getIconQueryUrl = (url: string) => {
+  return `${ICON_API}${encodeURIComponent(getIconQueryTarget(url))}`;
+};
 
 const renderHeader = () => `
   <header class="mt-10 sm:mt-14 text-center select-none">
@@ -301,11 +311,10 @@ const renderLinkIcon = (link: LinkItem) => {
   return `
     <img
       src="${escapeAttr(getIconQueryUrl(link.url))}"
-      alt="${escapeAttr(`${link.name} 图标`)}"
+      alt=""
       loading="lazy"
       decoding="async"
       fetchpriority="low"
-      crossorigin="anonymous"
       class="icon-img w-6 h-6 object-contain transition-opacity opacity-0"
       data-fallback-icon
     />
@@ -466,6 +475,14 @@ const renderFooter = () => `
         <i class="fas fa-server capsule-icon" aria-hidden="true"></i>
         <span class="capsule-dot" aria-hidden="true"></span>
         <span id="pro-name" class="capsule-text">正在同步服务数据...</span>
+      </div>
+
+      <div
+        id="ip-text"
+        class="footer-ip mt-2 animate-fade-in-up"
+        aria-live="polite"
+      >
+        正在同步 IP 信息...
       </div>
     </div>
   </footer>
@@ -908,37 +925,40 @@ const initApp = () => {
     }
   });
 
+  const revealLinkIcon = (img: HTMLImageElement) => {
+    img.style.opacity = "1";
+  };
+
+  const showFallbackIcon = (img: HTMLImageElement) => {
+    const fallback = img.nextElementSibling as HTMLElement | null;
+    if (fallback) {
+      fallback.classList.add("flex");
+      fallback.classList.remove("hidden");
+    }
+    img.style.display = "none";
+  };
+
   document
     .querySelectorAll<HTMLImageElement>("img[data-fallback-icon]")
     .forEach((img) => {
-      img.addEventListener(
-        "load",
-        () => {
-          img.style.opacity = "1";
-        },
-        { once: true },
-      );
-      img.addEventListener(
-        "error",
-        () => {
-          const fallback = img.nextElementSibling as HTMLElement | null;
-          if (fallback) {
-            fallback.classList.add("flex");
-            fallback.classList.remove("hidden");
-          }
-          img.style.display = "none";
-        },
-        { once: true },
-      );
-    });
+      if (img.complete) {
+        if (img.naturalWidth > 0) {
+          revealLinkIcon(img);
+        } else {
+          showFallbackIcon(img);
+        }
+        return;
+      }
 
-  UI.loadCachedIcons();
-  UI.setupIconCaching();
+      img.addEventListener("load", () => revealLinkIcon(img), { once: true });
+      img.addEventListener("error", () => showFallbackIcon(img), { once: true });
+    });
 
   UI.scheduleInit(() => {
     Promise.all([
       UI.fetchWeatherInfo(els.weather, els.weatherBox),
       fetchAndDetectProvider(els.proName, els.proBox),
+      UI.fetchIpInfo(els.ipText),
     ]).catch((err: unknown) => {
       console.error("初始化网络数据失败:", err);
     });

@@ -2,7 +2,7 @@
   "name": "panel",
   "type": "module",
   "version": "1.0.0",
-  "packageManager": "pnpm@11.0.6",
+  "packageManager": "pnpm@11.2.2",
   "scripts": {
     "dev": "vite",
     "start": "vite",
@@ -12,14 +12,12 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.2.0",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.2",
-    "@types/node": "^25.6.0",
-    "lightningcss": "^1.32.0",
-    "terser": "^5.46.1",
-    "typescript": "^6.0.2",
-    "vite": "^7.3.2"
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.13"
   }
 }

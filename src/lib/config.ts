@@ -7,14 +7,11 @@ export const SELECTOR_CARD = ".sun-card" as const;
 export const SELECTOR_CARD_TEXT = "[data-card-text]" as const;
 export const SELECTOR_CATEGORY_TITLE = ".category-title" as const;
 
-export const ICON_API = "https://api.lvcdy.cn/icon?url=" as const;
-export const ICON_API_SIZE = "&size=32..64..120" as const;
+export const ICON_API = "https://api.afmax.cn/so/ico/?r=" as const;
 export const BG_URL = "https://t.alcy.cc/ycy" as const;
 
 // Search & API Configuration
 export const DEFAULT_SEARCH_URL = "https://cn.bing.com/search?q=" as const;
-export const IP_INFO_URL = "https://ip.xxir.com/" as const;
-export const IP_API_PRIMARY = "https://ipapi.xxlb.org/" as const;
 export const WEATHER_API_URL = "https://api.seniverse.com/v3/weather/now.json" as const;
 export const WEATHER_API_KEY = "SUnfUoGPmINHHfYrc" as const;
 export const WEATHER_DEFAULT_LOCATION = "beijing" as const;
@@ -30,19 +27,3 @@ export const SEARCH_TIP_SHOW_TIME = 2000 as const;
 // Scroll Configuration
 export const SCROLL_THRESHOLD = 300 as const;
 export const SCROLL_DURATION = 600 as const;
-
-// Cache Configuration
-export const ICON_CACHE_KEY = "icon_cache" as const;
-export const CACHE_ENABLED = false as const;
-export const CACHE_VERSION = 1 as const;
-// Icon cache: longer TTL (24 hours)
-export const ICON_CACHE_TTL = 86400000 as const;
-// Icon cache max size in bytes (~2MB to stay safe within 5MB localStorage limit)
-export const ICON_CACHE_MAX_SIZE = 2097152 as const; // 2MB
-
-export interface IconCacheData {
-    version: number;
-    timestamp: number;
-    icons: Record<string, string>;
-}
-

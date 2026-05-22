@@ -13,6 +13,7 @@ export const createElementCache = () => ({
     icon: qs<HTMLElement>("#currentIcon"),
     proName: qs<HTMLElement>("#pro-name"),
     proBox: qs<HTMLElement>("#pro-info"),
+    ipText: qs<HTMLElement>("#ip-text"),
     searchBtn: qs<HTMLElement>("#searchBtn"),
     searchTip: qs<HTMLElement>("#searchTip"),
     floatingSearchBtn: qs<HTMLElement>("#floatingSearchBtn"),

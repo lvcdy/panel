@@ -21,7 +21,7 @@
 
 ### 环境要求
 
-- Node.js 18+
+- Node.js 20.19+ 或 22.12+
 - pnpm（推荐）或 npm
 
 ### 安装和运行
@@ -164,12 +164,10 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 
 | 技术 | 版本 | 描述 |
 |------|------|------|
-| [Vite](https://vite.dev) | 7.3.2 | 前端开发服务器与生产打包工具 |
-| [Tailwind CSS](https://tailwindcss.com) | 4.2.2 | 实用优先的 CSS 框架（Vite 插件集成） |
+| [Vite](https://vite.dev) | 8.0.13 | 前端开发服务器与生产打包工具 |
+| [Tailwind CSS](https://tailwindcss.com) | 4.3.0 | 实用优先的 CSS 框架（Vite 插件集成） |
 | [Font Awesome Free](https://fontawesome.com) | 7.2 | 图标库（@fortawesome/fontawesome-free） |
-| [TypeScript](https://www.typescriptlang.org) | 6.0.2 | 类型安全的 JavaScript |
-| [Lightning CSS](https://lightningcss.dev) | 1.32.0 | 高性能 CSS 编译器 |
-| [Terser](https://terser.org) | 5.46 | JavaScript 压缩工具 |
+| [TypeScript](https://www.typescriptlang.org) | 6.0.3 | 类型安全的 JavaScript |
 
 ## 📦 npm 脚本
 
@@ -238,7 +236,7 @@ pnpm build
 
 1. 推送代码到 GitHub
 2. 访问 [Vercel](https://vercel.com) 导入项目
-3. 自动识别 Vite 框架
+3. 自动识别 Vite 框架，并使用 `vercel.json` 将 `/api/ip-info` 转发到 IP9
 4. 点击部署完成
 
 ### 其他平台
@@ -248,6 +246,8 @@ pnpm build
 - Netlify
 - Cloudflare Pages
 - 自有服务器（Nginx、Apache 等）
+
+底部 IP 信息使用同源 `/api/ip-info` 请求 IP9，部署平台需要把该路径代理到 `https://ip9.com.cn/get`。没有反向代理能力的平台仍可展示页面，其 IP 文本会回退为不可用状态。
 
 ## 📄 项目信息
 
