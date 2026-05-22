@@ -85,7 +85,7 @@ export const fetchIpInfo = async (ipText: HTMLElement | null) => {
         showIpText(ipText, summary);
         cacheIpText(summary);
     } catch (error) {
-        console.warn("获取 IP 信息失败:", error);
+        console.debug("获取 IP 信息失败:", error);
         showIpText(ipText, FALLBACK_IP_TEXT);
     }
 };

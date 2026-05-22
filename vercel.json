@@ -3,6 +3,10 @@
     {
       "source": "/api/ip-info",
       "destination": "https://ip9.com.cn/get"
+    },
+    {
+      "source": "/api/site-status",
+      "destination": "https://isyourwebsitedownrightnow.com/api/status"
     }
   ]
 }

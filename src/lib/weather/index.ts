@@ -12,7 +12,7 @@ export const fetchWeatherInfo = async (
     try {
         weatherEl.textContent = await fetchWeatherText();
     } catch (error) {
-        console.warn("天气 API 请求失败:", error);
+        console.debug("天气 API 请求失败:", error);
         weatherEl.textContent = FALLBACK_WEATHER_TEXT;
     } finally {
         weatherBoxEl.style.opacity = "1";

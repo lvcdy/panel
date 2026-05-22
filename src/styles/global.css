@@ -229,6 +229,45 @@ main {
     transform: scale(1.05);
   }
 
+  .site-status-badge {
+    --_status-color: rgba(255, 255, 255, 0.42);
+    @apply inline-flex items-center gap-1.5 shrink-0 rounded-md border text-[10px] font-medium;
+    min-height: 1.3rem;
+    padding: 0 0.45rem;
+    border-color: color-mix(in srgb, var(--_status-color) 28%, transparent);
+    background: color-mix(in srgb, var(--_status-color) 10%, transparent);
+    color: color-mix(in srgb, var(--_status-color) 70%, white);
+    letter-spacing: 0;
+  }
+
+  .site-status-badge[data-state="up"] {
+    --_status-color: #34d399;
+  }
+
+  .site-status-badge[data-state="slow"] {
+    --_status-color: #fbbf24;
+  }
+
+  .site-status-badge[data-state="down"] {
+    --_status-color: #fb7185;
+  }
+
+  .site-status-badge[data-state="restricted"] {
+    --_status-color: #60a5fa;
+  }
+
+  .site-status-dot {
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 999px;
+    background: var(--_status-color);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--_status-color) 65%, transparent);
+  }
+
+  .site-status-badge[data-state="checking"] .site-status-dot {
+    animation: siteStatusPulse 1.2s ease-in-out infinite;
+  }
+
   /* ─────── Info Capsule ─────── */
   .info-capsule {
     @apply inline-flex items-center gap-2 rounded-full text-xs cursor-pointer select-none;
@@ -591,6 +630,13 @@ main {
 
   /* ━━━━━ Keyframes ━━━━━ */
 
+  @keyframes siteStatusPulse {
+    50% {
+      opacity: 0.35;
+      transform: scale(0.78);
+    }
+  }
+
   /* Entrance: blur dissolve + rise */
   @keyframes entrance {
     from {
@@ -820,6 +866,16 @@ main {
 
   .sun-card .card-icon {
     @apply w-8 h-8 text-sm;
+  }
+
+  .site-status-badge {
+    min-width: 1.3rem;
+    padding-inline: 0;
+    justify-content: center;
+  }
+
+  .site-status-badge [data-site-status-label] {
+    @apply sr-only;
   }
 
   .category-section h2 {

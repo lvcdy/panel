@@ -57,6 +57,7 @@ export interface LinkItem {
   readonly icon: string;
   readonly color: string;
   readonly useIcon?: boolean;
+  readonly status?: boolean;
 }
 
 export interface Category {
@@ -120,9 +121,9 @@ export const CATEGORIES = [
       { name: "智慧职教", url: "https://www.icve.com.cn/", icon: "fas fa-graduation-cap", color: "#e74c3c", useIcon: true },
       { name: "超星", url: "https://www.chaoxing.com/", icon: "fas fa-book", color: "#f39c12", useIcon: true },
       { name: "岗位实训综合管理平台", url: "https://gwsx.lnpc.edu.cn/", icon: "fas fa-briefcase", color: "#34495e", useIcon: true },
-      { name: "教务", url: "http://125.222.106.106/jsxsd/", icon: "fas fa-chalkboard-user", color: "#2980b9", useIcon: true },
-      { name: "webvpn", url: "https://webvpn.lntu.edu.cn/", icon: "fas fa-lock", color: "#16a085", useIcon: true },
-      { name: "智能化工虚拟仿真实训基地", url: "http://xnzypt.lnpc.edu.cn:8000/pc/#/login/account", icon: "fas fa-flask", color: "#27ae60", useIcon: true }
+      { name: "教务", url: "http://125.222.106.106/jsxsd/", icon: "fas fa-chalkboard-user", color: "#2980b9", useIcon: true, status: false },
+      { name: "webvpn", url: "https://webvpn.lntu.edu.cn/", icon: "fas fa-lock", color: "#16a085", useIcon: true, status: false },
+      { name: "智能化工虚拟仿真实训基地", url: "http://xnzypt.lnpc.edu.cn:8000/pc/#/login/account", icon: "fas fa-flask", color: "#27ae60", useIcon: true, status: false }
     ]
   },
   {

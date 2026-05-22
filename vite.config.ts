@@ -10,6 +10,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: () => "/get",
       },
+      "/api/site-status": {
+        target: "https://isyourwebsitedownrightnow.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/site-status/, "/api/status"),
+      },
     },
   },
   build: {

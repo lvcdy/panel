@@ -229,6 +229,40 @@ export const detectProvider = (headerKeys: string[], serverHeader: string) => {
 };
 
 let currentProviderUrl = "";
+const providerBoxes = new WeakSet<HTMLElement>();
+
+const openCurrentProvider = (event: Event) => {
+    event.stopPropagation();
+    if (currentProviderUrl) {
+        window.open(currentProviderUrl, "_blank", "noopener,noreferrer");
+    }
+};
+
+const handleProviderKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openCurrentProvider(event);
+    }
+};
+
+const bindProviderBox = (proBox: HTMLElement) => {
+    if (providerBoxes.has(proBox)) return;
+
+    proBox.addEventListener("click", openCurrentProvider);
+    proBox.addEventListener("keydown", handleProviderKeydown);
+    providerBoxes.add(proBox);
+};
+
+const syncProviderInteractivity = (proBox: HTMLElement, providerUrl: string) => {
+    if (providerUrl) {
+        proBox.tabIndex = 0;
+        proBox.setAttribute("aria-label", "点击查看服务提供商详情");
+        return;
+    }
+
+    proBox.removeAttribute("tabindex");
+    proBox.setAttribute("aria-label", "服务提供商");
+};
 
 export const updateProviderDisplay = (
     proName: HTMLElement | null,
@@ -241,6 +275,7 @@ export const updateProviderDisplay = (
 
     proName.innerText = providerName;
     currentProviderUrl = providerUrl;
+    syncProviderInteractivity(proBox, providerUrl);
 
     // Replace the Font Awesome icon with the provider SVG logo
     if (providerLogo) {
@@ -254,23 +289,7 @@ export const updateProviderDisplay = (
         }
     }
 
-    if (providerUrl) {
-        const openProvider = (e: Event) => {
-            e.stopPropagation();
-            if (currentProviderUrl) {
-                window.open(currentProviderUrl, "_blank", "noopener,noreferrer");
-            }
-        };
-        const onProviderKeydown = (e: KeyboardEvent) => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                openProvider(e);
-            }
-        };
-
-        proBox.addEventListener("click", openProvider);
-        proBox.addEventListener("keydown", onProviderKeydown);
-    }
+    bindProviderBox(proBox);
 
     proBox.style.opacity = "1";
     proBox.style.filter = "blur(0px)";

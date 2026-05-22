@@ -342,6 +342,19 @@ const renderLinkCard = (link: LinkItem, index: number) => `
       >
         ${escapeHtml(link.name)}
       </span>
+      ${link.status === false ? "" : `
+        <span
+          class="site-status-badge"
+          data-site-status
+          data-site-url="${escapeAttr(link.url)}"
+          data-state="checking"
+          aria-label="正在检查网站状态"
+          title="正在检查网站状态"
+        >
+          <span class="site-status-dot" aria-hidden="true"></span>
+          <span data-site-status-label>检测中</span>
+        </span>
+      `}
     </a>
   </li>
 `;
@@ -891,6 +904,7 @@ const initApp = () => {
   UI.setupScrollListener(els.floatingSearchBtn);
   UI.setupDocumentClickHandler(els.menu);
   UI.setupCategoryCollapse();
+  UI.setupSiteStatusBadges();
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "/" && document.activeElement === document.body) {
