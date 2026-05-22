@@ -40,7 +40,7 @@ const statusCopy: Record<SiteStatusValue, string> = {
     UNKNOWN: "待确认",
 };
 
-const statusCache = new Map<string, Promise<SiteStatusView>>();
+const pendingStatusChecks = new Map<string, Promise<SiteStatusView>>();
 const storedStatusCache = getStoredJson<Record<string, StoredSiteStatus>>(
     SITE_STATUS_CACHE_KEY,
     "session",
@@ -166,13 +166,21 @@ const queueSiteStatus = (domain: string) =>
     });
 
 const getSiteStatus = (domain: string) => {
-    const cached = statusCache.get(domain);
-    if (cached) return cached;
-
     const stored = getStoredStatus(domain);
-    const pending = stored ? Promise.resolve(stored) : queueSiteStatus(domain);
-    statusCache.set(domain, pending);
-    return pending;
+    if (stored) {
+        return Promise.resolve(stored);
+    }
+
+    const pending = pendingStatusChecks.get(domain);
+    if (pending) {
+        return pending;
+    }
+
+    const check = queueSiteStatus(domain).finally(() => {
+        pendingStatusChecks.delete(domain);
+    });
+    pendingStatusChecks.set(domain, check);
+    return check;
 };
 
 const updateStatusBadge = (badge: HTMLElement, status: SiteStatusView) => {

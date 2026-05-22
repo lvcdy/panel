@@ -1,6 +1,6 @@
 # Panel - 个人导航仪表板 🎯
 
-一个简洁高效的个人导航仪表板，用于快速访问常用网站、工具和服务。基于 Vite 7、TypeScript 和 Tailwind CSS v4 构建的现代化个人导航门户，支持多搜索引擎、IP 地理信息展示等丰富功能。
+一个简洁高效的个人导航仪表板，用于快速访问常用网站、工具和服务。基于 Vite 8、TypeScript 和 Tailwind CSS v4 构建的现代化个人导航门户，支持多搜索引擎、IP 地理信息展示等丰富功能。
 
 ## ✨ 主要功能
 
@@ -8,7 +8,7 @@
 - 🧩 **自定义搜索引擎** - 支持在界面中添加/编辑/清除自定义搜索引擎，支持 `{q}` 模板占位符
 - 🌐 **分类导航** - 可折叠的分类卡片，支持按名称/URL/分类标题搜索，搜索模式下统一布局
 - 🎨 **毛玻璃 UI** - 基于 Tailwind CSS v4 的 Glass Morphism 设计，动态背景图片加载与平滑过渡动画
-- ⚡ **性能优化** - 图标懒加载与 Canvas 缓存、requestIdleCallback 延迟初始化、事件委托、debounce、WeakMap 文本缓存
+- ⚡ **性能优化** - 图标懒加载、可见区域优先状态检测、requestIdleCallback 延迟初始化、事件委托、debounce、WeakMap 文本缓存
 - 📱 **响应式布局** - 1-5 列自适应网格，完美适配桌面、平板和手机
 - 🌍 **天气胶囊** - 通过浏览器定位自动获取当前位置天气，默认展示北京天气，支持点击刷新
 - 🏷️ **服务商检测** - 自动识别阿里云 ESA / Cloudflare Edge 等 CDN 服务商
@@ -55,17 +55,16 @@ panel/
 │   │   └── links.ts        # 导航链接与搜索引擎配置
 │   ├── lib/                # 工具函数库
 │   │   ├── background.ts   # 动态背景图片加载与过渡动画
-│   │   ├── cache.ts        # 智能缓存（图标 24h TTL / 2MB 限制）
 │   │   ├── category.ts     # 分类折叠/展开动画逻辑
 │   │   ├── config.ts       # 全局配置常量与 API 端点
 │   │   ├── custom-engine.ts # 自定义搜索引擎配置持久化与 URL 构建
 │   │   ├── dom.ts          # DOM 元素选择器封装
 │   │   ├── hitokoto.ts     # 一言 API 封装（随机名言）
-│   │   ├── icons.ts        # 图标直接获取 favicon、Canvas 缓存与回退处理
-│   │   ├── ip.ts           # IP 信息获取、隐私脱敏与格式化
+│   │   ├── ip-info.ts      # 页脚 IP 信息获取与格式化
 │   │   ├── main.ts         # 浏览器工具模块聚合出口
 │   │   ├── provider.ts     # CDN 服务商检测（阿里云/Cloudflare）
 │   │   ├── search.ts       # 搜索过滤、高亮、引擎切换、键盘交互
+│   │   ├── site-status.ts  # 网站状态检测、并发控制与会话缓存
 │   │   ├── time.ts         # 实时时钟更新（zh-CN 本地化）
 │   │   └── url.ts          # 通用 URL 校验工具
 │   ├── main.ts             # Vite 应用渲染与初始化入口
@@ -91,7 +90,7 @@ export const CATEGORIES: Category[] = [
         url: "https://example.com",
         icon: "fas fa-icon-name",
         color: "#3498db",
-        useIcon: true  // 可选：true 则自动通过 besticon /icon API 获取网站图标
+        useIcon: true  // 可选：true 则自动通过站点图标 API 获取 favicon
       }
     ]
   }
@@ -105,7 +104,8 @@ export const CATEGORIES: Category[] = [
   - `url` - 链接地址
   - `icon` - [Font Awesome](https://fontawesome.com/icons) 图标类名（作为默认或回退图标）
   - `color` - 十六进制颜色值
-  - `useIcon` - 可选，设为 `true` 时自动通过 besticon 的 `/icon` 接口获取网站图标并缓存
+  - `useIcon` - 可选，设为 `true` 时通过 `api.afmax.cn` 获取网站 favicon，失败时回退到 `icon`
+  - `status` - 可选，设为 `false` 时不展示网站状态检测
 
 ### 配置搜索引擎
 
@@ -127,9 +127,6 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
-| `CACHE_ENABLED` | `false` | 是否启用 localStorage 缓存 |
-| `ICON_CACHE_TTL` | 24 小时 | 图标缓存过期时间 |
-| `ICON_CACHE_MAX_SIZE` | 2 MB | 图标缓存最大占用空间 |
 | `SCROLL_THRESHOLD` | 300 px | 回顶按钮出现的滚动阈值 |
 | `SEARCH_TIP_SHOW_TIME` | 2000 ms | 搜索提示显示时长 |
 
@@ -157,7 +154,7 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 | **WeakMap 文本缓存** | 搜索高亮时保留原始文本，精确还原无残留 |
 | **事件委托** | 引擎菜单使用单一事件监听器，减少内存占用 |
 | **requestIdleCallback** | 非关键初始化延迟到浏览器空闲时执行 |
-| **Canvas 图标缓存** | 动态 favicon 转为 Data URL 存入 localStorage |
+| **状态缓存** | 网站状态检测做并发限制，并在 sessionStorage 中短期复用结果 |
 | **Debounce 防抖** | 搜索输入 150ms 防抖，减少无效 DOM 操作 |
 
 ## 🛠️ 技术栈
@@ -236,7 +233,7 @@ pnpm build
 
 1. 推送代码到 GitHub
 2. 访问 [Vercel](https://vercel.com) 导入项目
-3. 自动识别 Vite 框架，并使用 `vercel.json` 将 `/api/ip-info` 转发到 IP9
+3. 自动识别 Vite 框架，并使用 `vercel.json` 代理 `/api/ip-info` 与 `/api/site-status`
 4. 点击部署完成
 
 ### 其他平台

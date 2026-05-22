@@ -913,18 +913,27 @@ const initApp = () => {
     }
   });
 
-  document.querySelectorAll<HTMLElement>(".will-reveal").forEach((section) => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
+  const revealSections =
+    document.querySelectorAll<HTMLElement>(".will-reveal");
+
+  if (!("IntersectionObserver" in window)) {
+    revealSections.forEach((section) => section.classList.add("revealed"));
+  } else {
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          const section = entry.target as HTMLElement;
           section.classList.add("revealed");
-          observer.disconnect();
-        }
+          revealObserver.unobserve(section);
+        });
       },
       { threshold: 0.05, rootMargin: "0px 0px 80px 0px" },
     );
-    observer.observe(section);
-  });
+
+    revealSections.forEach((section) => revealObserver.observe(section));
+  }
 
   document.addEventListener("mouseover", (event) => {
     const target = (event.target as HTMLElement).closest?.<HTMLElement>(
