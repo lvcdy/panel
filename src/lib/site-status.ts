@@ -1,8 +1,8 @@
 import { getStoredJson, setStoredJson } from "./storage";
 
 const SITE_STATUS_URL = "/api/site-status";
-const SITE_STATUS_TIMEOUT = 6000;
-const SITE_STATUS_CONCURRENCY = 2;
+const SITE_STATUS_TIMEOUT = 4500;
+const SITE_STATUS_CONCURRENCY = 4;
 const SITE_STATUS_CACHE_KEY = "site-status-cache" as const;
 const SITE_STATUS_CACHE_TTL = 10 * 60 * 1000;
 const SITE_STATUS_FALLBACK_TTL = 60 * 1000;
@@ -217,7 +217,7 @@ export const setupSiteStatusBadges = () => {
                 loadBadge(badge);
             });
         },
-        { rootMargin: "180px 0px" },
+        { rootMargin: "720px 0px" },
     );
 
     badges.forEach((badge) => observer.observe(badge));
