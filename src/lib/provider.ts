@@ -238,6 +238,13 @@ const openCurrentProvider = (event: Event) => {
     }
 };
 
+interface EdgeIpResponse {
+    ret?: number;
+    data?: {
+        ip?: string;
+    };
+}
+
 const handleProviderKeydown = (event: KeyboardEvent) => {
     if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
@@ -269,11 +276,12 @@ export const updateProviderDisplay = (
     proBox: HTMLElement | null,
     providerName: string,
     providerUrl: string,
-    providerLogo?: string
+    providerLogo?: string,
+    edgeIp?: string
 ) => {
     if (!proName || !proBox) return;
 
-    proName.innerText = providerName;
+    proName.innerText = edgeIp ? `${providerName} · ${edgeIp}` : providerName;
     currentProviderUrl = providerUrl;
     syncProviderInteractivity(proBox, providerUrl);
 
@@ -303,17 +311,31 @@ export const fetchAndDetectProvider = async (
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     try {
-        const res = await fetch(window.location.href, {
-            method: "HEAD",
+        const edgeIpRequest = fetch("/api/edge-ip", {
             cache: "no-cache",
             signal: controller.signal,
-        });
+        }).then(async (response) => {
+            if (!response.ok) return "";
+
+            const payload = (await response.json()) as EdgeIpResponse;
+            const edgeIp = payload.data?.ip || "";
+            return payload.ret === 200 && edgeIp !== "unknown" ? edgeIp : "";
+        }).catch(() => "");
+
+        const [res, edgeIp] = await Promise.all([
+            fetch(window.location.href, {
+                method: "HEAD",
+                cache: "no-cache",
+                signal: controller.signal,
+            }),
+            edgeIpRequest,
+        ]);
 
         const serverHeader = (res.headers.get("server") || "").toLowerCase();
         const headerKeys = Array.from(res.headers.keys()).map((k) => k.toLowerCase());
 
         const provider = detectProvider(headerKeys, serverHeader);
-        updateProviderDisplay(proName, proBox, provider.name, provider.url, provider.logo);
+        updateProviderDisplay(proName, proBox, provider.name, provider.url, provider.logo, edgeIp);
     } catch (error) {
         if (proName) proName.innerText = "Edge Service";
     } finally {

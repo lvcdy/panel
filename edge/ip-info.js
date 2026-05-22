@@ -19,8 +19,9 @@ const getUnknownResponse = (error) => json({
 });
 
 const getIp9Response = async (clientIp) => {
+  const query = clientIp ? `?ip=${encodeURIComponent(clientIp)}` : "";
   const response = await fetch(
-    `https://ip9.com.cn/get?ip=${encodeURIComponent(clientIp)}`,
+    `https://ip9.com.cn/get${query}`,
     {
       headers: {
         accept: "application/json",
@@ -49,6 +50,15 @@ export const getIpInfoResponse = async (clientIp) => {
     return await getIp9Response(clientIp);
   } catch (error) {
     console.error("IP info fetch error:", error);
+    return getUnknownResponse(error);
+  }
+};
+
+export const getEdgeIpResponse = async () => {
+  try {
+    return await getIp9Response();
+  } catch (error) {
+    console.error("Edge IP fetch error:", error);
     return getUnknownResponse(error);
   }
 };

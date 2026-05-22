@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "packageManager": "pnpm@11.2.2",
   "scripts": {
-    "dev": "vite",
-    "start": "vite",
+    "dev": "node ./node_modules/vite/bin/vite.js",
+    "start": "node ./node_modules/vite/bin/vite.js",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
+    "preview": "node ./node_modules/vite/bin/vite.js preview",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

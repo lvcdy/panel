@@ -10,6 +10,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: () => "/get",
       },
+      "/api/edge-ip": {
+        target: "https://ip9.com.cn",
+        changeOrigin: true,
+        rewrite: () => "/get",
+      },
       "/api/site-status": {
         target: "https://isyourwebsitedownrightnow.com",
         changeOrigin: true,
