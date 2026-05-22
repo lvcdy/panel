@@ -244,9 +244,9 @@ pnpm build
 - Cloudflare Pages
 - 自有服务器（Nginx、Apache 等）
 
-底部 IP 信息使用同源 `/api/ip-info` 请求 IP9，提供商胶囊使用同源 `/api/edge-ip` 查询边缘侧访问 IP9 的 IP，网站状态使用同源 `/api/site-status` 请求状态接口。Cloudflare Pages 与 EdgeOne Pages 会使用 `functions/api` 下的 Pages Functions 处理 IP9 查询；Vercel 会使用 `api` 下的函数读取请求头中的用户 IP，并使用 `vercel.json` 代理网站状态接口；其他静态平台需要自行提供对应反向代理，否则 IP 与网站状态会回退为不可用状态。
+底部 IP 信息使用同源 `/api/ip-info` 请求 IP9，提供商信息使用同源 `/api/edge-ip` 查询边缘侧访问 IP9 的 IP，网站状态使用同源 `/api/site-status` 请求状态接口。Cloudflare Pages 与 EdgeOne Pages 会使用 `functions/api` 下的 Pages Functions 处理 IP9 查询；Vercel 会使用 `api` 下的函数读取请求头中的用户 IP，并使用 `vercel.json` 代理网站状态接口；其他静态平台需要自行提供对应反向代理，否则 IP 与网站状态会回退为不可用状态。
 
-ESA Pages 需要将 Function File Path 配置为 `./esa/index.js`，并启用 Real Client IP 请求头注入，保持请求头名为默认的 `ali-real-client-ip`。ESA 的 IP 信息入口只处理 `/api/ip-info`，网站状态接口仍需要另行代理。
+ESA Pages 需要将 Function File Path 配置为 `./esa/index.js`，并启用 Real Client IP 请求头注入，保持请求头名为默认的 `ali-real-client-ip`。ESA 的 IP 信息入口处理 `/api/ip-info` 与 `/api/edge-ip`，网站状态接口仍需要另行代理。
 
 ## 📄 项目信息
 

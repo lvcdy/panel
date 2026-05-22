@@ -349,6 +349,54 @@ main {
     letter-spacing: 0.01em;
   }
 
+  .provider-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.45rem;
+    max-width: min(48rem, calc(100vw - 2rem));
+    margin-inline: auto;
+    color: rgba(255, 255, 255, 0.34);
+    font-size: 0.68rem;
+    line-height: 1.6;
+    text-wrap: balance;
+    opacity: 0;
+    filter: blur(8px);
+    transition:
+      opacity 700ms var(--ease-out-expo),
+      filter 700ms var(--ease-out-expo);
+  }
+
+  .provider-line .provider-name {
+    min-width: 0;
+    max-width: min(18rem, 54vw);
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.56);
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .provider-line .provider-node {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .provider-line .provider-ip {
+    max-width: min(20rem, 64vw);
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.42);
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .provider-line [hidden] {
+    display: none;
+  }
+
   .floating-action-btn {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)),
@@ -884,6 +932,19 @@ main {
 
   .info-capsule {
     max-width: calc(100vw - 2rem);
+  }
+
+  .provider-line {
+    column-gap: 0.35rem;
+  }
+
+  .provider-line .provider-name {
+    max-width: min(13rem, 54vw);
+  }
+
+  .provider-line .provider-node,
+  .provider-line .provider-ip {
+    max-width: calc(100vw - 3rem);
   }
 
   .footer-ip {

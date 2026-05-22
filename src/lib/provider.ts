@@ -228,76 +228,57 @@ export const detectProvider = (headerKeys: string[], serverHeader: string) => {
     return DEFAULT_PROVIDER;
 };
 
-let currentProviderUrl = "";
-const providerBoxes = new WeakSet<HTMLElement>();
-
-const openCurrentProvider = (event: Event) => {
-    event.stopPropagation();
-    if (currentProviderUrl) {
-        window.open(currentProviderUrl, "_blank", "noopener,noreferrer");
-    }
-};
-
 interface EdgeIpResponse {
     ret?: number;
     data?: {
         ip?: string;
+        country?: string;
+        prov?: string;
+        city?: string;
+        area?: string;
     };
 }
 
-const handleProviderKeydown = (event: KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        openCurrentProvider(event);
-    }
-};
+interface EdgeNodeInfo {
+    ip: string;
+    location: string;
+}
 
-const bindProviderBox = (proBox: HTMLElement) => {
-    if (providerBoxes.has(proBox)) return;
+const getText = (value: unknown) =>
+    typeof value === "string" ? value.trim() : "";
 
-    proBox.addEventListener("click", openCurrentProvider);
-    proBox.addEventListener("keydown", handleProviderKeydown);
-    providerBoxes.add(proBox);
-};
+const formatEdgeNode = (data?: EdgeIpResponse["data"]): EdgeNodeInfo | null => {
+    const ip = getText(data?.ip);
+    if (!ip || ip === "unknown") return null;
 
-const syncProviderInteractivity = (proBox: HTMLElement, providerUrl: string) => {
-    if (providerUrl) {
-        proBox.tabIndex = 0;
-        proBox.setAttribute("aria-label", "点击查看服务提供商详情");
-        return;
-    }
+    const seen = new Set<string>();
+    const location = [data?.country, data?.prov, data?.city, data?.area]
+        .map(getText)
+        .filter((part) => part && !seen.has(part) && seen.add(part))
+        .join(" ");
 
-    proBox.removeAttribute("tabindex");
-    proBox.setAttribute("aria-label", "服务提供商");
+    return { ip, location };
 };
 
 export const updateProviderDisplay = (
     proName: HTMLElement | null,
+    proNode: HTMLElement | null,
+    proIp: HTMLElement | null,
     proBox: HTMLElement | null,
     providerName: string,
-    providerUrl: string,
-    providerLogo?: string,
-    edgeIp?: string
+    edgeNode?: EdgeNodeInfo | null
 ) => {
     if (!proName || !proBox) return;
 
-    proName.innerText = edgeIp ? `${providerName} · ${edgeIp}` : providerName;
-    currentProviderUrl = providerUrl;
-    syncProviderInteractivity(proBox, providerUrl);
-
-    // Replace the Font Awesome icon with the provider SVG logo
-    if (providerLogo) {
-        const iconEl = proBox.querySelector(".capsule-icon");
-        if (iconEl) {
-            const logoWrapper = document.createElement("span");
-            logoWrapper.className = "capsule-icon";
-            logoWrapper.setAttribute("aria-hidden", "true");
-            logoWrapper.innerHTML = providerLogo;
-            iconEl.replaceWith(logoWrapper);
-        }
+    proName.innerText = providerName;
+    if (proNode) {
+        proNode.innerText = edgeNode?.location ? `${edgeNode.location}节点` : "";
+        proNode.hidden = !edgeNode?.location;
     }
-
-    bindProviderBox(proBox);
+    if (proIp) {
+        proIp.innerText = edgeNode?.ip || "";
+        proIp.hidden = !edgeNode?.ip;
+    }
 
     proBox.style.opacity = "1";
     proBox.style.filter = "blur(0px)";
@@ -305,6 +286,8 @@ export const updateProviderDisplay = (
 
 export const fetchAndDetectProvider = async (
     proName: HTMLElement | null,
+    proNode: HTMLElement | null,
+    proIp: HTMLElement | null,
     proBox: HTMLElement | null
 ) => {
     const controller = new AbortController();
@@ -315,12 +298,11 @@ export const fetchAndDetectProvider = async (
             cache: "no-cache",
             signal: controller.signal,
         }).then(async (response) => {
-            if (!response.ok) return "";
+            if (!response.ok) return null;
 
             const payload = (await response.json()) as EdgeIpResponse;
-            const edgeIp = payload.data?.ip || "";
-            return payload.ret === 200 && edgeIp !== "unknown" ? edgeIp : "";
-        }).catch(() => "");
+            return payload.ret === 200 ? formatEdgeNode(payload.data) : null;
+        }).catch(() => null);
 
         const [res, edgeIp] = await Promise.all([
             fetch(window.location.href, {
@@ -335,7 +317,7 @@ export const fetchAndDetectProvider = async (
         const headerKeys = Array.from(res.headers.keys()).map((k) => k.toLowerCase());
 
         const provider = detectProvider(headerKeys, serverHeader);
-        updateProviderDisplay(proName, proBox, provider.name, provider.url, provider.logo, edgeIp);
+        updateProviderDisplay(proName, proNode, proIp, proBox, provider.name, edgeIp);
     } catch (error) {
         if (proName) proName.innerText = "Edge Service";
     } finally {

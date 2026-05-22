@@ -1,5 +1,5 @@
 import { WEATHER_DEFAULT_LABEL } from "../config";
-import type { WeatherResult } from "./types";
+import type { WeatherResult, WeatherSummary } from "./types";
 
 export const FALLBACK_WEATHER_TEXT = `${WEATHER_DEFAULT_LABEL} · 天气暂不可用`;
 export const LOADING_WEATHER_TEXT = "正在同步天气数据...";
@@ -34,14 +34,14 @@ const formatLocationHierarchy = (locationName?: string) => {
     return dedupedSegments.reverse().slice(0, 3).join(" · ");
 };
 
-export const formatWeatherSummary = (result: WeatherResult, sourceLabel: string) => {
+export const formatWeatherSummary = (result: WeatherResult, sourceLabel: string): WeatherSummary => {
     const locationName = formatLocationHierarchy(
         result.location?.path || result.location?.name || sourceLabel,
     );
     const now = result.now;
 
     if (!now) {
-        return FALLBACK_WEATHER_TEXT;
+        return { text: FALLBACK_WEATHER_TEXT };
     }
 
     const parts = [
@@ -53,5 +53,8 @@ export const formatWeatherSummary = (result: WeatherResult, sourceLabel: string)
         now.humidity ? `湿度 ${now.humidity}%` : "",
     ].filter(Boolean);
 
-    return parts.join(" · ") || FALLBACK_WEATHER_TEXT;
+    return {
+        text: parts.join(" · ") || FALLBACK_WEATHER_TEXT,
+        code: now.code,
+    };
 };

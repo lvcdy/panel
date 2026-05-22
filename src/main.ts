@@ -480,14 +480,13 @@ const renderFooter = () => `
 
       <div
         id="pro-info"
-        class="info-capsule"
-        role="button"
-        tabindex="0"
-        aria-label="点击查看服务提供商详情"
+        class="provider-line"
+        aria-live="polite"
       >
-        <i class="fas fa-server capsule-icon" aria-hidden="true"></i>
-        <span class="capsule-dot" aria-hidden="true"></span>
-        <span id="pro-name" class="capsule-text">正在同步服务数据...</span>
+        <span class="provider-prefix">当前使用的是</span>
+        <span id="pro-name" class="provider-name">正在同步服务数据...</span>
+        <span id="pro-node" class="provider-node" hidden></span>
+        <span id="pro-ip" class="provider-ip" hidden></span>
       </div>
 
       <div
@@ -980,7 +979,7 @@ const initApp = () => {
   UI.scheduleInit(() => {
     Promise.all([
       UI.fetchWeatherInfo(els.weather, els.weatherBox),
-      fetchAndDetectProvider(els.proName, els.proBox),
+      fetchAndDetectProvider(els.proName, els.proNode, els.proIp, els.proBox),
       UI.fetchIpInfo(els.ipText),
     ]).catch((err: unknown) => {
       console.error("初始化网络数据失败:", err);

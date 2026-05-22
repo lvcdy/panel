@@ -25,3 +25,8 @@ export interface WeatherPlace {
     readonly location: string;
     readonly label: string;
 }
+
+export interface WeatherSummary {
+    readonly text: string;
+    readonly code?: string;
+}

@@ -1,10 +1,10 @@
 import { WEATHER_API_KEY, WEATHER_API_URL } from "../config";
 import { buildWeatherRequestUrl, FALLBACK_WEATHER_TEXT } from "./format";
 import { getBrowserLocation } from "./location";
-import type { WeatherApiResponse } from "./types";
+import type { WeatherApiResponse, WeatherSummary } from "./types";
 import { formatWeatherSummary } from "./format";
 
-export const fetchWeatherText = async () => {
+export const fetchWeatherSummary = async (): Promise<WeatherSummary> => {
     const { location, label } = await getBrowserLocation();
     const res = await fetch(buildWeatherRequestUrl(WEATHER_API_URL, WEATHER_API_KEY, location).toString(), {
         cache: "no-store",
@@ -17,5 +17,5 @@ export const fetchWeatherText = async () => {
 
     const data = (await res.json()) as WeatherApiResponse;
     const result = data.results?.[0];
-    return result ? formatWeatherSummary(result, label) : FALLBACK_WEATHER_TEXT;
+    return result ? formatWeatherSummary(result, label) : { text: FALLBACK_WEATHER_TEXT };
 };

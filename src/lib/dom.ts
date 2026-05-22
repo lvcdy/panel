@@ -12,6 +12,8 @@ export const createElementCache = () => ({
     menu: qs<HTMLElement>("#engineMenu"),
     icon: qs<HTMLElement>("#currentIcon"),
     proName: qs<HTMLElement>("#pro-name"),
+    proNode: qs<HTMLElement>("#pro-node"),
+    proIp: qs<HTMLElement>("#pro-ip"),
     proBox: qs<HTMLElement>("#pro-info"),
     ipText: qs<HTMLElement>("#ip-text"),
     searchBtn: qs<HTMLElement>("#searchBtn"),
