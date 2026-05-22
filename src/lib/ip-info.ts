@@ -1,8 +1,8 @@
 import { getStoredText, setStoredText } from "./storage";
 
-const IP9_API_URL = "/api/ip-info";
+const IP_API_URL = "/api/ip-info";
 const FALLBACK_IP_TEXT = "IP 信息暂不可用";
-const IP_INFO_CACHE_KEY = "ip9-info-text" as const;
+const IP_INFO_CACHE_KEY = "ip-info-text" as const;
 
 interface Ip9Info {
     ip?: string;
@@ -68,7 +68,7 @@ export const fetchIpInfo = async (ipText: HTMLElement | null) => {
     }
 
     try {
-        const res = await fetch(IP9_API_URL, {
+        const res = await fetch(IP_API_URL, {
             signal: AbortSignal.timeout(5000),
         });
 
@@ -78,7 +78,7 @@ export const fetchIpInfo = async (ipText: HTMLElement | null) => {
 
         const payload = (await res.json()) as Ip9Response;
         if (payload.ret !== 200 || !payload.data) {
-            throw new Error("IP9 response is unavailable");
+            throw new Error("IP response is unavailable");
         }
 
         const summary = formatIpSummary(payload.data);
