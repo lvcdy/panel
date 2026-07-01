@@ -458,7 +458,10 @@ const renderFooter = () => `
             src="https://ywtb.mps.gov.cn/authservice/images/foot-icp.png"
             class="w-3 h-3 brightness-110 opacity-80"
             alt="ICP"
+            width="12"
+            height="12"
             loading="lazy"
+            decoding="async"
           />
           <span>辽 ICP 备 2025051495 号-2</span>
         </a>
@@ -472,7 +475,10 @@ const renderFooter = () => `
             src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png"
             class="w-3 h-3 brightness-110 opacity-80"
             alt="GWA"
+            width="12"
+            height="12"
             loading="lazy"
+            decoding="async"
           />
           <span>辽公网安备 21070002000117 号</span>
         </a>
@@ -666,9 +672,8 @@ const initApp = () => {
   if (!root) return;
 
   root.innerHTML = renderApp();
-  document.getElementById("footerYear")!.textContent = String(
-    new Date().getFullYear(),
-  );
+  const footerYear = document.getElementById("footerYear");
+  if (footerYear) footerYear.textContent = String(new Date().getFullYear());
 
   initSettings();
   initBackgroundImage();

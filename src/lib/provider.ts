@@ -270,13 +270,13 @@ export const updateProviderDisplay = (
 ) => {
     if (!proName || !proBox) return;
 
-    proName.innerText = providerName;
+    proName.textContent = providerName;
     if (proNode) {
-        proNode.innerText = edgeNode?.location ? `${edgeNode.location}节点` : "";
+        proNode.textContent = edgeNode?.location ? `${edgeNode.location}节点` : "";
         proNode.hidden = !edgeNode?.location;
     }
     if (proIp) {
-        proIp.innerText = edgeNode?.ip || "";
+        proIp.textContent = edgeNode?.ip || "";
         proIp.hidden = !edgeNode?.ip;
     }
 
@@ -290,13 +290,12 @@ export const fetchAndDetectProvider = async (
     proIp: HTMLElement | null,
     proBox: HTMLElement | null
 ) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const signal = AbortSignal.timeout(5000);
 
     try {
         const edgeIpRequest = fetch("/api/edge-ip", {
             cache: "no-cache",
-            signal: controller.signal,
+            signal,
         }).then(async (response) => {
             if (!response.ok) return null;
 
@@ -308,7 +307,7 @@ export const fetchAndDetectProvider = async (
             fetch(window.location.href, {
                 method: "HEAD",
                 cache: "no-cache",
-                signal: controller.signal,
+                signal,
             }),
             edgeIpRequest,
         ]);
@@ -319,8 +318,6 @@ export const fetchAndDetectProvider = async (
         const provider = detectProvider(headerKeys, serverHeader);
         updateProviderDisplay(proName, proNode, proIp, proBox, provider.name, edgeIp);
     } catch (error) {
-        if (proName) proName.innerText = "Edge Service";
-    } finally {
-        clearTimeout(timeoutId);
+        if (proName) proName.textContent = "Edge Service";
     }
 };

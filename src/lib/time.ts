@@ -12,35 +12,26 @@ export const updateTime = (clockEl: HTMLElement | null, dateEl: HTMLElement | nu
     }
 };
 
-/** 启动时钟，使用 RAF + 页面可见性控制，避免后台标签页浪费资源 */
+/** 启动时钟，使用递归 setTimeout 精确每秒更新，避免后台标签页浪费资源 */
 export const startClock = (
     clockEl: HTMLElement | null,
     dateEl: HTMLElement | null,
 ) => {
-    let lastSecond = -1;
-    let rafId = 0;
+    let timerId = 0;
 
     const tick = () => {
-        const now = new Date();
-        const sec = now.getSeconds();
-        if (sec !== lastSecond) {
-            lastSecond = sec;
-            updateTime(clockEl, dateEl);
-        }
-        rafId = requestAnimationFrame(tick);
+        updateTime(clockEl, dateEl);
+        timerId = window.setTimeout(tick, 1000 - (Date.now() % 1000));
     };
 
     const start = () => {
-        if (!rafId) {
-            lastSecond = -1;
-            rafId = requestAnimationFrame(tick);
-        }
+        if (!timerId) tick();
     };
 
     const stop = () => {
-        if (rafId) {
-            cancelAnimationFrame(rafId);
-            rafId = 0;
+        if (timerId) {
+            clearTimeout(timerId);
+            timerId = 0;
         }
     };
 

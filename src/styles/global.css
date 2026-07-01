@@ -98,6 +98,7 @@ body::after {
     radial-gradient(circle at 82% 40%, rgba(244, 114, 182, 0.12), transparent 24%);
   filter: blur(32px);
   opacity: 0.8;
+  will-change: filter;
 }
 
 .page-vignette {
@@ -121,19 +122,20 @@ body.bg-loaded::before {
 
 html {
   scrollbar-width: none;
-  -ms-overflow-style: none;
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
 }
 
 .category-toggle-btn {
-  border: none;
+  border: 1px solid transparent;
   padding: 0;
   color: inherit;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
+  min-height: 1.8rem;
+  padding-inline: 0.55rem;
 }
 
 .category-toggle-btn:focus-visible {
@@ -284,6 +286,7 @@ main {
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
     opacity: 0;
     filter: blur(8px);
+    contain: layout style;
     transition:
       opacity 700ms var(--ease-out-expo),
       filter 700ms var(--ease-out-expo),
@@ -405,6 +408,7 @@ main {
     box-shadow:
       0 18px 42px rgba(0, 0, 0, 0.28),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    contain: layout style;
   }
 
   .floating-action-btn:hover {
@@ -431,12 +435,6 @@ main {
   .category-title {
     letter-spacing: 0;
     text-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
-  }
-
-  .category-toggle-btn {
-    min-height: 1.8rem;
-    padding-inline: 0.55rem;
-    border: 1px solid transparent;
   }
 
   .category-toggle-btn:hover {
@@ -602,6 +600,7 @@ main {
     box-shadow:
       0 18px 48px rgba(0, 0, 0, 0.24),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    contain: layout style;
     transition:
       background-color var(--dur-base) var(--ease-smooth),
       border-color var(--dur-base) var(--ease-smooth),

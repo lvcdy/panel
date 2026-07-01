@@ -13,6 +13,8 @@ type TimeoutId = ReturnType<typeof setTimeout>;
 
 let cachedCategories: NodeListOf<Element> | null = null;
 let searchTipTimeout: TimeoutId | null = null;
+let cachedNavContainer: HTMLElement | null = null;
+let cachedSearchFeedback: HTMLElement | null = null;
 
 // 保存原始文本以便还原高亮
 const originalTexts = new WeakMap<HTMLElement, string>();
@@ -80,7 +82,10 @@ const clearAllHighlights = () => {
 
 /** 更新搜索结果计数提示 */
 const updateSearchFeedback = (matchCount: number, query: string) => {
-    const feedback = document.getElementById("searchFeedback");
+    if (!cachedSearchFeedback) {
+        cachedSearchFeedback = document.getElementById("searchFeedback");
+    }
+    const feedback = cachedSearchFeedback;
     if (!feedback) return;
 
     if (!query) {
@@ -99,12 +104,20 @@ const updateSearchFeedback = (matchCount: number, query: string) => {
 };
 
 /** 获取链接导航容器 */
-const getNavContainer = () => document.querySelector<HTMLElement>("nav[aria-label]");
+const getNavContainer = () => {
+    if (!cachedNavContainer) {
+        cachedNavContainer = document.querySelector<HTMLElement>("nav[aria-label]");
+    }
+    return cachedNavContainer;
+};
 
 /** 搜索模式下强制所有 section 可见（跳过未触发 IntersectionObserver 的 reveal 动画） */
 const forceRevealAll = () => {
     getCategories().forEach((cat) => {
-        (cat as HTMLElement).classList.add("revealed");
+        const el = cat as HTMLElement;
+        if (!el.classList.contains("revealed")) {
+            el.classList.add("revealed");
+        }
     });
 };
 
@@ -346,11 +359,12 @@ export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
     if (!floatingBtn) return;
 
     let isVisible = false;
-    let scrollTimeout: TimeoutId | null = null;
+    let ticking = false;
 
     window.addEventListener("scroll", () => {
-        if (scrollTimeout) return;
-        scrollTimeout = setTimeout(() => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
             const shouldShow = window.scrollY > SCROLL_THRESHOLD;
             if (shouldShow !== isVisible) {
                 isVisible = shouldShow;
@@ -358,8 +372,8 @@ export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
                 floatingBtn.classList.toggle("opacity-100", shouldShow);
                 floatingBtn.style.pointerEvents = shouldShow ? "auto" : "none";
             }
-            scrollTimeout = null;
-        }, 100);
+            ticking = false;
+        });
     }, { passive: true });
 };
 

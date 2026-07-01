@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "useDefineForClassFields": true,
+    "target": "ES2024",
     "module": "ESNext",
     "lib": [
-      "ES2022",
+      "ES2024",
       "DOM",
       "DOM.Iterable"
     ],
@@ -15,8 +14,6 @@
     "moduleDetection": "force",
     "noEmit": true,
     "strict": true,
-    "ignoreDeprecations": "6.0",
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"

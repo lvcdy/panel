@@ -48,7 +48,7 @@ const formatIpSummary = (info: Ip9Info) => {
 
 const showIpText = (ipText: HTMLElement | null, text: string) => {
     if (ipText) {
-        ipText.innerText = text;
+        ipText.textContent = text;
     }
 };
 

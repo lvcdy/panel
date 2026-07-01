@@ -189,12 +189,12 @@ export const initSettings = () => {
     });
 
     blurSlider.addEventListener("input", (event) => {
-        const value = parseInt((event.target as HTMLInputElement).value, 10);
+        const value = Number.parseInt((event.target as HTMLInputElement).value, 10);
         syncBlurSetting(value, blurValue);
     });
 
     saturateSlider.addEventListener("input", (event) => {
-        const value = parseInt((event.target as HTMLInputElement).value, 10);
+        const value = Number.parseInt((event.target as HTMLInputElement).value, 10);
         syncSaturateSetting(value, saturateValue);
     });
 

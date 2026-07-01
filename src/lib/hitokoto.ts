@@ -26,25 +26,22 @@ export const fetchHitokoto = async (inputEl: HTMLInputElement | null) => {
     if (!inputEl) return;
 
     try {
-        for (const api of getHitokotoApiList()) {
-            try {
+        const apis = getHitokotoApiList();
+        const result = await Promise.any(
+            apis.map(async (api) => {
                 const res = await fetch(api, {
                     signal: AbortSignal.timeout(3000),
                 });
                 const data = await res.json();
-                if (data?.hitokoto) {
-                    const author = data.from || data.creator || "未知";
-                    inputEl.placeholder = `${data.hitokoto} —— 「${author}」`;
-                    return;
+                if (!data?.hitokoto) {
+                    throw new Error("No hitokoto");
                 }
-            } catch (error) {
-                console.debug(`一言 API (${api}) 请求失败:`, error);
-                continue;
-            }
-        }
-        inputEl.placeholder = "永远相信美好的事情即将发生";
-    } catch (error) {
-        console.debug("获取一言失败:", error);
+                return data as { hitokoto: string; from?: string; creator?: string };
+            }),
+        );
+        const author = result.from || result.creator || "未知";
+        inputEl.placeholder = `${result.hitokoto} —— 「${author}」`;
+    } catch {
         inputEl.placeholder = "永远相信美好的事情即将发生";
     }
 };
