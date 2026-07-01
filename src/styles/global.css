@@ -415,6 +415,8 @@ main {
 
   /* ─────── Category ─────── */
   .category-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 200px;
     transition:
       opacity var(--dur-base) var(--ease-smooth),
       transform var(--dur-base) var(--ease-smooth),

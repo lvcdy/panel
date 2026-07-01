@@ -814,7 +814,7 @@ const initApp = () => {
   };
 
   UI.updateTime(els.clock, els.date);
-  setInterval(() => UI.updateTime(els.clock, els.date), 1000);
+  UI.startClock(els.clock, els.date);
 
   syncCustomEngineItem();
   window.addEventListener(

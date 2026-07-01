@@ -8,9 +8,10 @@ const getCurrentBackgroundUrl = (): string => {
     return savedUrl || BG_URL;
 };
 
-const applyBackgroundByUrl = (url: string) => {
+const applyBackgroundByUrl = (url: string, priority: "high" | "low" = "low") => {
     const img = new Image();
     img.decoding = "async";
+    img.fetchPriority = priority;
     img.src = url;
 
     const applyBackground = () => {
@@ -46,5 +47,5 @@ export const setCustomBackgroundUrl = (url: string) => {
 };
 
 export const initBackgroundImage = () => {
-    applyBackgroundByUrl(getCurrentBackgroundUrl());
+    applyBackgroundByUrl(getCurrentBackgroundUrl(), "high");
 };
