@@ -436,8 +436,8 @@ const renderFooter = () => `
           class="text-white hover:underline font-medium"
           target="_blank"
           rel="noopener noreferrer"
-          href="https://vite.dev"
-        >Vite</a>
+          href="https://astro.build"
+        >Astro</a>
         &
         <a
           class="text-white hover:underline font-medium"
@@ -667,7 +667,7 @@ const renderApp = () => `
   ${renderFloatingControl()}
 `;
 
-const initApp = () => {
+export const initApp = () => {
   const root = document.getElementById("app");
   if (!root) return;
 
@@ -995,5 +995,3 @@ const initApp = () => {
     UI.fetchHitokoto(els.input);
   });
 };
-
-initApp();

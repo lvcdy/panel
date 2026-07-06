@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/api/site-status",
-      "destination": "https://isyourwebsitedownrightnow.com/api/status"
-    }
-  ]
-}

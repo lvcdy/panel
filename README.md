@@ -1,6 +1,6 @@
 # Panel - 个人导航仪表板 🎯
 
-一个简洁高效的个人导航仪表板，用于快速访问常用网站、工具和服务。基于 Vite 8、TypeScript 和 Tailwind CSS v4 构建的现代化个人导航门户，支持多搜索引擎、IP 地理信息展示等丰富功能。
+一个简洁高效的个人导航仪表板，用于快速访问常用网站、工具和服务。基于 Astro 7、TypeScript 和 Tailwind CSS v4 构建的现代化个人导航门户，支持多搜索引擎、IP 地理信息展示等丰富功能。
 
 ## ✨ 主要功能
 
@@ -34,7 +34,7 @@ cd panel
 # 安装依赖
 pnpm install
 
-# 本地开发（访问 http://localhost:5173）
+# 本地开发（访问 http://localhost:4321）
 pnpm dev
 
 # 生产构建
@@ -48,12 +48,14 @@ pnpm preview
 
 ```
 panel/
-├── index.html              # Vite HTML 入口
 ├── public/                  # 静态资源
 ├── src/
 │   ├── data/
 │   │   └── links.ts        # 导航链接与搜索引擎配置
+│   ├── layouts/
+│   │   └── Layout.astro    # 页面布局组件
 │   ├── lib/                # 工具函数库
+│   │   ├── api-edge.ts     # Edge API 工具函数（IP 查询等）
 │   │   ├── background.ts   # 动态背景图片加载与过渡动画
 │   │   ├── category.ts     # 分类折叠/展开动画逻辑
 │   │   ├── config.ts       # 全局配置常量与 API 端点
@@ -67,10 +69,17 @@ panel/
 │   │   ├── site-status.ts  # 网站状态检测、并发控制与会话缓存
 │   │   ├── time.ts         # 实时时钟更新（zh-CN 本地化）
 │   │   └── url.ts          # 通用 URL 校验工具
-│   ├── main.ts             # Vite 应用渲染与初始化入口
+│   ├── pages/
+│   │   ├── index.astro     # 首页
+│   │   └── api/            # API 路由
+│   │       ├── edge-ip.ts
+│   │       ├── ip-info.ts
+│   │       └── site-status.ts
+│   ├── main.ts             # 应用渲染与初始化入口
 │   └── styles/
 │       └── global.css      # 全局样式（毛玻璃、动画、响应式）
-├── vite.config.ts          # Vite 配置（Tailwind v4、压缩与资源目录）
+├── astro.config.ts         # Astro 配置（Vercel 适配器、Tailwind v4、代理）
+├── tsconfig.json           # TypeScript 配置
 └── package.json
 ```
 
@@ -169,8 +178,8 @@ export const SEARCH_ENGINES: SearchEngine[] = [
 ## 📦 npm 脚本
 
 ```bash
-pnpm dev       # 启动开发服务器（http://localhost:5173）
-pnpm build     # 类型检查 + 构建生产版本
+pnpm dev       # 启动开发服务器（http://localhost:4321）
+pnpm build     # 构建生产版本
 pnpm preview   # 预览构建结果
 pnpm typecheck # 仅执行 TypeScript 类型检查
 ```
@@ -233,27 +242,25 @@ pnpm build
 
 1. 推送代码到 GitHub
 2. 访问 [Vercel](https://vercel.com) 导入项目
-3. 自动识别 Vite 框架，使用 `api/ip-info.js` 获取用户 IP 信息，并使用 `vercel.json` 代理 `/api/site-status`
-4. 点击部署完成
+3. Vercel 会自动检测 Astro 项目并使用 `@astrojs/vercel` 适配器
+4. API 路由（`/api/ip-info`、`/api/edge-ip`、`/api/site-status`）将作为 Serverless Functions 自动部署
+5. 点击部署完成
 
 ### 其他平台
 
-本项目构建输出为纯静态文件，可部署到任何静态托管平台：
-- GitHub Pages
-- Netlify
-- Cloudflare Pages
-- 自有服务器（Nginx、Apache 等）
+本项目支持静态和混合渲染模式：
+- **静态页面**（首页）可部署到任何静态托管平台
+- **API 路由**需要支持 Serverless Functions 的平台（如 Vercel、Netlify、Cloudflare Pages）
 
-底部 IP 信息使用同源 `/api/ip-info` 请求 IP9，提供商信息使用同源 `/api/edge-ip` 查询边缘侧访问 IP9 的 IP，网站状态使用同源 `/api/site-status` 请求状态接口。Cloudflare Pages 与 EdgeOne Pages 会使用 `functions/api` 下的 Pages Functions 处理 IP9 查询；Vercel 会使用 `api` 下的函数读取请求头中的用户 IP，并使用 `vercel.json` 代理网站状态接口；其他静态平台需要自行提供对应反向代理，否则 IP 与网站状态会回退为不可用状态。
-
-ESA Pages 需要将 Function File Path 配置为 `./esa/index.js`，并启用 Real Client IP 请求头注入，保持请求头名为默认的 `ali-real-client-ip`。ESA 的 IP 信息入口处理 `/api/ip-info` 与 `/api/edge-ip`，网站状态接口仍需要另行代理。
+> API 路由通过 `export const prerender = false` 启用服务端渲染，如部署到纯静态平台需要自行配置反向代理。
 
 ## 📄 项目信息
 
 - **版本**: 1.0.0
-- **类型**: 静态网站
+- **类型**: 混合渲染（静态页面 + Serverless API）
+- **框架**: Astro 7
 - **构建输出**: `./dist/`
-- **开发端口**: 5173
+- **开发端口**: 4321
 
 ## 📝 许可证
 

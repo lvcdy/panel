@@ -1,3 +1,11 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = 'Panel' } = Astro.props;
+---
+
 <!doctype html>
 <html lang="zh-CN" class="scrollbar-hide">
   <head>
@@ -6,15 +14,14 @@
     <meta name="description" content="Panel" />
     <meta name="theme-color" content="#0b1220" />
     <meta name="color-scheme" content="dark" />
-    <meta property="og:title" content="Panel" />
+    <meta property="og:title" content={title} />
     <meta property="og:description" content="Panel" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Panel" />
+    <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content="Panel" />
-    <title>Panel</title>
+    <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
     <link rel="preconnect" href="https://api.lvcdy.cn" crossorigin />
     <link rel="preconnect" href="https://api.afmax.cn" crossorigin />
     <link rel="preconnect" href="https://t.alcy.cc" crossorigin />
@@ -23,12 +30,9 @@
     <link rel="dns-prefetch" href="https://api.afmax.cn" />
     <link rel="dns-prefetch" href="https://t.alcy.cc" />
   </head>
-  <body
-    class="relative min-h-screen antialiased bg-[#0b1220] overflow-x-hidden selection:bg-white/20"
-  >
+  <body class="relative min-h-screen antialiased bg-[#0b1220] overflow-x-hidden selection:bg-white/20">
     <div class="page-aurora" aria-hidden="true"></div>
     <div class="page-vignette" aria-hidden="true"></div>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <slot />
   </body>
 </html>
