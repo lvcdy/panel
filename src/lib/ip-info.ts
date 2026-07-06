@@ -1,21 +1,15 @@
 import { getStoredText, setStoredText } from "./storage";
 
-const PUBLIC_IP_API_URL = "https://ip9.com.cn/get";
+const PUBLIC_IP_API_URL = "https://ipinfo.io/json";
 const FALLBACK_IP_TEXT = "IP 信息暂不可用";
-const IP_INFO_CACHE_KEY = "ip-info-text-v2" as const;
+const IP_INFO_CACHE_KEY = "ip-info-text-v4" as const;
 
-interface Ip9Info {
+interface IpInfoData {
     ip?: string;
-    country?: string;
-    prov?: string;
     city?: string;
-    area?: string;
-    isp?: string;
-}
-
-interface Ip9Response {
-    ret?: number;
-    data?: Ip9Info;
+    region?: string;
+    country?: string;
+    org?: string;
 }
 
 const getText = (value: unknown) =>
@@ -29,15 +23,14 @@ const getUniqueParts = (parts: unknown[]) => {
         .filter((part) => part && !seen.has(part) && seen.add(part));
 };
 
-const formatIpSummary = (info: Ip9Info) => {
+const formatIpSummary = (info: IpInfoData) => {
     const ip = getText(info.ip);
     const location = getUniqueParts([
         info.country,
-        info.prov,
+        info.region,
         info.city,
-        info.area,
     ]).join(" ");
-    const isp = getText(info.isp);
+    const isp = getText(info.org);
 
     return [
         ip ? `IP ${ip}` : "",
@@ -76,13 +69,13 @@ export const fetchIpInfo = async (ipText: HTMLElement | null) => {
             throw new Error(`HTTP ${res.status}`);
         }
 
-        const payload = (await res.json()) as Ip9Response;
+        const payload = (await res.json()) as IpInfoData;
 
-        if (payload.ret !== 200 || !payload.data) {
+        if (!payload.ip) {
             throw new Error("IP response is unavailable");
         }
 
-        const summary = formatIpSummary(payload.data);
+        const summary = formatIpSummary(payload);
         showIpText(ipText, summary);
         cacheIpText(summary);
     } catch (error) {
