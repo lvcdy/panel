@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 
 const STATUS_API_URL = "https://isyourwebsitedownrightnow.com/api/status";
 
-export const prerender = true;
+export const prerender = false;
 
 const isValidDomain = (value: string): boolean =>
   /^[a-z0-9.-]+$/i.test(value) &&

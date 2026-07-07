@@ -40,19 +40,6 @@ const getIp9Response = async (clientIp?: string) => {
   return jsonResponse(data);
 };
 
-export const getIpInfoResponse = async (clientIp?: string) => {
-  try {
-    if (!clientIp) {
-      throw new Error("Missing client IP");
-    }
-
-    return await getIp9Response(clientIp);
-  } catch (error) {
-    console.error("IP info fetch error:", error);
-    return getUnknownResponse(error as Error);
-  }
-};
-
 export const getEdgeIpResponse = async () => {
   try {
     return await getIp9Response();

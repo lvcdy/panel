@@ -1,15 +1,22 @@
 import { getStoredText, setStoredText } from "./storage";
 
-const PUBLIC_IP_API_URL = "https://ipinfo.io/json";
+const IP_PROXY_URL = "/api/ip-info";
 const FALLBACK_IP_TEXT = "IP 信息暂不可用";
-const IP_INFO_CACHE_KEY = "ip-info-text-v4" as const;
+const IP_INFO_CACHE_KEY = "ip-info-text-v6" as const;
 
-interface IpInfoData {
+interface Ip9Data {
     ip?: string;
-    city?: string;
-    region?: string;
     country?: string;
-    org?: string;
+    prov?: string;
+    city?: string;
+    area?: string;
+    isp?: string;
+}
+
+interface Ip9Response {
+    ret?: number;
+    data?: Ip9Data;
+    error?: string;
 }
 
 const getText = (value: unknown) =>
@@ -23,14 +30,18 @@ const getUniqueParts = (parts: unknown[]) => {
         .filter((part) => part && !seen.has(part) && seen.add(part));
 };
 
-const formatIpSummary = (info: IpInfoData) => {
-    const ip = getText(info.ip);
+const formatIpSummary = (info: Ip9Response) => {
+    const d = info.data;
+    if (!d) return FALLBACK_IP_TEXT;
+
+    const ip = getText(d.ip);
     const location = getUniqueParts([
-        info.country,
-        info.region,
-        info.city,
+        d.country,
+        d.prov,
+        d.city,
+        d.area,
     ]).join(" ");
-    const isp = getText(info.org);
+    const isp = getText(d.isp);
 
     return [
         ip ? `IP ${ip}` : "",
@@ -61,7 +72,8 @@ export const fetchIpInfo = async (ipText: HTMLElement | null) => {
     }
 
     try {
-        const res = await fetch(PUBLIC_IP_API_URL, {
+        const res = await fetch(IP_PROXY_URL, {
+            headers: { accept: "application/json" },
             signal: AbortSignal.timeout(5000),
         });
 
@@ -69,10 +81,10 @@ export const fetchIpInfo = async (ipText: HTMLElement | null) => {
             throw new Error(`HTTP ${res.status}`);
         }
 
-        const payload = (await res.json()) as IpInfoData;
+        const payload = (await res.json()) as Ip9Response;
 
-        if (!payload.ip) {
-            throw new Error("IP response is unavailable");
+        if (payload.ret !== 200 || !payload.data?.ip) {
+            throw new Error(payload.error || "IP9 API response unavailable");
         }
 
         const summary = formatIpSummary(payload);
