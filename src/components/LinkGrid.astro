@@ -1,0 +1,108 @@
+---
+import { CATEGORIES } from '../data/links';
+import { getIconQueryUrl } from '../lib/html';
+---
+
+<nav
+  class="w-full max-w-[1500px] px-4 sm:px-10 mt-8 flex-grow"
+  aria-label="链接导航"
+>
+  {CATEGORIES.map((category, categoryIndex) => (
+    <section
+      class="mb-6 category-section will-reveal"
+      data-collapsed="false"
+      aria-labelledby={`category-${categoryIndex}`}
+    >
+      <h2
+        id={`category-${categoryIndex}`}
+        class="text-xl font-bold mb-3 pl-2 drop-shadow-md category-header flex items-center justify-between gap-3"
+      >
+        <span class="category-title">{category.title}</span>
+        <button
+          type="button"
+          class="category-toggle-btn group/toggle inline-flex items-center gap-1.5 text-xs tracking-wide text-white/40 hover:text-white/80 py-1.5 px-2 rounded-lg hover:bg-white/5 transition-all duration-200 cursor-pointer"
+          aria-expanded="true"
+          aria-controls={`category-content-${categoryIndex}`}
+        >
+          <span class="category-toggle-label opacity-0 group-hover/toggle:opacity-100 transition-opacity duration-200">
+            收起
+          </span>
+          <i
+            class="fas fa-chevron-down category-toggle-icon text-[0.65rem] transition-transform duration-300"
+            aria-hidden="true"
+          ></i>
+        </button>
+      </h2>
+      <div class="category-wrapper grid transition-[grid-template-rows] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]">
+        <ul
+          id={`category-content-${categoryIndex}`}
+          class="category-content list-none p-0 m-0"
+        >
+          {category.links.map((link, index) => (
+            <li>
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="sun-card glass flex items-center gap-3 p-3 rounded-xl group relative animate-fade-in-up h-full"
+                style={`--card-color: ${link.color}; animation-delay: ${index * 50 + 100}ms`}
+                data-url={link.url}
+                data-tooltip={`访问 ${link.name}`}
+              >
+                <div class="card-icon w-9 h-9 flex-shrink-0 rounded-lg flex items-center justify-center overflow-hidden text-base">
+                  {link.useIcon === false ? (
+                    <div
+                      class="flex w-full h-full items-center justify-center"
+                      style={`color:${link.color}`}
+                      aria-hidden="true"
+                    >
+                      <i class={link.icon}></i>
+                    </div>
+                  ) : (
+                    <>
+                      <img
+                        src={getIconQueryUrl(link.url)}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        fetchpriority="low"
+                        class="icon-img w-6 h-6 object-contain transition-opacity opacity-0"
+                        data-fallback-icon
+                      />
+                      <div
+                        class="hidden w-full h-full items-center justify-center"
+                        style={`color:${link.color}`}
+                        aria-hidden="true"
+                      >
+                        <i class={link.icon}></i>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <span
+                  data-card-text
+                  class="flex-1 min-w-0 text-white/85 font-semibold text-sm truncate transition-colors duration-200 group-hover:text-white"
+                >
+                  {link.name}
+                </span>
+                {('status' in link ? link.status !== false : true) && (
+                  <span
+                    class="site-status-badge"
+                    data-site-status
+                    data-site-url={link.url}
+                    data-state="checking"
+                    aria-label="正在检查网站状态"
+                    title="正在检查网站状态"
+                  >
+                    <span class="site-status-dot" aria-hidden="true"></span>
+                    <span data-site-status-label>检测中</span>
+                  </span>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ))}
+</nav>

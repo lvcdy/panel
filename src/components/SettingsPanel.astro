@@ -1,0 +1,125 @@
+---
+---
+
+<div class="settings-container">
+  <button
+    id="settings-toggle"
+    class="settings-btn"
+    aria-label="打开设置"
+    aria-expanded="false"
+    aria-controls="settings-panel"
+  >
+    <i class="fas fa-gear" aria-hidden="true"></i>
+  </button>
+
+  <div
+    id="settings-panel"
+    class="settings-panel"
+    role="dialog"
+    aria-labelledby="settings-title"
+    aria-hidden="true"
+  >
+    <div class="settings-content">
+      <div class="settings-header">
+        <h2 id="settings-title" class="settings-title">设置</h2>
+        <button
+          id="settings-close"
+          class="settings-close-btn"
+          aria-label="关闭设置"
+        >
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="settings-body">
+        <div class="setting-item">
+          <label for="blur-slider" class="setting-label">毛玻璃强弱</label>
+          <div class="slider-container">
+            <input
+              id="blur-slider"
+              type="range"
+              min="0"
+              max="100"
+              value="18"
+              class="blur-slider"
+              aria-label="调节毛玻璃强弱"
+            />
+            <span id="blur-value" class="blur-value">18px</span>
+          </div>
+          <div class="slider-description">
+            <span>弱</span>
+            <span>强</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="saturate-slider" class="setting-label">饱和度</label>
+          <div class="slider-container">
+            <input
+              id="saturate-slider"
+              type="range"
+              min="100"
+              max="200"
+              value="165"
+              class="saturate-slider"
+              aria-label="调节饱和度"
+            />
+            <span id="saturate-value" class="saturate-value">165%</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="bg-url-input" class="setting-label">
+            自定义背景图 URL
+          </label>
+          <input
+            id="bg-url-input"
+            type="url"
+            class="bg-url-input"
+            placeholder="https://example.com/background.jpg"
+            aria-label="输入自定义背景图 URL"
+          />
+          <div class="bg-actions">
+            <button id="bg-url-apply" type="button" class="bg-action-btn">
+              应用
+            </button>
+            <button
+              id="bg-url-reset"
+              type="button"
+              class="bg-action-btn bg-action-btn-secondary"
+            >
+              恢复默认
+            </button>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="hitokoto-api-input" class="setting-label">
+            自定义一言 API
+          </label>
+          <input
+            id="hitokoto-api-input"
+            type="url"
+            class="bg-url-input"
+            placeholder="https://example.com/hitokoto"
+            aria-label="输入自定义一言 API"
+          />
+          <div class="bg-actions">
+            <button id="hitokoto-api-apply" type="button" class="bg-action-btn">
+              应用
+            </button>
+            <button
+              id="hitokoto-api-reset"
+              type="button"
+              class="bg-action-btn bg-action-btn-secondary"
+            >
+              恢复默认
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-overlay" class="settings-overlay" aria-hidden="true"></div>
+</div>
