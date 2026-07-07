@@ -1,3 +1,7 @@
+import { fetchIp9, type Ip9Response } from "./ip-utils";
+
+const IP9_API_URL = "https://ip9.com.cn/get";
+
 const jsonResponse = (body: unknown) =>
   new Response(JSON.stringify(body), {
     headers: {
@@ -20,23 +24,11 @@ const getUnknownResponse = (error: Error) =>
     error: error.message,
   });
 
-const getIp9Response = async (clientIp?: string) => {
-  const query = clientIp ? `?ip=${encodeURIComponent(clientIp)}` : "";
-  const response = await fetch(`https://ip9.com.cn/get${query}`, {
-    headers: {
-      accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`IP9 API returned ${response.status}`);
-  }
-
-  const data = await response.json();
-  if (data?.ret !== 200 || !data.data) {
-    throw new Error("Invalid IP9 API response");
-  }
-
+const getIp9Response = async (clientIp?: string): Promise<Response> => {
+  const url = clientIp
+    ? `${IP9_API_URL}?ip=${encodeURIComponent(clientIp)}`
+    : IP9_API_URL;
+  const data = await fetchIp9(url, 8000);
   return jsonResponse(data);
 };
 
