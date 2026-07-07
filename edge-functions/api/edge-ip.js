@@ -3,7 +3,6 @@ export async function onRequestGet() {
   try {
     const res = await fetch("https://ip9.com.cn/get", {
       headers: { accept: "application/json" },
-      signal: AbortSignal.timeout(8000),
     });
     const body = await res.json();
     return new Response(JSON.stringify(body), {
