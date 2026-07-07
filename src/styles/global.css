@@ -287,16 +287,15 @@ main {
       0 12px 28px rgba(0, 0, 0, 0.16),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
     opacity: 0;
-    filter: blur(8px);
+    transform: scale(0.96);
     contain: layout style;
     transition:
       opacity 700ms var(--ease-out-expo),
-      filter 700ms var(--ease-out-expo),
+      transform 700ms var(--ease-out-expo),
       background-color var(--dur-base) var(--ease-smooth),
       border-color var(--dur-base) var(--ease-smooth),
       box-shadow var(--dur-slow) var(--ease-smooth),
-      color var(--dur-base) var(--ease-smooth),
-      transform var(--dur-base) var(--ease-spring);
+      color var(--dur-base) var(--ease-smooth);
   }
 
   .info-capsule:hover {
@@ -340,66 +339,9 @@ main {
     transform: scale(1.1);
   }
 
-  /* ─────── Provider Logo ─────── */
-  .provider-logo {
-    width: 14px;
-    height: 14px;
-    display: inline-block;
-    vertical-align: middle;
-    flex-shrink: 0;
-  }
-
   .info-capsule .capsule-text {
     @apply truncate max-w-[280px] sm:max-w-none;
     letter-spacing: 0.01em;
-  }
-
-  .provider-line {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.45rem;
-    max-width: min(48rem, calc(100vw - 2rem));
-    margin-inline: auto;
-    color: rgba(255, 255, 255, 0.34);
-    font-size: 0.68rem;
-    line-height: 1.6;
-    text-wrap: balance;
-    opacity: 0;
-    filter: blur(8px);
-    transition:
-      opacity 700ms var(--ease-out-expo),
-      filter 700ms var(--ease-out-expo);
-  }
-
-  .provider-line .provider-name {
-    min-width: 0;
-    max-width: min(18rem, 54vw);
-    overflow: hidden;
-    color: rgba(255, 255, 255, 0.56);
-    font-weight: 500;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .provider-line .provider-node {
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  .provider-line .provider-ip {
-    max-width: min(20rem, 64vw);
-    overflow: hidden;
-    color: rgba(255, 255, 255, 0.42);
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-    font-size: 0.68rem;
-    font-weight: 500;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .provider-line [hidden] {
-    display: none;
   }
 
   .floating-action-btn {
@@ -425,9 +367,7 @@ main {
     contain-intrinsic-size: auto 200px;
     transition:
       opacity var(--dur-base) var(--ease-smooth),
-      transform var(--dur-base) var(--ease-smooth),
-      filter var(--dur-base) var(--ease-smooth),
-      max-height var(--dur-slow) var(--ease-out-expo);
+      transform var(--dur-base) var(--ease-smooth);
   }
 
   .category-section > .category-header {
@@ -447,19 +387,18 @@ main {
     border-radius: 1.1rem;
   }
 
-  .category-section.hidden-icons {
-    @apply opacity-0 pointer-events-none;
-    transform: translateY(1rem);
-    filter: blur(4px);
-  }
-
   /* ─────── 搜索统一布局模式 ─────── */
-  /* 搜索时：隐藏分类标题和折叠按钮，所有分类合并为连续流式布局 */
+  /* 搜索时：保留分类标题，隐藏折叠按钮，所有分类合并为连续网格布局 */
   .is-searching .category-section {
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
   }
 
   .is-searching .category-header {
+    padding-bottom: 0;
+    margin-bottom: 0.15rem;
+  }
+
+  .is-searching .category-toggle-btn {
     @apply hidden;
   }
 
@@ -468,46 +407,35 @@ main {
   }
 
   .is-searching .category-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     padding-top: 0;
     padding-bottom: 0;
-    /* 搜索模式下统一使用flex wrap，让所有匹配卡片平铺 */
-    display: flex;
-    flex-wrap: wrap;
     gap: 0.75rem;
   }
 
   @media (min-width: 640px) {
     .is-searching .category-content {
+      grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
     }
   }
 
-  .is-searching .category-content>li {
-    /* 统一卡片宽度 */
-    width: calc(50% - 0.5rem);
-  }
-
-  @media (min-width: 1024px) {
-    .is-searching .category-content>li {
-      width: calc(33.333% - 0.7rem);
-    }
-  }
-
   @media (min-width: 1280px) {
-    .is-searching .category-content>li {
-      width: calc(25% - 0.75rem);
+    .is-searching .category-content {
+      grid-template-columns: repeat(4, 1fr);
     }
   }
 
   @media (min-width: 1536px) {
-    .is-searching .category-content>li {
-      width: calc(20% - 0.8rem);
+    .is-searching .category-content {
+      grid-template-columns: repeat(5, 1fr);
     }
   }
 
   /* 搜索过滤：无匹配结果的分类 */
   .category-section.search-no-results {
-    @apply hidden;
+    display: none;
   }
 
   /* 搜索过滤：隐藏不匹配的卡片（直接由 JS 切换 class） */
@@ -531,12 +459,31 @@ main {
 
   /* 搜索结果反馈 */
   .search-feedback {
-    @apply text-center text-xs mt-2;
-    transition: opacity var(--dur-base) var(--ease-smooth);
+    @apply text-center text-xs;
+    margin-top: 0.6rem;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition:
+      opacity var(--dur-base) var(--ease-smooth),
+      background-color var(--dur-base) var(--ease-smooth);
   }
 
   .search-feedback.hidden {
     @apply opacity-0;
+    pointer-events: none;
+  }
+
+  /* 分类搜索结果计数 */
+  .search-category-count {
+    @apply text-xs font-normal text-white/30;
+    margin-left: 0.4rem;
+    transition: color var(--dur-base) var(--ease-smooth);
+  }
+
+  .category-section:hover .search-category-count {
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .category-content {
@@ -688,53 +635,46 @@ main {
     }
   }
 
-  /* Entrance: blur dissolve + rise */
+  /* Entrance: opacity + scale（避免 filter:blur 的 GPU 开销） */
   @keyframes entrance {
     from {
       opacity: 0;
-      filter: blur(12px);
-      transform: translateY(30px);
+      transform: translateY(24px) scale(0.96);
     }
 
     to {
       opacity: 1;
-      filter: blur(0px);
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
   }
 
-  /* Menu: spring open */
+  /* Menu: spring open（用 scale 替代 filter:blur） */
   @keyframes menuOpen {
     0% {
       opacity: 0;
-      filter: blur(8px);
-      transform: scale(0.9) translateY(-6px);
+      transform: scale(0.92) translateY(-6px);
     }
 
     60% {
       opacity: 1;
-      filter: blur(0px);
-      transform: scale(1.03) translateY(1px);
+      transform: scale(1.02) translateY(1px);
     }
 
     100% {
       opacity: 1;
-      filter: blur(0px);
       transform: scale(1) translateY(0);
     }
   }
 
-  /* Menu: dismiss */
+  /* Menu: dismiss（用 scale 替代 filter:blur） */
   @keyframes menuClose {
     from {
       opacity: 1;
-      filter: blur(0px);
       transform: scale(1) translateY(0);
     }
 
     to {
       opacity: 0;
-      filter: blur(6px);
       transform: scale(0.96) translateY(-4px);
     }
   }
@@ -808,13 +748,6 @@ main {
     text-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
   }
 
-  .footer-ip {
-    color: rgba(255, 255, 255, 0.34);
-    font-size: 0.68rem;
-    line-height: 1.6;
-    text-wrap: balance;
-  }
-
   /* ─────── Custom Tooltip ─────── */
   [data-tooltip] {
     position: relative;
@@ -879,25 +812,17 @@ main {
   .search-container,
   .engine-item,
   .engine-menu,
+  .info-capsule,
   .animate-fade-in-up {
     transition-duration: 1ms !important;
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
   }
 
-  .animate-fade-in-up {
+  .animate-fade-in-up,
+  .info-capsule {
     opacity: 1;
-    filter: none;
     transform: none;
-  }
-
-  .engine-menu:not(.hidden),
-  .engine-menu.hidden {
-    animation: none;
-  }
-
-  .will-reveal .animate-fade-in-up {
-    animation-play-state: running;
   }
 }
 
@@ -937,23 +862,6 @@ main {
     max-width: calc(100vw - 2rem);
   }
 
-  .provider-line {
-    column-gap: 0.35rem;
-  }
-
-  .provider-line .provider-name {
-    max-width: min(13rem, 54vw);
-  }
-
-  .provider-line .provider-node,
-  .provider-line .provider-ip {
-    max-width: calc(100vw - 3rem);
-  }
-
-  .footer-ip {
-    max-width: min(19rem, calc(100vw - 2rem));
-    margin-inline: auto;
-  }
 }
 
 @media (max-width: 400px) {

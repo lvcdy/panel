@@ -1,4 +1,4 @@
-import { isValidHttpUrl } from "./url";
+import { isValidHttpUrl } from "./utils";
 import {
     getStoredJson,
     removeStoredValue,

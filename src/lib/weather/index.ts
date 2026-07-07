@@ -68,7 +68,6 @@ export const fetchWeatherInfo = async (
         updateWeatherIcon(weatherBoxEl);
     } finally {
         weatherBoxEl.style.opacity = "1";
-        weatherBoxEl.style.filter = "blur(0px)";
     }
 };
 

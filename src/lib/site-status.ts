@@ -1,8 +1,10 @@
 import { getStoredJson, setStoredJson } from "./storage";
 
 const SITE_STATUS_URL = "/api/site-status";
-const SITE_STATUS_TIMEOUT = 4500;
+const SITE_STATUS_TIMEOUT = 10_000;
 const SITE_STATUS_CONCURRENCY = 4;
+const SITE_STATUS_RETRY_DELAY = 3_000;
+const SITE_STATUS_MAX_RETRIES = 1;
 const SITE_STATUS_CACHE_KEY = "site-status-cache" as const;
 const SITE_STATUS_CACHE_TTL = 10 * 60 * 1000;
 const SITE_STATUS_FALLBACK_TTL = 60 * 1000;
@@ -82,7 +84,7 @@ const formatDetail = (status: SiteStatusValue, payload: SiteStatusResponse) => {
     return parts.length > 0 ? parts.join(" · ") : statusCopy[status];
 };
 
-const fetchSiteStatus = async (domain: string): Promise<SiteStatusView> => {
+const fetchSiteStatus = async (domain: string, retries = 0): Promise<SiteStatusView> => {
     try {
         const query = new URLSearchParams({ domain });
         const response = await fetch(`${SITE_STATUS_URL}?${query}`, {
@@ -105,6 +107,13 @@ const fetchSiteStatus = async (domain: string): Promise<SiteStatusView> => {
         if (!(error instanceof DOMException && error.name === "TimeoutError")) {
             console.debug(`网站状态获取失败 (${domain}):`, error);
         }
+
+        // Retry once after a short delay for network/timeout errors
+        if (retries < SITE_STATUS_MAX_RETRIES) {
+            await new Promise((r) => setTimeout(r, SITE_STATUS_RETRY_DELAY));
+            return fetchSiteStatus(domain, retries + 1);
+        }
+
         return fallbackStatus;
     }
 };

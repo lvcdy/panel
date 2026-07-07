@@ -2,7 +2,7 @@ import {
     getSavedBackgroundUrl,
     setCustomBackgroundUrl,
 } from "./background";
-import { isValidHttpUrl } from "./url";
+import { isValidHttpUrl } from "./utils";
 import {
     fetchHitokoto,
     getSavedHitokotoApi,

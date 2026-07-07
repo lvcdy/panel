@@ -50,7 +50,6 @@ pnpm preview
 panel/
 ├── edge-functions/          # EdgeOne Edge Functions（API 代理）
 │   └── api/
-│       ├── edge-ip.js       # IP 地理位置代理（ip9.com.cn）
 │       └── site-status.js   # 网站状态检测代理
 ├── public/                  # 静态资源
 ├── src/
@@ -65,11 +64,7 @@ panel/
 │   │   ├── custom-engine.ts # 自定义搜索引擎配置持久化与 URL 构建
 │   │   ├── dom.ts          # DOM 元素选择器封装
 │   │   ├── hitokoto.ts     # 一言 API 封装（随机名言）
-│   │   ├── ip-info.ts      # 页脚 IP 信息获取与格式化
-│   │   ├── ip-utils.ts     # 共享 IP 工具函数（类型、格式化、fetch）
-│   │   ├── logos.ts        # CDN/云服务商 SVG Logo 常量
 │   │   ├── main.ts         # 浏览器工具模块聚合出口
-│   │   ├── provider.ts     # CDN 服务商检测（阿里云/Cloudflare）
 │   │   ├── search.ts       # 搜索过滤、高亮、引擎切换、键盘交互
 │   │   ├── site-status.ts  # 网站状态检测、并发控制与会话缓存
 │   │   ├── time.ts         # 实时时钟更新（zh-CN 本地化）
@@ -249,7 +244,6 @@ pnpm build
 2. 访问 [EdgeOne Pages](https://pages.edgeone.ai) 导入项目
 3. 框架预设选择 **Astro**，构建命令 `pnpm build:edgeone`，输出目录 `dist`
 4. API 代理通过 `edge-functions/` 目录下的 Edge Functions 自动部署：
-   - `/api/edge-ip` → `edge-functions/api/edge-ip.js`（IP 地理位置代理）
    - `/api/site-status` → `edge-functions/api/site-status.js`（网站状态检测代理）
 
 ### Vercel（境外推荐）
