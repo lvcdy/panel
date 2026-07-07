@@ -179,9 +179,11 @@ export const showAllIcons = () => {
         const catTitle = catElement.querySelector(SELECTOR_CATEGORY_TITLE) as HTMLElement | null;
         if (catTitle) {
             const original = originalCatTitles.get(catElement as HTMLElement);
-            if (original !== undefined) catTitle.textContent = original;
+            if (original !== undefined) {
+                catTitle.textContent = original;
+                originalCatTitles.delete(catElement as HTMLElement);
+            }
         }
     });
-    originalCatTitles.clear();
     updateSearchFeedback(0, "");
 };
