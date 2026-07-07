@@ -1,21 +1,28 @@
-// EdgeOne Edge Function: return both user IP and edge node IP via ip9.com.cn
-export async function onRequestGet() {
+// EdgeOne Edge Function: return user IP and/or edge node IP via ip9.com.cn
+export async function onRequestGet(context) {
   try {
-    // 1. Get user's real IP from ipify (edge function call, no CORS issue)
-    const userIpRes = await fetch("https://api.ipify.org?format=json");
-    const userIpText = await userIpRes.text();
-    let userIp;
-    try {
-      userIp = JSON.parse(userIpText).ip;
-    } catch {
+    const url = new URL(context.request.url);
+    const userIp = url.searchParams.get("ip")?.trim();
+
+    if (userIp) {
+      // Both user and edge node info requested
+      const [userRes, edgeRes] = await Promise.all([
+        fetch(`https://ip9.com.cn/get?ip=${encodeURIComponent(userIp)}`, {
+          headers: { accept: "application/json" },
+        }),
+        fetch("https://ip9.com.cn/get", {
+          headers: { accept: "application/json" },
+        }),
+      ]);
+      const userData = await userRes.json();
+      const edgeData = await edgeRes.json();
       return new Response(
         JSON.stringify({
-          ret: 502,
-          error: "ipify parse failed",
-          debug: { status: userIpRes.status, body: userIpText.slice(0, 200) },
+          ret: 200,
+          user: userData.data || null,
+          edge: edgeData.data || null,
         }),
         {
-          status: 502,
           headers: {
             "content-type": "application/json",
             "cache-control": "no-store",
@@ -25,23 +32,15 @@ export async function onRequestGet() {
       );
     }
 
-    // 2. Query ip9.com.cn for both IPs in parallel
-    const [userRes, edgeRes] = await Promise.all([
-      fetch(`https://ip9.com.cn/get?ip=${userIp}`, {
-        headers: { accept: "application/json" },
-      }),
-      fetch("https://ip9.com.cn/get", {
-        headers: { accept: "application/json" },
-      }),
-    ]);
-
-    const userData = await userRes.json();
+    // Only edge node info requested (no ?ip=)
+    const edgeRes = await fetch("https://ip9.com.cn/get", {
+      headers: { accept: "application/json" },
+    });
     const edgeData = await edgeRes.json();
-
     return new Response(
       JSON.stringify({
         ret: 200,
-        user: userData.data || null,
+        user: null,
         edge: edgeData.data || null,
       }),
       {

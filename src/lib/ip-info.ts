@@ -2,8 +2,7 @@ import { getStoredText, setStoredText } from "./storage";
 import { formatIpSummary, FALLBACK_IP_TEXT } from "./ip-utils";
 import type { Ip9Data } from "./ip-utils";
 
-const IP_PROXY_URL = "/api/edge-ip";
-const IP_INFO_CACHE_KEY = "ip-info-text-v6" as const;
+const IP_INFO_CACHE_KEY = "ip-info-text-v7" as const;
 
 interface EdgeIpResponse {
     ret: number;
@@ -26,6 +25,17 @@ const cacheIpText = (text: string) => {
     setStoredText(IP_INFO_CACHE_KEY, text, "session");
 };
 
+/** Get user's real IP from ipify (browser direct, supports CORS) */
+const fetchUserIp = async (): Promise<string> => {
+    const res = await fetch("https://api.ipify.org?format=json", {
+        signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) throw new Error(`ipify HTTP ${res.status}`);
+    const data = (await res.json()) as { ip?: string };
+    if (!data.ip) throw new Error("ipify returned no ip");
+    return data.ip;
+};
+
 export const fetchIpInfo = async (ipText: HTMLElement | null) => {
     const cachedText = getCachedIpText();
     if (cachedText) {
@@ -34,10 +44,14 @@ export const fetchIpInfo = async (ipText: HTMLElement | null) => {
     }
 
     try {
-        const res = await fetch(IP_PROXY_URL, {
-            signal: AbortSignal.timeout(5000),
+        // 1. Get user's real IP from browser
+        const userIp = await fetchUserIp();
+
+        // 2. Send to edge function for ip9.com.cn geolocation lookup
+        const res = await fetch(`/api/edge-ip?ip=${encodeURIComponent(userIp)}`, {
+            signal: AbortSignal.timeout(8000),
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`edge-ip HTTP ${res.status}`);
         const payload = (await res.json()) as EdgeIpResponse;
         if (payload.ret !== 200 || !payload.user) {
             throw new Error(payload.error || "API unavailable");

@@ -9,18 +9,39 @@ function devApiProxy() {
   return {
     name: "dev-api-proxy",
     configureServer(server: { middlewares: { use: (path: string, handler: MiddlewareHandler) => void } }) {
-      server.middlewares.use("/api/edge-ip", async (_req, res) => {
+      server.middlewares.use("/api/edge-ip", async (req, res) => {
         try {
-          // In local dev, user IP and edge node IP are the same (no CDN)
-          const upstream = await fetch("https://ip9.com.cn/get", {
-            headers: { accept: "application/json" },
-            signal: AbortSignal.timeout(8000),
-          });
-          const body = await upstream.json();
-          const data = body.data || null;
-          res.setHeader("content-type", "application/json");
-          res.setHeader("cache-control", "no-store");
-          res.end(JSON.stringify({ ret: 200, user: data, edge: data }));
+          const reqUrl = new URL(req.url ?? "", "http://localhost");
+          const userIp = reqUrl.searchParams.get("ip")?.trim();
+
+          if (userIp) {
+            // Both user and edge node info
+            const [userUpstream, edgeUpstream] = await Promise.all([
+              fetch(`https://ip9.com.cn/get?ip=${encodeURIComponent(userIp)}`, {
+                headers: { accept: "application/json" },
+                signal: AbortSignal.timeout(8000),
+              }),
+              fetch("https://ip9.com.cn/get", {
+                headers: { accept: "application/json" },
+                signal: AbortSignal.timeout(8000),
+              }),
+            ]);
+            const userData = await userUpstream.json();
+            const edgeData = await edgeUpstream.json();
+            res.setHeader("content-type", "application/json");
+            res.setHeader("cache-control", "no-store");
+            res.end(JSON.stringify({ ret: 200, user: userData.data || null, edge: edgeData.data || null }));
+          } else {
+            // Only edge node info
+            const upstream = await fetch("https://ip9.com.cn/get", {
+              headers: { accept: "application/json" },
+              signal: AbortSignal.timeout(8000),
+            });
+            const body = await upstream.json();
+            res.setHeader("content-type", "application/json");
+            res.setHeader("cache-control", "no-store");
+            res.end(JSON.stringify({ ret: 200, user: null, edge: body.data || null }));
+          }
         } catch (error) {
           res.setHeader("content-type", "application/json");
           res.statusCode = 502;
