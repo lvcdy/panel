@@ -48,6 +48,10 @@ pnpm preview
 
 ```
 panel/
+├── edge-functions/          # EdgeOne Edge Functions（API 代理）
+│   └── api/
+│       ├── edge-ip.js       # IP 地理位置代理（ip9.com.cn）
+│       └── site-status.js   # 网站状态检测代理
 ├── public/                  # 静态资源
 ├── src/
 │   ├── data/
@@ -55,7 +59,6 @@ panel/
 │   ├── layouts/
 │   │   └── Layout.astro    # 页面布局组件
 │   ├── lib/                # 工具函数库
-│   │   ├── api-edge.ts     # Edge API 工具函数（IP 查询等）
 │   │   ├── background.ts   # 动态背景图片加载与过渡动画
 │   │   ├── category.ts     # 分类折叠/展开动画逻辑
 │   │   ├── config.ts       # 全局配置常量与 API 端点
@@ -63,6 +66,8 @@ panel/
 │   │   ├── dom.ts          # DOM 元素选择器封装
 │   │   ├── hitokoto.ts     # 一言 API 封装（随机名言）
 │   │   ├── ip-info.ts      # 页脚 IP 信息获取与格式化
+│   │   ├── ip-utils.ts     # 共享 IP 工具函数（类型、格式化、fetch）
+│   │   ├── logos.ts        # CDN/云服务商 SVG Logo 常量
 │   │   ├── main.ts         # 浏览器工具模块聚合出口
 │   │   ├── provider.ts     # CDN 服务商检测（阿里云/Cloudflare）
 │   │   ├── search.ts       # 搜索过滤、高亮、引擎切换、键盘交互
@@ -70,15 +75,11 @@ panel/
 │   │   ├── time.ts         # 实时时钟更新（zh-CN 本地化）
 │   │   └── url.ts          # 通用 URL 校验工具
 │   ├── pages/
-│   │   ├── index.astro     # 首页
-│   │   └── api/            # API 路由
-│   │       ├── edge-ip.ts
-│   │       ├── ip-info.ts
-│   │       └── site-status.ts
+│   │   └── index.astro     # 首页（纯静态）
 │   ├── main.ts             # 应用渲染与初始化入口
 │   └── styles/
 │       └── global.css      # 全局样式（毛玻璃、动画、响应式）
-├── astro.config.ts         # Astro 配置（Vercel 适配器、Tailwind v4、代理）
+├── astro.config.ts         # Astro 配置（纯静态、Tailwind v4）
 ├── tsconfig.json           # TypeScript 配置
 └── package.json
 ```
@@ -238,28 +239,51 @@ pnpm build
 
 ## 🚀 部署
 
-### Vercel 部署
+支持三个平台部署，通过 `DEPLOY_TARGET` 环境变量切换：
+
+### EdgeOne Pages（国内推荐）
+
+构建命令：`pnpm build:edgeone`
+
+1. 推送代码到 GitHub
+2. 访问 [EdgeOne Pages](https://pages.edgeone.ai) 导入项目
+3. 框架预设选择 **Astro**，构建命令 `pnpm build:edgeone`，输出目录 `dist`
+4. API 代理通过 `edge-functions/` 目录下的 Edge Functions 自动部署：
+   - `/api/edge-ip` → `edge-functions/api/edge-ip.js`（IP 地理位置代理）
+   - `/api/site-status` → `edge-functions/api/site-status.js`（网站状态检测代理）
+
+### Vercel（境外推荐）
+
+构建命令：`pnpm build:vercel`
 
 1. 推送代码到 GitHub
 2. 访问 [Vercel](https://vercel.com) 导入项目
-3. Vercel 会自动检测 Astro 项目并使用 `@astrojs/vercel` 适配器
-4. API 路由（`/api/ip-info`、`/api/edge-ip`、`/api/site-status`）将作为 Serverless Functions 自动部署
-5. 点击部署完成
+3. 构建命令设为 `pnpm build:vercel`，输出目录设为 `.vercel/output`
+4. API 路由自动转换为 Vercel Serverless Functions
 
-### 其他平台
+### Cloudflare Pages（境外推荐）
 
-本项目支持静态和混合渲染模式：
-- **静态页面**（首页）可部署到任何静态托管平台
-- **API 路由**需要支持 Serverless Functions 的平台（如 Vercel、Netlify、Cloudflare Pages）
+构建命令：`pnpm build:cloudflare`
 
-> API 路由通过 `export const prerender = false` 启用服务端渲染，如部署到纯静态平台需要自行配置反向代理。
+1. 推送代码到 GitHub
+2. 访问 [Cloudflare Pages](https://pages.cloudflare.com) 导入项目
+3. 构建命令设为 `pnpm build:cloudflare`，输出目录设为 `dist`
+4. API 路由自动转换为 Cloudflare Workers
+
+### 构建命令一览
+
+| 平台 | 命令 | 输出 |
+|------|------|------|
+| EdgeOne | `pnpm build:edgeone` | `dist/`（静态）+ `edge-functions/` |
+| Vercel | `pnpm build:vercel` | `.vercel/output/`（SSR） |
+| Cloudflare | `pnpm build:cloudflare` | `dist/`（SSR + Workers） |
 
 ## 📄 项目信息
 
 - **版本**: 1.0.0
-- **类型**: 混合渲染（静态页面 + Serverless API）
+- **类型**: 静态站点 + 多平台 SSR 支持
 - **框架**: Astro 7
-- **构建输出**: `./dist/`
+- **部署平台**: EdgeOne（国内）、Vercel / Cloudflare（境外）
 - **开发端口**: 4321
 
 ## 📝 许可证

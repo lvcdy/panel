@@ -1,7 +1,7 @@
 import { getStoredText, setStoredText } from "./storage";
-import { formatIpSummary, fetchIp9, FALLBACK_IP_TEXT, type Ip9Response } from "./ip-utils";
+import { formatIpSummary, fetchIp9, FALLBACK_IP_TEXT } from "./ip-utils";
 
-const IP_PROXY_URL = "/api/ip-info";
+const IP_PROXY_URL = "/api/edge-ip";
 const IP_INFO_CACHE_KEY = "ip-info-text-v6" as const;
 
 const showIpText = (ipText: HTMLElement | null, text: string) => {

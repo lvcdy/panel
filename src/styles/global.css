@@ -1,7 +1,9 @@
 @import "@fortawesome/fontawesome-free/css/fontawesome.min.css";
 @import "@fortawesome/fontawesome-free/css/solid.min.css";
 @import "@fortawesome/fontawesome-free/css/brands.min.css";
-@import "tailwindcss";
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/preflight" layer(base);
+@import "tailwindcss/utilities" layer(utilities);
 
 @theme {
   --font-sans: 'MiSans', 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;

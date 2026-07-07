@@ -1,5 +1,5 @@
 import { LOGOS } from "./logos";
-import { formatEdgeNode, fetchIp9, type Ip9Response } from "./ip-utils";
+import { formatEdgeNode, type Ip9Response } from "./ip-utils";
 
 // Provider detection configuration
 interface ProviderConfig {
