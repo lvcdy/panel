@@ -11,20 +11,22 @@ function devApiProxy() {
     configureServer(server: { middlewares: { use: (path: string, handler: MiddlewareHandler) => void } }) {
       server.middlewares.use("/api/edge-ip", async (_req, res) => {
         try {
+          // In local dev, user IP and edge node IP are the same (no CDN)
           const upstream = await fetch("https://ip9.com.cn/get", {
             headers: { accept: "application/json" },
             signal: AbortSignal.timeout(8000),
           });
-          const body = await upstream.text();
+          const body = await upstream.json();
+          const data = body.data || null;
           res.setHeader("content-type", "application/json");
           res.setHeader("cache-control", "no-store");
-          res.end(body);
+          res.end(JSON.stringify({ ret: 200, user: data, edge: data }));
         } catch (error) {
           res.setHeader("content-type", "application/json");
+          res.statusCode = 502;
           res.end(
             JSON.stringify({
-              ret: 200,
-              data: { ip: "unknown", country: "未知", prov: "", city: "", area: "", isp: "" },
+              ret: 502,
               error: error instanceof Error ? error.message : String(error),
             }),
           );

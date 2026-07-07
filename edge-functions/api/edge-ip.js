@@ -1,19 +1,29 @@
-// EdgeOne Edge Function: proxy ip9.com.cn API (server-side, no CORS)
-export async function onRequestGet(context) {
+// EdgeOne Edge Function: return both user IP and edge node IP via ip9.com.cn
+export async function onRequestGet() {
   try {
-    // Extract ALL request headers for debugging
-    const headers = {};
-    context.request.headers.forEach((value, key) => {
-      headers[key.toLowerCase()] = value;
-    });
+    // 1. Get user's real IP from ipify (edge function call, no CORS issue)
+    const userIpRes = await fetch("https://api.ipify.org?format=json");
+    const { ip: userIp } = await userIpRes.json();
 
-    const res = await fetch("https://ip9.com.cn/get", {
-      headers: { accept: "application/json" },
-    });
-    const body = await res.json();
+    // 2. Query ip9.com.cn for both IPs in parallel
+    const [userRes, edgeRes] = await Promise.all([
+      fetch(`https://ip9.com.cn/get?ip=${userIp}`, {
+        headers: { accept: "application/json" },
+      }),
+      fetch("https://ip9.com.cn/get", {
+        headers: { accept: "application/json" },
+      }),
+    ]);
+
+    const userData = await userRes.json();
+    const edgeData = await edgeRes.json();
 
     return new Response(
-      JSON.stringify({ ...body, _headers: headers }),
+      JSON.stringify({
+        ret: 200,
+        user: userData.data || null,
+        edge: edgeData.data || null,
+      }),
       {
         headers: {
           "content-type": "application/json",

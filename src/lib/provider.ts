@@ -1,5 +1,5 @@
 import { LOGOS } from "./logos";
-import { formatEdgeNode, type Ip9Response } from "./ip-utils";
+import { formatEdgeNode, type Ip9Data } from "./ip-utils";
 
 // Provider detection configuration
 interface ProviderConfig {
@@ -227,8 +227,8 @@ export const fetchAndDetectProvider = async (
         }).then(async (response) => {
             if (!response.ok) return null;
 
-            const payload = (await response.json()) as Ip9Response;
-            return payload.ret === 200 ? formatEdgeNode(payload.data) : null;
+            const payload = await response.json();
+            return payload.ret === 200 ? formatEdgeNode(payload.edge) : null;
         }).catch(() => null);
 
         const [res, edgeIp] = await Promise.all([
