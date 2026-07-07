@@ -3,7 +3,27 @@ export async function onRequestGet() {
   try {
     // 1. Get user's real IP from ipify (edge function call, no CORS issue)
     const userIpRes = await fetch("https://api.ipify.org?format=json");
-    const { ip: userIp } = await userIpRes.json();
+    const userIpText = await userIpRes.text();
+    let userIp;
+    try {
+      userIp = JSON.parse(userIpText).ip;
+    } catch {
+      return new Response(
+        JSON.stringify({
+          ret: 502,
+          error: "ipify parse failed",
+          debug: { status: userIpRes.status, body: userIpText.slice(0, 200) },
+        }),
+        {
+          status: 502,
+          headers: {
+            "content-type": "application/json",
+            "cache-control": "no-store",
+            "access-control-allow-origin": "*",
+          },
+        }
+      );
+    }
 
     // 2. Query ip9.com.cn for both IPs in parallel
     const [userRes, edgeRes] = await Promise.all([
