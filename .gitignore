@@ -23,3 +23,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# 临时调试残留（截图、脚本、无头浏览器 profile）
+.tmp-*
