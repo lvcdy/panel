@@ -4,6 +4,7 @@ interface Props {
 }
 
 const { title = 'Panel' } = Astro.props;
+const base = import.meta.env.BASE_URL;
 ---
 
 <!doctype html>
@@ -21,7 +22,26 @@ const { title = 'Panel' } = Astro.props;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content="Panel" />
     <title>{title}</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      try {
+        if (window.localStorage.getItem("panel-config")) {
+          document.documentElement.setAttribute("data-panel-config-pending", "");
+          window.setTimeout(function () {
+            document.documentElement.removeAttribute("data-panel-config-pending");
+          }, 4000);
+        }
+      } catch (error) {
+        // localStorage 不可用时保持默认内容可见。
+      }
+    </script>
+    <noscript>
+      <style>
+        html[data-panel-config-pending] #linkGridContent {
+          visibility: visible;
+        }
+      </style>
+    </noscript>
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <link rel="preconnect" href="https://api.lvcdy.cn" crossorigin />
     <link rel="preconnect" href="https://api.afmax.cn" crossorigin />
     <link rel="preconnect" href="https://t.alcy.cc" crossorigin />

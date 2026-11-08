@@ -80,6 +80,53 @@ const profileConfig = { name: "与众不同的糖" };
       </a>
     </div>
 
+    <div
+      id="network-info"
+      class="network-info"
+      data-state="loading"
+      aria-live="polite"
+    >
+      <span id="network-info-loading" class="network-info-status">
+        正在获取网络信息...
+      </span>
+      <span id="network-info-unavailable" class="network-info-status" hidden>
+        网络信息暂不可用
+      </span>
 
+      <span class="network-info-item" data-network-item="clientIp" hidden>
+        <span class="network-info-label">出口 IP</span>
+        <span id="network-ip" class="network-info-value"></span>
+      </span>
+      <span class="network-info-item" data-network-item="location" hidden>
+        <span class="network-info-label">位置</span>
+        <span id="network-location" class="network-info-value"></span>
+      </span>
+      <span class="network-info-item" data-network-item="organization" hidden>
+        <span class="network-info-label">网络</span>
+        <span id="network-organization" class="network-info-value"></span>
+      </span>
+      <span class="network-info-item" data-network-item="asn" hidden>
+        <span class="network-info-label">ASN</span>
+        <span id="network-asn" class="network-info-value"></span>
+      </span>
+      <span class="network-info-item" data-network-item="edgeLocation" hidden>
+        <span class="network-info-label">边缘</span>
+        <span id="network-edge" class="network-info-value"></span>
+      </span>
+      <span class="network-info-item" data-network-item="platform" hidden>
+        <span class="network-info-label">平台</span>
+        <span id="network-platform" class="network-info-value"></span>
+      </span>
+
+      <button
+        id="network-info-refresh"
+        type="button"
+        class="network-info-refresh"
+        aria-label="刷新网络信息"
+        title="刷新网络信息"
+      >
+        <i class="fas fa-rotate" aria-hidden="true"></i>
+      </button>
+    </div>
   </div>
 </footer>

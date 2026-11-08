@@ -117,6 +117,109 @@
             </button>
           </div>
         </div>
+
+        <section class="settings-section" aria-labelledby="settings-edit-nav-title">
+          <h3 id="settings-edit-nav-title" class="settings-section-title">
+            导航编辑
+          </h3>
+          <p class="settings-section-hint">
+            进入编辑模式后可添加、编辑、删除网站；编辑模式不会被保存，刷新后自动退出。
+          </p>
+          <button
+            id="open-edit-mode-btn"
+            type="button"
+            class="bg-action-btn settings-data-btn settings-data-btn-primary"
+          >
+            编辑导航
+          </button>
+        </section>
+
+        <section class="settings-section" aria-labelledby="settings-backup-title">
+          <h3 id="settings-backup-title" class="settings-section-title">
+            配置备份
+          </h3>
+          <p class="settings-section-hint">
+            导出或导入 JSON 备份文件。导入前会先校验完整数据。
+          </p>
+          <div class="settings-action-grid">
+            <button
+              id="export-all-btn"
+              type="button"
+              class="bg-action-btn settings-data-btn"
+            >
+              导出全部配置
+            </button>
+            <button
+              id="export-nav-btn"
+              type="button"
+              class="bg-action-btn settings-data-btn"
+            >
+              导出导航配置
+            </button>
+            <button
+              id="import-all-btn"
+              type="button"
+              class="bg-action-btn settings-data-btn"
+            >
+              导入全部配置
+            </button>
+            <button
+              id="import-nav-btn"
+              type="button"
+              class="bg-action-btn settings-data-btn"
+            >
+              导入导航配置
+            </button>
+          </div>
+          <input
+            id="import-all-input"
+            type="file"
+            accept="application/json,.json"
+            class="hidden"
+            aria-hidden="true"
+            tabindex="-1"
+          />
+          <input
+            id="import-nav-input"
+            type="file"
+            accept="application/json,.json"
+            class="hidden"
+            aria-hidden="true"
+            tabindex="-1"
+          />
+        </section>
+
+        <section class="settings-section" aria-labelledby="settings-restore-nav-title">
+          <h3 id="settings-restore-nav-title" class="settings-section-title">
+            恢复导航
+          </h3>
+          <p class="settings-section-hint">
+            仅恢复默认网站、分类和排序，保留背景、搜索引擎、一言与毛玻璃设置。
+          </p>
+          <button
+            id="restore-nav-btn"
+            type="button"
+            class="bg-action-btn settings-data-btn settings-data-btn-warning"
+          >
+            恢复默认导航
+          </button>
+        </section>
+
+        <section class="settings-section" aria-labelledby="settings-restore-all-title">
+          <h3 id="settings-restore-all-title" class="settings-section-title">
+            恢复全部设置
+          </h3>
+          <p class="settings-section-hint">
+            清除当前导航与个性化设置，恢复初始状态，无法自动撤销。
+          </p>
+          <button
+            id="restore-all-btn"
+            type="button"
+            class="bg-action-btn settings-data-btn settings-data-btn-danger"
+          >
+            恢复全部设置
+          </button>
+        </section>
       </div>
     </div>
   </div>

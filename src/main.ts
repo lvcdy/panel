@@ -1,5 +1,17 @@
-﻿import { initBackgroundImage } from "./lib/background";
-import { initSettings } from "./lib/settings";
+﻿import { initSettings } from "./lib/settings";
+import { initNetworkInfo } from "./lib/network-info";
+import { initCategoryDelete } from "./lib/panel/category-delete";
+import { initCategoryEditor } from "./lib/panel/category-editor";
+import { initCategoryManager } from "./lib/panel/category-manager";
+import { initConfirmDialog } from "./lib/panel/confirm";
+import { initDataPanel } from "./lib/panel/data-panel";
+import { initDragSort } from "./lib/panel/drag-sort";
+import { initNavigationEditor } from "./lib/panel/editor";
+import { initSiteEditor } from "./lib/panel/site-editor";
+import { initSettingsRuntime } from "./lib/panel/settings-runtime";
+import { getStoreInitWarning, initPanelStore } from "./lib/panel/store";
+import { initNavigationView } from "./lib/panel/view";
+import { initToast, showToast } from "./lib/toast";
 import * as UI from "./lib";
 import { initSearch } from "./init/search-init";
 import {
@@ -13,8 +25,24 @@ export const initApp = () => {
   const footerYear = document.getElementById("footerYear");
   if (footerYear) footerYear.textContent = String(new Date().getFullYear());
 
+  initToast();
+  initPanelStore();
+
+  const storeWarning = getStoreInitWarning();
+  if (storeWarning) showToast(storeWarning, "error", 6000);
+
   initSettings();
-  initBackgroundImage();
+  initSettingsRuntime();
+  initNavigationView();
+  initNetworkInfo();
+  initConfirmDialog();
+  initDataPanel();
+  initSiteEditor();
+  initNavigationEditor();
+  initDragSort();
+  initCategoryEditor();
+  initCategoryDelete();
+  initCategoryManager();
 
   const els = UI.createElementCache();
 
@@ -48,7 +76,4 @@ export const initApp = () => {
     });
   });
 
-  UI.scheduleInit(() => {
-    UI.fetchHitokoto(els.input);
-  });
 };

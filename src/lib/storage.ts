@@ -29,21 +29,45 @@ export const getStoredJson = <T>(key: string, scope: StorageScope = "local") => 
     }
 };
 
+export type StorageWriteError = "unavailable" | "quota-exceeded" | "unknown";
+
+export interface StorageWriteResult {
+    readonly ok: boolean;
+    readonly error?: StorageWriteError;
+}
+
+/** 写入并返回可区分的错误，供配置仓库提示用户使用 */
+export const trySetStoredText = (
+    key: string,
+    value: string,
+    scope: StorageScope = "local",
+): StorageWriteResult => {
+    const storage = getStorage(scope);
+    if (!storage) {
+        return { ok: false, error: "unavailable" };
+    }
+
+    try {
+        storage.setItem(key, value);
+        return { ok: true };
+    } catch (error) {
+        if (
+            error instanceof DOMException &&
+            (error.name === "QuotaExceededError" ||
+                error.name === "NS_ERROR_DOM_QUOTA_REACHED")
+        ) {
+            return { ok: false, error: "quota-exceeded" };
+        }
+
+        return { ok: false, error: "unknown" };
+    }
+};
+
 export const setStoredText = (
     key: string,
     value: string,
     scope: StorageScope = "local",
-) => {
-    try {
-        const storage = getStorage(scope);
-        if (!storage) return false;
-
-        storage.setItem(key, value);
-        return true;
-    } catch {
-        return false;
-    }
-};
+) => trySetStoredText(key, value, scope).ok;
 
 export const setStoredJson = (
     key: string,

@@ -6,6 +6,13 @@ import LinkGrid from '../components/LinkGrid.astro';
 import Footer from '../components/Footer.astro';
 import SettingsPanel from '../components/SettingsPanel.astro';
 import FloatingButton from '../components/FloatingButton.astro';
+import ToastContainer from '../components/ToastContainer.astro';
+import ConfirmModal from '../components/ConfirmModal.astro';
+import ManagementToolbar from '../components/ManagementToolbar.astro';
+import SiteEditorModal from '../components/SiteEditorModal.astro';
+import CategoryManagerModal from '../components/CategoryManagerModal.astro';
+import CategoryEditorModal from '../components/CategoryEditorModal.astro';
+import CategoryDeleteModal from '../components/CategoryDeleteModal.astro';
 import '../styles/global.css';
 ---
 
@@ -18,6 +25,13 @@ import '../styles/global.css';
   </main>
   <SettingsPanel />
   <FloatingButton />
+  <ToastContainer />
+  <ConfirmModal />
+  <SiteEditorModal />
+  <CategoryManagerModal />
+  <CategoryEditorModal />
+  <CategoryDeleteModal />
+  <ManagementToolbar />
   <script>
     import { initApp } from '../main';
     initApp();

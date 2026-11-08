@@ -1,4 +1,23 @@
+import { joinApiEndpoint, normalizeApiBase } from "./paths";
+
+// 静态站点基址由 Astro base / import.meta.env.BASE_URL 提供；
+// API 基址独立配置，默认仍为根 /api/，确保子路径静态部署不误伤 Functions 路由。
+export const PANEL_API_BASE = normalizeApiBase(
+    typeof __PANEL_API_BASE__ === "string" ? __PANEL_API_BASE__ : "/api/",
+);
+export const SITE_STATUS_URL = joinApiEndpoint(
+    PANEL_API_BASE,
+    "site-status",
+);
+export const NETWORK_INFO_URL = joinApiEndpoint(
+    PANEL_API_BASE,
+    "network-info",
+);
+
 // DOM Selectors
+export const SELECTOR_LINK_GRID = "#linkGrid" as const;
+export const SELECTOR_LINK_GRID_CONTENT = "#linkGridContent" as const;
+export const SELECTOR_SEARCH_EMPTY_STATE = "#searchEmptyState" as const;
 export const SELECTOR_CATEGORIES = ".category-section" as const;
 export const SELECTOR_CATEGORY_TOGGLE_BTN = ".category-toggle-btn" as const;
 export const SELECTOR_CATEGORY_TOGGLE_ICON = ".category-toggle-icon" as const;

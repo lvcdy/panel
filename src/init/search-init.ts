@@ -6,6 +6,7 @@ import {
 } from "../lib/custom-engine";
 import { GOOGLE_SVG_ICON, DEFAULT_SEARCH_URL } from "../lib/config";
 import { isValidHttpUrl } from "../lib/utils";
+import { showToast } from "../lib/toast";
 import * as UI from "../lib";
 
 /** 初始化搜索引擎选择、自定义引擎模态框、搜索输入 */
@@ -125,27 +126,40 @@ export const initSearch = (els: ReturnType<typeof UI.createElementCache>) => {
     const placeholder = customEnginePlaceholderInput?.value.trim() || "";
 
     if (!url) {
-      window.alert("请输入自定义搜索引擎 URL");
+      showToast("请输入自定义搜索引擎 URL", "error");
       return;
     }
 
     if (!isValidHttpUrl(url)) {
-      window.alert("请输入有效的 http/https 搜索引擎 URL");
+      showToast("请输入有效的 http/https 搜索引擎 URL", "error");
       return;
     }
 
-    setCustomSearchEngine({
+    const result = setCustomSearchEngine({
       name: name || "自定义",
       url,
       placeholder: placeholder || "🔎 输入关键词开始搜索...",
     });
 
+    if (!result.ok) {
+      showToast(result.message, "error");
+      return;
+    }
+
+    showToast("自定义搜索引擎已保存", "success");
     emitCustomEngineUpdated();
     closeCustomEngineModal();
   });
 
   customEngineClearBtn?.addEventListener("click", () => {
-    clearCustomSearchEngine();
+    const result = clearCustomSearchEngine();
+
+    if (!result.ok) {
+      showToast(result.message, "error");
+      return;
+    }
+
+    showToast("已恢复内置搜索引擎", "success");
     emitCustomEngineUpdated();
     closeCustomEngineModal();
   });
@@ -183,6 +197,22 @@ export const initSearch = (els: ReturnType<typeof UI.createElementCache>) => {
 
   UI.setupSearchButtonHandler(els.searchBtn, () => doSearch());
   UI.setupDocumentClickHandler(els.menu);
+
+  // ── 清除导航搜索（不触发外部搜索引擎） ──
+  const searchClearBtn = document.getElementById("searchClearBtn");
+  const searchEmptyClearBtn = document.getElementById("searchEmptyClear");
+
+  const clearNavigationSearch = () => {
+    if (!els.input) return;
+    els.input.value = "";
+    // 触发空关键词过滤，同时取消仍在防抖队列中的旧关键词。
+    els.input.dispatchEvent(new Event("input", { bubbles: true }));
+    UI.showAllIcons();
+    els.input.focus();
+  };
+
+  searchClearBtn?.addEventListener("click", clearNavigationSearch);
+  searchEmptyClearBtn?.addEventListener("click", clearNavigationSearch);
 
   // ── 全局键盘快捷键 ──
   document.addEventListener("keydown", (event) => {

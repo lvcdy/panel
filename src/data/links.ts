@@ -58,10 +58,17 @@ export interface LinkItem {
   readonly color: string;
   readonly useIcon?: boolean;
   readonly status?: boolean;
+  readonly description?: string;
+  readonly tags?: readonly string[];
+  readonly favorite?: boolean;
+  readonly openInNewTab?: boolean;
+  readonly visible?: boolean;
 }
 
 export interface Category {
   readonly title: string;
+  readonly icon?: string;
+  readonly visible?: boolean;
   readonly links: readonly LinkItem[];
 }
 

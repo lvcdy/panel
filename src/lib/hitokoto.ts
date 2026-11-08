@@ -1,28 +1,35 @@
 import { HITOKOTO_APIS } from "./config";
-import { getStoredText, removeStoredValue, setStoredText } from "./storage";
-
-export const CUSTOM_HITOKOTO_API_KEY = "custom-hitokoto-api" as const;
+import { getPanelSettings, updatePanelSettings } from "./panel/store";
+import type { PanelConfig, StoreResult } from "./panel/types";
+import { isValidHttpUrl } from "./utils";
 
 const getHitokotoApiList = (): string[] => {
-    const customApi = getStoredText(CUSTOM_HITOKOTO_API_KEY);
+    const customApi = getPanelSettings().hitokotoApi;
     return customApi ? [customApi, ...HITOKOTO_APIS] : [...HITOKOTO_APIS];
 };
 
-export const getSavedHitokotoApi = (): string => {
-    return getStoredText(CUSTOM_HITOKOTO_API_KEY);
-};
+export const getSavedHitokotoApi = (): string =>
+    getPanelSettings().hitokotoApi;
 
-export const setCustomHitokotoApi = (url: string) => {
+export const setCustomHitokotoApi = (
+    url: string,
+): StoreResult<PanelConfig> => {
     const normalized = url.trim();
-    if (normalized) {
-        setStoredText(CUSTOM_HITOKOTO_API_KEY, normalized);
-        return;
+
+    if (normalized && !isValidHttpUrl(normalized)) {
+        return {
+            ok: false,
+            code: "invalid",
+            message: "请输入有效的 http/https 一言 API URL",
+        };
     }
 
-    removeStoredValue(CUSTOM_HITOKOTO_API_KEY);
+    return updatePanelSettings({ hitokotoApi: normalized });
 };
 
-export const fetchHitokoto = async (inputEl: HTMLInputElement | null) => {
+export const fetchHitokoto = async (
+    inputEl: HTMLInputElement | null,
+): Promise<void> => {
     if (!inputEl) return;
 
     try {

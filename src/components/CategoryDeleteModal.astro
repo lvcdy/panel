@@ -1,0 +1,114 @@
+<div
+  id="category-delete-modal"
+  class="panel-modal hidden"
+  aria-hidden="true"
+>
+  <div id="category-delete-overlay" class="panel-modal-overlay"></div>
+  <div
+    class="panel-modal-card panel-delete-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="category-delete-title"
+  >
+    <div class="panel-modal-header">
+      <h3 id="category-delete-title" class="panel-modal-title">删除分类</h3>
+      <button
+        id="category-delete-close"
+        type="button"
+        class="panel-modal-close"
+        aria-label="关闭删除分类弹窗"
+      >
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="category-delete-body">
+      <p id="category-delete-message" class="panel-modal-message"></p>
+
+      <div class="panel-confirm-details">
+        <div class="panel-confirm-detail">
+          <span class="panel-confirm-detail-label">分类名称</span>
+          <span id="category-delete-name" class="panel-confirm-detail-value"></span>
+        </div>
+        <div class="panel-confirm-detail">
+          <span class="panel-confirm-detail-label">网站数量</span>
+          <span id="category-delete-count" class="panel-confirm-detail-value"></span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <span class="form-label">网站列表</span>
+        <ul id="category-delete-links" class="category-delete-links"></ul>
+      </div>
+
+      <div class="category-delete-options">
+        <label
+          id="category-delete-move-option"
+          class="category-delete-option"
+          for="category-delete-move-radio"
+        >
+          <input
+            id="category-delete-move-radio"
+            type="radio"
+            name="category-delete-mode"
+            value="move"
+          />
+          <span>移动网站到其他分类</span>
+        </label>
+        <select
+          id="category-delete-target"
+          class="form-input form-select category-delete-target"
+          aria-label="目标分类"
+        ></select>
+        <p id="category-delete-move-hint" class="form-hint"></p>
+
+        <label
+          id="category-delete-all-option"
+          class="category-delete-option category-delete-option-danger"
+          for="category-delete-all-radio"
+        >
+          <input
+            id="category-delete-all-radio"
+            type="radio"
+            name="category-delete-mode"
+            value="delete"
+          />
+          <span>
+            删除分类及全部
+            <strong id="category-delete-all-count">0</strong>
+            个网站
+          </span>
+        </label>
+        <p
+          id="category-delete-warning"
+          class="category-delete-warning hidden"
+        >
+          此操作会同时删除该分类内的全部网站，且无法自动撤销。
+        </p>
+      </div>
+
+      <p
+        id="category-delete-error"
+        class="form-error form-error-general"
+        role="alert"
+      ></p>
+    </div>
+
+    <div class="panel-modal-actions category-delete-actions">
+      <button
+        id="category-delete-cancel"
+        type="button"
+        class="panel-btn panel-btn-secondary"
+      >
+        取消
+      </button>
+      <button
+        id="category-delete-confirm"
+        type="button"
+        class="panel-btn panel-btn-primary"
+      >
+        移动并删除
+      </button>
+    </div>
+  </div>
+</div>

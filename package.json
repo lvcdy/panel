@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/generate-deployment-files.mjs",
     "preview": "astro preview",
     "typecheck": "astro check"
   },

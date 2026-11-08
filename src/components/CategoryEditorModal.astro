@@ -1,0 +1,115 @@
+<div
+  id="category-editor-modal"
+  class="panel-modal hidden"
+  aria-hidden="true"
+>
+  <div id="category-editor-overlay" class="panel-modal-overlay"></div>
+  <div
+    class="panel-modal-card panel-form-modal-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="category-editor-title"
+  >
+    <div class="panel-modal-header">
+      <h3 id="category-editor-title" class="panel-modal-title">新增分类</h3>
+      <button
+        id="category-editor-close"
+        type="button"
+        class="panel-modal-close"
+        aria-label="关闭分类编辑弹窗"
+      >
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <form id="category-editor-form" class="site-editor-form" novalidate>
+      <div class="site-form-body">
+        <input id="category-editor-id" type="hidden" value="" />
+
+        <div class="form-field">
+          <label for="category-name-input" class="form-label">
+            分类名称 <span class="required-mark">*</span>
+          </label>
+          <input
+            id="category-name-input"
+            type="text"
+            class="form-input"
+            maxlength="60"
+            autocomplete="off"
+            required
+          />
+          <p id="category-name-error" class="form-error" aria-live="polite"></p>
+        </div>
+
+        <div class="form-field">
+          <label for="category-icon-input" class="form-label">分类图标</label>
+          <input
+            id="category-icon-input"
+            type="text"
+            class="form-input"
+            maxlength="100"
+            placeholder="fas fa-folder"
+            autocomplete="off"
+          />
+          <p class="form-hint">
+            Font Awesome 类名，例如 fas fa-folder、fas fa-book。留空则不显示图标。
+          </p>
+          <p id="category-icon-error" class="form-error" aria-live="polite"></p>
+        </div>
+
+        <div class="form-field">
+          <span class="form-label">图标预览</span>
+          <div class="site-icon-preview-row">
+            <div class="site-icon-preview category-icon-preview">
+              <i
+                id="category-icon-preview-i"
+                class="fas fa-folder"
+                aria-hidden="true"
+              ></i>
+            </div>
+            <p class="form-hint">留空时导航中不显示分类图标。</p>
+          </div>
+        </div>
+
+        <label class="form-switch" for="category-visible-input">
+          <span class="form-switch-text">
+            <span class="form-switch-title">显示分类</span>
+            <span class="form-switch-hint">
+              关闭后普通模式不显示，编辑模式仍可管理
+            </span>
+          </span>
+          <input
+            id="category-visible-input"
+            type="checkbox"
+            class="form-switch-input"
+            checked
+          />
+          <span class="form-switch-track" aria-hidden="true"></span>
+        </label>
+
+        <p
+          id="category-form-error"
+          class="form-error form-error-general"
+          role="alert"
+        ></p>
+      </div>
+
+      <div class="panel-modal-actions site-form-actions">
+        <button
+          id="category-editor-cancel"
+          type="button"
+          class="panel-btn panel-btn-secondary"
+        >
+          取消
+        </button>
+        <button
+          id="category-editor-save"
+          type="submit"
+          class="panel-btn panel-btn-primary"
+        >
+          保存
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

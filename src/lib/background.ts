@@ -1,14 +1,14 @@
 import { BG_URL } from "./config";
-import { getStoredText, removeStoredValue, setStoredText } from "./storage";
+import { getPanelSettings, updatePanelSettings } from "./panel/store";
+import type { PanelConfig, StoreResult } from "./panel/types";
+import { isValidHttpUrl } from "./utils";
 
-export const CUSTOM_BG_URL_KEY = "custom-bg-url" as const;
+const resolveBackgroundUrl = (url: string): string => url || BG_URL;
 
-const getCurrentBackgroundUrl = (): string => {
-    const savedUrl = getStoredText(CUSTOM_BG_URL_KEY);
-    return savedUrl || BG_URL;
-};
-
-const applyBackgroundByUrl = (url: string, priority: "high" | "low" = "low") => {
+const applyBackgroundByUrl = (
+    url: string,
+    priority: "high" | "low" = "low",
+): void => {
     const img = new Image();
     img.decoding = "async";
     img.fetchPriority = priority;
@@ -30,22 +30,32 @@ const applyBackgroundByUrl = (url: string, priority: "high" | "low" = "low") => 
     }
 };
 
-export const getSavedBackgroundUrl = (): string => {
-    return getStoredText(CUSTOM_BG_URL_KEY);
+export const getSavedBackgroundUrl = (): string =>
+    getPanelSettings().backgroundUrl;
+
+export const applyBackgroundSetting = (
+    url: string,
+    priority: "high" | "low" = "low",
+): void => {
+    applyBackgroundByUrl(resolveBackgroundUrl(url), priority);
 };
 
-export const setCustomBackgroundUrl = (url: string) => {
+export const setCustomBackgroundUrl = (
+    url: string,
+): StoreResult<PanelConfig> => {
     const normalized = url.trim();
-    if (normalized) {
-        setStoredText(CUSTOM_BG_URL_KEY, normalized);
-        applyBackgroundByUrl(normalized);
-        return;
+
+    if (normalized && !isValidHttpUrl(normalized)) {
+        return {
+            ok: false,
+            code: "invalid",
+            message: "请输入有效的 http/https 图片 URL",
+        };
     }
 
-    removeStoredValue(CUSTOM_BG_URL_KEY);
-    applyBackgroundByUrl(BG_URL);
+    return updatePanelSettings({ backgroundUrl: normalized });
 };
 
-export const initBackgroundImage = () => {
-    applyBackgroundByUrl(getCurrentBackgroundUrl(), "high");
+export const initBackgroundImage = (): void => {
+    applyBackgroundSetting(getSavedBackgroundUrl(), "high");
 };

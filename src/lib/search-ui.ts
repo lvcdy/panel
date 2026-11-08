@@ -75,6 +75,8 @@ export const setupInputHandlers = (
         if (e.key === "Enter") onSearch();
         if (e.key === "Escape") {
             input.value = "";
+            // 取消可能仍在防抖队列中的旧关键词。
+            debouncedFilter("");
             showAllIcons();
             input.blur();
         }

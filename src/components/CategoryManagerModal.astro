@@ -1,0 +1,55 @@
+<div
+  id="category-manager-modal"
+  class="panel-modal hidden"
+  aria-hidden="true"
+>
+  <div id="category-manager-overlay" class="panel-modal-overlay"></div>
+  <div
+    class="panel-modal-card panel-manager-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="category-manager-title"
+  >
+    <div class="panel-modal-header">
+      <h3 id="category-manager-title" class="panel-modal-title">分类管理</h3>
+      <button
+        id="category-manager-close"
+        type="button"
+        class="panel-modal-close"
+        aria-label="关闭分类管理"
+      >
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="category-manager-body">
+      <div
+        id="category-manager-list"
+        class="category-manager-list"
+        role="list"
+      ></div>
+      <div id="category-manager-empty" class="category-manager-empty hidden">
+        <i class="fas fa-folder-open" aria-hidden="true"></i>
+        <p>还没有分类</p>
+        <p class="form-hint">点击下方“新增分类”开始。</p>
+      </div>
+    </div>
+
+    <div class="panel-modal-actions category-manager-actions">
+      <button
+        id="category-manager-add"
+        type="button"
+        class="panel-btn panel-btn-primary"
+      >
+        新增分类
+      </button>
+      <button
+        id="category-manager-done"
+        type="button"
+        class="panel-btn panel-btn-secondary"
+      >
+        关闭
+      </button>
+    </div>
+  </div>
+</div>

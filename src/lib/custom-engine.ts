@@ -1,56 +1,45 @@
+import { getPanelSettings, updatePanelSettings } from "./panel/store";
+import type {
+    PanelConfig,
+    PanelCustomSearchEngine,
+    StoreResult,
+} from "./panel/types";
 import { isValidHttpUrl } from "./utils";
-import {
-    getStoredJson,
-    removeStoredValue,
-    setStoredJson,
-} from "./storage";
 
-export const CUSTOM_SEARCH_ENGINE_KEY = "custom-search-engine" as const;
-
-export interface CustomSearchEngineConfig {
-    name: string;
-    url: string;
-    placeholder: string;
-}
+export type CustomSearchEngineConfig = PanelCustomSearchEngine;
 
 const normalize = (value: string) => value.trim();
 
-export const isValidSearchEngineUrl = (value: string): boolean => {
-    return isValidHttpUrl(value);
+export const isValidSearchEngineUrl = (value: string): boolean =>
+    isValidHttpUrl(value);
+
+export const getSavedCustomSearchEngine = (): CustomSearchEngineConfig | null =>
+    getPanelSettings().customSearchEngine;
+
+export const setCustomSearchEngine = (
+    config: CustomSearchEngineConfig,
+): StoreResult<PanelConfig> => {
+    const url = normalize(config.url);
+
+    if (!url || !isValidSearchEngineUrl(url)) {
+        return {
+            ok: false,
+            code: "invalid",
+            message: "请输入有效的 http/https 搜索引擎 URL",
+        };
+    }
+
+    return updatePanelSettings({
+        customSearchEngine: {
+            name: normalize(config.name) || "自定义",
+            url,
+            placeholder: normalize(config.placeholder) || "🔎 输入关键词开始搜索...",
+        },
+    });
 };
 
-export const getSavedCustomSearchEngine = (): CustomSearchEngineConfig | null => {
-    const parsed = getStoredJson<Partial<CustomSearchEngineConfig>>(
-        CUSTOM_SEARCH_ENGINE_KEY,
-    );
-    if (!parsed) return null;
-
-    const name = normalize(parsed.name || "");
-    const url = normalize(parsed.url || "");
-    const placeholder = normalize(parsed.placeholder || "");
-
-    if (!url || !isValidSearchEngineUrl(url)) return null;
-
-    return {
-        name: name || "自定义",
-        url,
-        placeholder: placeholder || "🔎 输入关键词开始搜索...",
-    };
-};
-
-export const setCustomSearchEngine = (config: CustomSearchEngineConfig) => {
-    const normalized: CustomSearchEngineConfig = {
-        name: normalize(config.name) || "自定义",
-        url: normalize(config.url),
-        placeholder: normalize(config.placeholder) || "🔎 输入关键词开始搜索...",
-    };
-
-    setStoredJson(CUSTOM_SEARCH_ENGINE_KEY, normalized);
-};
-
-export const clearCustomSearchEngine = () => {
-    removeStoredValue(CUSTOM_SEARCH_ENGINE_KEY);
-};
+export const clearCustomSearchEngine = (): StoreResult<PanelConfig> =>
+    updatePanelSettings({ customSearchEngine: null });
 
 export const buildSearchUrl = (urlTemplate: string, query: string) => {
     const encoded = encodeURIComponent(query);

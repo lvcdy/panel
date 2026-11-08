@@ -1,0 +1,44 @@
+<div
+  id="panel-confirm-modal"
+  class="panel-modal hidden"
+  aria-hidden="true"
+>
+  <div id="panel-confirm-overlay" class="panel-modal-overlay"></div>
+  <div
+    class="panel-modal-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="panel-confirm-title"
+    aria-describedby="panel-confirm-message"
+  >
+    <div class="panel-modal-header">
+      <h3 id="panel-confirm-title" class="panel-modal-title">确认操作</h3>
+      <button
+        id="panel-confirm-close"
+        type="button"
+        class="panel-modal-close"
+        aria-label="关闭确认弹窗"
+      >
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <p id="panel-confirm-message" class="panel-modal-message"></p>
+    <div id="panel-confirm-details" class="panel-confirm-details hidden"></div>
+    <div class="panel-modal-actions">
+      <button
+        id="panel-confirm-cancel"
+        type="button"
+        class="panel-btn panel-btn-secondary"
+      >
+        取消
+      </button>
+      <button
+        id="panel-confirm-accept"
+        type="button"
+        class="panel-btn panel-btn-primary"
+      >
+        确认
+      </button>
+    </div>
+  </div>
+</div>

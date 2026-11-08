@@ -1,0 +1,250 @@
+<div id="site-editor-modal" class="panel-modal hidden" aria-hidden="true">
+  <div id="site-editor-overlay" class="panel-modal-overlay"></div>
+  <div
+    class="panel-modal-card panel-form-modal-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="site-editor-title"
+  >
+    <div class="panel-modal-header">
+      <h3 id="site-editor-title" class="panel-modal-title">添加网站</h3>
+      <button
+        id="site-editor-close"
+        type="button"
+        class="panel-modal-close"
+        aria-label="关闭网站编辑弹窗"
+      >
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <form id="site-editor-form" class="site-editor-form" novalidate>
+      <div class="site-form-body">
+        <input id="site-editor-id" type="hidden" value="" />
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="site-name-input" class="form-label">
+              网站名称 <span class="required-mark">*</span>
+            </label>
+            <input
+              id="site-name-input"
+              type="text"
+              class="form-input"
+              maxlength="100"
+              autocomplete="off"
+              required
+            />
+            <p id="site-name-error" class="form-error" aria-live="polite"></p>
+          </div>
+
+          <div class="form-field">
+            <label for="site-category-select" class="form-label">
+              所属分类 <span class="required-mark">*</span>
+            </label>
+            <select
+              id="site-category-select"
+              class="form-input form-select"
+              required
+            ></select>
+            <p id="site-category-error" class="form-error" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="site-url-input" class="form-label">
+            网站 URL <span class="required-mark">*</span>
+          </label>
+          <input
+            id="site-url-input"
+            type="url"
+            class="form-input"
+            maxlength="2048"
+            placeholder="https://example.com"
+            autocomplete="off"
+            required
+          />
+          <p id="site-url-error" class="form-error" aria-live="polite"></p>
+        </div>
+
+        <div class="form-field">
+          <label for="site-description-input" class="form-label">网站描述</label>
+          <textarea
+            id="site-description-input"
+            class="form-input form-textarea"
+            rows="3"
+            maxlength="500"
+            placeholder="可选，用于搜索和卡片提示"
+          ></textarea>
+          <p id="site-description-error" class="form-error" aria-live="polite"></p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="site-icon-input" class="form-label">网站图标类名</label>
+            <input
+              id="site-icon-input"
+              type="text"
+              class="form-input"
+              maxlength="100"
+              placeholder="fas fa-globe"
+              autocomplete="off"
+            />
+            <p class="form-hint">
+              Font Awesome 类名，例如 fas fa-globe、fab fa-github。
+            </p>
+            <p id="site-icon-error" class="form-error" aria-live="polite"></p>
+          </div>
+
+          <div class="form-field">
+            <label for="site-color-input" class="form-label">图标颜色</label>
+            <div class="form-color-row">
+              <input
+                id="site-color-input"
+                type="color"
+                class="form-color-picker"
+                value="#ffffff"
+                aria-label="选择图标颜色"
+              />
+              <input
+                id="site-color-text"
+                type="text"
+                class="form-input form-color-text"
+                value="#ffffff"
+                maxlength="9"
+                aria-label="图标颜色十六进制值"
+                autocomplete="off"
+              />
+            </div>
+            <p id="site-color-error" class="form-error" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <span class="form-label">图标预览</span>
+          <div class="site-icon-preview-row">
+            <div id="site-icon-preview" class="site-icon-preview">
+              <img
+                id="site-icon-preview-img"
+                class="site-icon-preview-img hidden"
+                alt=""
+              />
+              <i id="site-icon-preview-i" class="fas fa-link" aria-hidden="true"></i>
+            </div>
+            <p class="form-hint">
+              根据“自动获取网站图标”开关显示 favicon 或 Font Awesome 图标。
+            </p>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="site-tags-input" class="form-label">标签</label>
+          <input
+            id="site-tags-input"
+            type="text"
+            class="form-input"
+            maxlength="1000"
+            placeholder="开发, 工具, 文档"
+            autocomplete="off"
+          />
+          <p class="form-hint">用逗号分隔，最多 20 个，单个标签不超过 32 个字符。</p>
+          <p id="site-tags-error" class="form-error" aria-live="polite"></p>
+        </div>
+
+        <div class="form-switch-grid">
+          <label class="form-switch" for="site-favorite-input">
+            <span class="form-switch-text">
+              <span class="form-switch-title">收藏</span>
+              <span class="form-switch-hint">在卡片名称旁显示星标</span>
+            </span>
+            <input
+              id="site-favorite-input"
+              type="checkbox"
+              class="form-switch-input"
+            />
+            <span class="form-switch-track" aria-hidden="true"></span>
+          </label>
+
+          <label class="form-switch" for="site-visible-input">
+            <span class="form-switch-text">
+              <span class="form-switch-title">显示网站</span>
+              <span class="form-switch-hint">关闭后仅在编辑模式可见</span>
+            </span>
+            <input
+              id="site-visible-input"
+              type="checkbox"
+              class="form-switch-input"
+              checked
+            />
+            <span class="form-switch-track" aria-hidden="true"></span>
+          </label>
+
+          <label class="form-switch" for="site-new-tab-input">
+            <span class="form-switch-text">
+              <span class="form-switch-title">新窗口打开</span>
+              <span class="form-switch-hint">关闭则在当前窗口打开</span>
+            </span>
+            <input
+              id="site-new-tab-input"
+              type="checkbox"
+              class="form-switch-input"
+              checked
+            />
+            <span class="form-switch-track" aria-hidden="true"></span>
+          </label>
+
+          <label class="form-switch" for="site-use-icon-input">
+            <span class="form-switch-text">
+              <span class="form-switch-title">自动获取网站图标</span>
+              <span class="form-switch-hint">失败时使用上方图标类名</span>
+            </span>
+            <input
+              id="site-use-icon-input"
+              type="checkbox"
+              class="form-switch-input"
+              checked
+            />
+            <span class="form-switch-track" aria-hidden="true"></span>
+          </label>
+
+          <label class="form-switch" for="site-status-input">
+            <span class="form-switch-text">
+              <span class="form-switch-title">显示状态徽章</span>
+              <span class="form-switch-hint">关闭后不请求网站状态</span>
+            </span>
+            <input
+              id="site-status-input"
+              type="checkbox"
+              class="form-switch-input"
+              checked
+            />
+            <span class="form-switch-track" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <p
+          id="site-form-error"
+          class="form-error form-error-general"
+          role="alert"
+        ></p>
+      </div>
+
+      <div class="panel-modal-actions site-form-actions">
+        <button
+          id="site-editor-cancel"
+          type="button"
+          class="panel-btn panel-btn-secondary"
+        >
+          取消
+        </button>
+        <button
+          id="site-editor-save"
+          type="submit"
+          class="panel-btn panel-btn-primary"
+        >
+          保存
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

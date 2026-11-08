@@ -1,19 +1,9 @@
-import {
-    getSavedBackgroundUrl,
-    setCustomBackgroundUrl,
-} from "./background";
-import { isValidHttpUrl } from "./utils";
-import {
-    fetchHitokoto,
-    getSavedHitokotoApi,
-    setCustomHitokotoApi,
-} from "./hitokoto";
-import { getStoredText, setStoredText } from "./storage";
-
-const STORAGE_KEYS = {
-    blur: "card-glass-blur-value",
-    saturate: "card-glass-saturate-value",
-} as const;
+import { setCustomBackgroundUrl } from "./background";
+import { fetchHitokoto, setCustomHitokotoApi } from "./hitokoto";
+import { isConfirmDialogOpen } from "./panel/confirm";
+import { getPanelSettings, updatePanelSettings } from "./panel/store";
+import type { GlassSettings, PanelSettings } from "./panel/types";
+import { showToast } from "./toast";
 
 const SETTING_RANGES = {
     blur: { min: 0, max: 100 },
@@ -30,6 +20,50 @@ const setValueLabel = (
     }
 };
 
+export const applyGlassSettings = (glass: GlassSettings): void => {
+    document.documentElement.style.setProperty(
+        "--card-glass-blur-value",
+        `${glass.blur}px`,
+    );
+    document.documentElement.style.setProperty(
+        "--card-glass-saturate-value",
+        `${glass.saturate}%`,
+    );
+};
+
+export const syncGlassControls = (glass: GlassSettings): void => {
+    const blurSlider = document.getElementById("blur-slider") as HTMLInputElement | null;
+    const saturateSlider = document.getElementById(
+        "saturate-slider",
+    ) as HTMLInputElement | null;
+
+    if (blurSlider) blurSlider.value = String(glass.blur);
+    if (saturateSlider) saturateSlider.value = String(glass.saturate);
+
+    setValueLabel(glass.blur, "px", document.getElementById("blur-value"));
+    setValueLabel(
+        glass.saturate,
+        "%",
+        document.getElementById("saturate-value"),
+    );
+};
+
+export const syncSettingsControls = (settings: PanelSettings): void => {
+    syncGlassControls(settings.glass);
+
+    const bgUrlInput = document.getElementById("bg-url-input") as HTMLInputElement | null;
+    if (bgUrlInput && document.activeElement !== bgUrlInput) {
+        bgUrlInput.value = settings.backgroundUrl;
+    }
+
+    const hitokotoApiInput = document.getElementById(
+        "hitokoto-api-input",
+    ) as HTMLInputElement | null;
+    if (hitokotoApiInput && document.activeElement !== hitokotoApiInput) {
+        hitokotoApiInput.value = settings.hitokotoApi;
+    }
+};
+
 const createPanelState = () => {
     const toggleBtn = document.getElementById("settings-toggle");
     const closeBtn = document.getElementById("settings-close");
@@ -37,12 +71,16 @@ const createPanelState = () => {
     const overlay = document.getElementById("settings-overlay");
     const blurSlider = document.getElementById("blur-slider") as HTMLInputElement | null;
     const blurValue = document.getElementById("blur-value");
-    const saturateSlider = document.getElementById("saturate-slider") as HTMLInputElement | null;
+    const saturateSlider = document.getElementById(
+        "saturate-slider",
+    ) as HTMLInputElement | null;
     const saturateValue = document.getElementById("saturate-value");
     const bgUrlInput = document.getElementById("bg-url-input") as HTMLInputElement | null;
     const bgApplyBtn = document.getElementById("bg-url-apply");
     const bgResetBtn = document.getElementById("bg-url-reset");
-    const hitokotoApiInput = document.getElementById("hitokoto-api-input") as HTMLInputElement | null;
+    const hitokotoApiInput = document.getElementById(
+        "hitokoto-api-input",
+    ) as HTMLInputElement | null;
     const hitokotoApplyBtn = document.getElementById("hitokoto-api-apply");
     const hitokotoResetBtn = document.getElementById("hitokoto-api-reset");
     const searchInput = document.getElementById("searchInput") as HTMLInputElement | null;
@@ -80,26 +118,15 @@ const createPanelState = () => {
     };
 };
 
-const syncBlurSetting = (value: number, blurValue: HTMLElement | null) => {
-    document.documentElement.style.setProperty("--card-glass-blur-value", `${value}px`);
-    setValueLabel(value, "px", blurValue);
-    setStoredText(STORAGE_KEYS.blur, String(value));
-};
-
-const syncSaturateSetting = (value: number, saturateValue: HTMLElement | null) => {
-    document.documentElement.style.setProperty("--card-glass-saturate-value", `${value}%`);
-    setValueLabel(value, "%", saturateValue);
-    setStoredText(STORAGE_KEYS.saturate, String(value));
-};
-
-const getStoredRangeValue = (
-    key: string,
+const readSliderValue = (
+    input: HTMLInputElement,
+    fallback: number,
     range: { readonly min: number; readonly max: number },
-) => {
-    const value = Number.parseInt(getStoredText(key), 10);
+): number => {
+    const value = Number.parseInt(input.value, 10);
     return Number.isInteger(value) && value >= range.min && value <= range.max
         ? value
-        : null;
+        : fallback;
 };
 
 const openPanel = (panel: HTMLElement, overlay: HTMLElement, toggleBtn: HTMLElement) => {
@@ -119,13 +146,18 @@ const closePanel = (panel: HTMLElement, overlay: HTMLElement, toggleBtn: HTMLEle
 };
 
 const togglePanel = (panel: HTMLElement, overlay: HTMLElement, toggleBtn: HTMLElement) => {
-    const isActive = panel.classList.contains("active");
-    if (isActive) {
+    if (panel.classList.contains("active")) {
         closePanel(panel, overlay, toggleBtn);
         return;
     }
 
     openPanel(panel, overlay, toggleBtn);
+};
+
+export const closeSettingsPanel = (): void => {
+    const state = createPanelState();
+    if (!state) return;
+    closePanel(state.panel, state.overlay, state.toggleBtn);
 };
 
 export const initSettings = () => {
@@ -150,31 +182,40 @@ export const initSettings = () => {
         searchInput,
     } = state;
 
-    const savedBlur = getStoredRangeValue(STORAGE_KEYS.blur, SETTING_RANGES.blur);
-    const savedSaturate = getStoredRangeValue(
-        STORAGE_KEYS.saturate,
-        SETTING_RANGES.saturate,
-    );
+    const initialSettings = getPanelSettings();
+    syncSettingsControls(initialSettings);
+    applyGlassSettings(initialSettings.glass);
 
-    if (savedBlur !== null) {
-        blurSlider.value = String(savedBlur);
-        syncBlurSetting(savedBlur, blurValue);
-    }
+    const readGlassFromControls = (): GlassSettings => {
+        const stored = getPanelSettings().glass;
+        return {
+            blur: readSliderValue(blurSlider, stored.blur, SETTING_RANGES.blur),
+            saturate: readSliderValue(
+                saturateSlider,
+                stored.saturate,
+                SETTING_RANGES.saturate,
+            ),
+        };
+    };
 
-    if (savedSaturate !== null) {
-        saturateSlider.value = String(savedSaturate);
-        syncSaturateSetting(savedSaturate, saturateValue);
-    }
+    const previewGlass = () => {
+        const glass = readGlassFromControls();
+        applyGlassSettings(glass);
+        setValueLabel(glass.blur, "px", blurValue);
+        setValueLabel(glass.saturate, "%", saturateValue);
+    };
 
-    const savedBgUrl = getSavedBackgroundUrl();
-    if (savedBgUrl) {
-        bgUrlInput.value = savedBgUrl;
-    }
+    const commitGlass = () => {
+        const glass = readGlassFromControls();
+        const result = updatePanelSettings({ glass });
 
-    const savedHitokotoApi = getSavedHitokotoApi();
-    if (savedHitokotoApi) {
-        hitokotoApiInput.value = savedHitokotoApi;
-    }
+        if (result.ok) return;
+
+        const stored = getPanelSettings().glass;
+        syncGlassControls(stored);
+        applyGlassSettings(stored);
+        showToast(result.message, "error");
+    };
 
     toggleBtn.addEventListener("click", () => {
         togglePanel(panel, overlay, toggleBtn);
@@ -188,34 +229,33 @@ export const initSettings = () => {
         closePanel(panel, overlay, toggleBtn);
     });
 
-    blurSlider.addEventListener("input", (event) => {
-        const value = Number.parseInt((event.target as HTMLInputElement).value, 10);
-        syncBlurSetting(value, blurValue);
-    });
-
-    saturateSlider.addEventListener("input", (event) => {
-        const value = Number.parseInt((event.target as HTMLInputElement).value, 10);
-        syncSaturateSetting(value, saturateValue);
-    });
+    blurSlider.addEventListener("input", previewGlass);
+    saturateSlider.addEventListener("input", previewGlass);
+    blurSlider.addEventListener("change", commitGlass);
+    saturateSlider.addEventListener("change", commitGlass);
 
     bgApplyBtn?.addEventListener("click", () => {
         const value = bgUrlInput.value.trim();
-        if (!value) {
-            setCustomBackgroundUrl("");
+        const result = setCustomBackgroundUrl(value);
+
+        if (!result.ok) {
+            showToast(result.message, "error");
+            bgUrlInput.value = getPanelSettings().backgroundUrl;
             return;
         }
 
-        if (!isValidHttpUrl(value)) {
-            window.alert("请输入有效的 http/https 图片 URL");
-            return;
-        }
-
-        setCustomBackgroundUrl(value);
+        showToast(value ? "背景已更新" : "背景已恢复默认", "success");
     });
 
     bgResetBtn?.addEventListener("click", () => {
-        bgUrlInput.value = "";
-        setCustomBackgroundUrl("");
+        const result = setCustomBackgroundUrl("");
+
+        if (!result.ok) {
+            showToast(result.message, "error");
+            return;
+        }
+
+        showToast("背景已恢复默认", "success");
     });
 
     bgUrlInput.addEventListener("keydown", (event) => {
@@ -225,27 +265,32 @@ export const initSettings = () => {
         }
     });
 
-    hitokotoApplyBtn?.addEventListener("click", async () => {
+    hitokotoApplyBtn?.addEventListener("click", () => {
         const value = hitokotoApiInput.value.trim();
-        if (!value) {
-            setCustomHitokotoApi("");
-            await fetchHitokoto(searchInput);
+        const unchanged = value === getPanelSettings().hitokotoApi;
+        const result = setCustomHitokotoApi(value);
+
+        if (!result.ok) {
+            showToast(result.message, "error");
+            hitokotoApiInput.value = getPanelSettings().hitokotoApi;
             return;
         }
 
-        if (!isValidHttpUrl(value)) {
-            window.alert("请输入有效的 http/https 一言 API URL");
-            return;
-        }
-
-        setCustomHitokotoApi(value);
-        await fetchHitokoto(searchInput);
+        showToast(value ? "一言 API 已更新" : "一言 API 已恢复默认", "success");
+        if (unchanged) void fetchHitokoto(searchInput);
     });
 
-    hitokotoResetBtn?.addEventListener("click", async () => {
-        hitokotoApiInput.value = "";
-        setCustomHitokotoApi("");
-        await fetchHitokoto(searchInput);
+    hitokotoResetBtn?.addEventListener("click", () => {
+        const unchanged = getPanelSettings().hitokotoApi === "";
+        const result = setCustomHitokotoApi("");
+
+        if (!result.ok) {
+            showToast(result.message, "error");
+            return;
+        }
+
+        showToast("一言 API 已恢复默认", "success");
+        if (unchanged) void fetchHitokoto(searchInput);
     });
 
     hitokotoApiInput.addEventListener("keydown", (event) => {
@@ -257,6 +302,8 @@ export const initSettings = () => {
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && panel.classList.contains("active")) {
+            // 确认弹窗打开时，Esc 只关闭弹窗，不关闭设置面板。
+            if (isConfirmDialogOpen()) return;
             closePanel(panel, overlay, toggleBtn);
         }
     });
