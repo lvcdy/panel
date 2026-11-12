@@ -1,4 +1,5 @@
 import { corsHeaders, isCrossOriginDenied } from "./cors.js";
+import { fetchWithTimeout } from "./fetch.js";
 import { isValidStatusDomain } from "./ip.js";
 import { checkRateLimit } from "./rate-limit.js";
 
@@ -123,10 +124,12 @@ export const handleSiteStatus = async (
     const upstreamUrl = new URL(STATUS_API_URL);
     upstreamUrl.searchParams.set("domain", domain);
 
-    const upstream = await fetchImpl(upstreamUrl.toString(), {
-      headers: { accept: "application/json" },
-      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
-    });
+    const upstream = await fetchWithTimeout(
+      fetchImpl,
+      upstreamUrl.toString(),
+      { headers: { accept: "application/json" } },
+      UPSTREAM_TIMEOUT_MS,
+    );
 
     if (!upstream.ok) {
       return jsonResponse(

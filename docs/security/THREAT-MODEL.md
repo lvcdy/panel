@@ -30,7 +30,7 @@
 | **T**ampering | 篡改 `panel-config` / 备份 JSON 注入恶意 HTML/URL | 导入时校验 `app/kind/formatVersion/大小/JSON schema`；渲染全部转义；URL 仅 http(s)、图标类名白名单（`src/lib/panel/validate.ts`、`render.ts`） | 用户可修改自己的配置：按设计预期，不视为越权 |
 | **R**epudiation | 无法证明谁改过配置 | 配置仅存在用户浏览器，无多用户/无服务端写入；变更由用户本地操作触发 | 无服务端审计需求 |
 | **I**nformation disclosure | 通过 API 获取访客 IP；错误响应泄露堆栈/内部信息 | IP 仅回传调用方自身；错误统一 `{error}` 无堆栈；`no-store`；CORS 默认拒绝；安全响应头（CSP/HSTS/Referrer-Policy） | IP9 上游会看到访客公网 IP：已在 README 披露 |
-| **D**enial of service | 滥用代理接口刷上游/耗尽配额 | 每路由固定窗口限速 + 平台 WAF 建议；上游请求 1.5s/2.5s 超时；客户端并发 4 + 2s/5s 超时；静态资源长缓存 | 边缘 isolate 内存限速为尽力而为，需平台 WAF 兜底 |
+| **D**enial of service | 滥用代理接口刷上游/耗尽配额 | 每路由固定窗口限速 + 平台 WAF 建议；上游请求 3s/4.5s 超时（AbortController，不用部分运行时缺失的 `AbortSignal.timeout`）；客户端并发 4 + 5s/7s 超时；ip9 配额（60 次/分钟/IP）靠内存缓存与负缓存兜底；静态资源长缓存 | 边缘 isolate 内存限速为尽力而为，需平台 WAF 兜底 |
 | **E**levation of privilege | 通过接口越权访问他人数据/执行写操作 | API 只支持 GET，且无用户体系、无服务端数据写入；`OPTIONS` 仅预检；未登记方法 405 | 无权限模型可被提升（N/A） |
 | 供应链 | 依赖投毒、构建产物被替换 | 锁文件 + `--frozen-lockfile`、`pnpm audit --audit-level=high`、SBOM、cosign 签名、GitHub provenance、仅官方 npm registry | 上游 npm 账号被攻破（由签名/SBOM 提供可追溯性） |
 | 客户端 | XSS / 点击劫持 / 信息泄露 | 全量转义 + `textContent`；无 `eval`/`innerHTML` 拼接用户输入；CSP + `X-Frame-Options: DENY` | CSP 目前允许 `'unsafe-inline'`（Astro 内联防闪脚本），后续以 hash/nonce 收紧 |

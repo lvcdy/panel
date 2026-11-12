@@ -2,12 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   handleNetworkInfo,
+  resetIp9Cache,
 } from "../shared/api/network-info.js";
 import {
   handleSiteStatus,
   sanitizeSiteStatusPayload,
 } from "../shared/api/site-status.js";
 import { corsHeaders, isCrossOriginDenied } from "../shared/api/cors.js";
+import { fetchWithTimeout } from "../shared/api/fetch.js";
 import { isValidStatusDomain, normalizePublicIp } from "../shared/api/ip.js";
 import {
   checkRateLimit,
@@ -167,6 +169,7 @@ test("同源请求即使带 Origin 头也放行（不依赖跨源白名单）", 
 });
 
 test("EdgeOne：request.cf 空兼容对象不再误判为 Cloudflare", async () => {
+  resetIp9Cache();
   const request = withPlatform(makeRequest("/api/network-info"), "cf", {});
   withPlatform(request, "eo", {
     clientIp: "1.1.1.1",
@@ -176,6 +179,7 @@ test("EdgeOne：request.cf 空兼容对象不再误判为 Cloudflare", async () 
   const upstream = async () =>
     new Response(
       JSON.stringify({
+        ret: 200,
         data: { isp: "Example ISP", country: "中国", prov: "广东", city: "深圳" },
       }),
       { status: 200, headers: { "content-type": "application/json" } },
@@ -193,6 +197,7 @@ test("EdgeOne：request.cf 空兼容对象不再误判为 Cloudflare", async () 
 });
 
 test("EdgeOne：仅 eo-connecting-ip 头时也能识别", async () => {
+  resetIp9Cache();
   const request = makeRequest("/api/network-info", {
     headers: { "eo-connecting-ip": "1.1.1.1" },
   });
@@ -242,4 +247,94 @@ test("只有空 request.cf、没有平台头时返回 unknown（回归：曾误�
   assert.equal(payload.platform, "unknown");
   assert.equal(payload.clientIp, null);
   assert.deepEqual(payload.availableFields, []);
+});
+
+test("fetchWithTimeout：正常返回，并在超时后通过 AbortController 中断", async () => {
+  const ok = await fetchWithTimeout(
+    async () => new Response("ok"),
+    "https://example.com/",
+    {},
+    1_000,
+  );
+  assert.equal(await ok.text(), "ok");
+
+  const hangingFetch = (_url, init) =>
+    new Promise((_resolve, reject) => {
+      init.signal.addEventListener("abort", () => {
+        reject(new Error("aborted"));
+      });
+    });
+
+  await assert.rejects(
+    fetchWithTimeout(hangingFetch, "https://example.com/", {}, 20),
+    /aborted/,
+  );
+});
+
+test("ip9：校验 ret=200 并解析 VIP 字段 ip_asn", async () => {
+  resetIp9Cache();
+  const request = withPlatform(makeRequest("/api/network-info"), "cf", {});
+  withPlatform(request, "eo", { clientIp: "8.8.4.4" });
+
+  const upstream = async () =>
+    new Response(
+      JSON.stringify({
+        ret: 200,
+        data: {
+          ip: "8.8.4.4",
+          isp: "中国移动",
+          country: "中国",
+          prov: "辽宁",
+          city: "本溪",
+          ip_asn: "AS17429",
+        },
+      }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    );
+
+  const payload = await (await handleNetworkInfo(request, upstream)).json();
+  assert.equal(payload.organization, "中国移动");
+  assert.equal(payload.asn, 17429);
+});
+
+test("ip9：ret 非 200 时不采信返回数据", async () => {
+  resetIp9Cache();
+  const request = withPlatform(makeRequest("/api/network-info"), "cf", {});
+  withPlatform(request, "eo", { clientIp: "9.9.9.9" });
+
+  const upstream = async () =>
+    new Response(JSON.stringify({ ret: 400, data: [] }), { status: 200 });
+
+  const payload = await (await handleNetworkInfo(request, upstream)).json();
+  assert.equal(payload.organization, null);
+  assert.equal(payload.asn, null);
+});
+
+test("ip9：成功结果进入缓存，后续请求不再打上游", async () => {
+  resetIp9Cache();
+  const makeOne = () => {
+    const request = withPlatform(makeRequest("/api/network-info"), "cf", {});
+    return withPlatform(request, "eo", { clientIp: "208.67.222.222" });
+  };
+
+  let calls = 0;
+  const upstream = async () => {
+    calls += 1;
+    return new Response(
+      JSON.stringify({
+        ret: 200,
+        data: { isp: "Cached ISP", country: "中国", prov: "北京", city: "北京" },
+      }),
+      { status: 200 },
+    );
+  };
+
+  await handleNetworkInfo(makeOne(), upstream);
+  const second = await handleNetworkInfo(makeOne(), async () => {
+    throw new Error("should not be called");
+  });
+
+  const payload = await second.json();
+  assert.equal(calls, 1);
+  assert.equal(payload.organization, "Cached ISP");
 });

@@ -165,6 +165,7 @@ Cloudflare 的 `cf-connecting-ip` + `request.cf`、EdgeOne 的 `request.eo.clien
 |------|----------|
 | 访客 IP | 仅在请求生命周期内用于查 ISP；不持久化、不入日志、响应仅返回调用方自身 |
 | 上游返回体 | 白名单字段过滤后返回；非法字段丢弃（`sanitizeSiteStatusPayload`） |
+| 运营商/ASN 查询结果（ip9） | 仅内存缓存（成功 10 分钟、失败负缓存 60 秒，最多 500 条），不落盘、不写日志；官方免费接口限每个客户端 IP 60 次/分钟，边缘共享出口靠缓存避免打满配额 |
 | 用户配置 | 仅存浏览器本地；导出文件由用户自行保管；备份导入限制大小与 schema |
 | 备份文件 | 服务端不接收；导入端校验 app/kind/formatVersion/大小/JSON 结构 |
 

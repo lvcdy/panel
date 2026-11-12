@@ -1,7 +1,8 @@
 import { NETWORK_INFO_URL } from "./config";
 import { scheduleInit } from "./time";
 
-const NETWORK_INFO_TIMEOUT = 2_500;
+// 服务端解析 IP 后可能还需查询 ip9 补充运营商（≤3s），客户端留出余量。
+const NETWORK_INFO_TIMEOUT = 5_000;
 
 type NetworkPlatform = "cloudflare" | "edgeone" | "unknown";
 

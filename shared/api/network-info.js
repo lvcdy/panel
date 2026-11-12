@@ -1,9 +1,15 @@
 import { corsHeaders, isCrossOriginDenied } from "./cors.js";
+import { fetchWithTimeout } from "./fetch.js";
 import { normalizePublicIp, sanitizeText } from "./ip.js";
 import { checkRateLimit } from "./rate-limit.js";
 
 const IP9_API_URL = "https://ip9.com.cn/get";
-const IP_LOOKUP_TIMEOUT_MS = 1_500;
+// ip9 文档说明：免费接口每个客户端 IP 限 60 次/分钟。边缘函数出口 IP 是
+// 共享的，因此加结果缓存并对失败做短负缓存，避免把共享配额打满。
+const IP_LOOKUP_TIMEOUT_MS = 3_000;
+const IP9_CACHE_TTL_MS = 10 * 60 * 1000;
+const IP9_FAILURE_TTL_MS = 60 * 1000;
+const IP9_CACHE_MAX = 500;
 
 const baseHeaders = (request, env) => ({
   "content-type": "application/json; charset=utf-8",
@@ -144,26 +150,75 @@ const getEdgeOneFields = (request) => {
   };
 };
 
+const ip9Cache = new Map();
+
+/** 仅用于测试：清空 ip9 缓存。 */
+export const resetIp9Cache = () => {
+  ip9Cache.clear();
+};
+
+const readCachedIp9 = (clientIp) => {
+  const entry = ip9Cache.get(clientIp);
+  if (!entry) return undefined;
+
+  const ttl = entry.value ? IP9_CACHE_TTL_MS : IP9_FAILURE_TTL_MS;
+  if (Date.now() - entry.timestamp > ttl) {
+    ip9Cache.delete(clientIp);
+    return undefined;
+  }
+
+  return entry.value;
+};
+
+const writeCachedIp9 = (clientIp, value) => {
+  if (ip9Cache.size >= IP9_CACHE_MAX) {
+    const oldest = ip9Cache.keys().next().value;
+    if (oldest !== undefined) ip9Cache.delete(oldest);
+  }
+
+  ip9Cache.set(clientIp, { value, timestamp: Date.now() });
+};
+
+/** ip9 返回的 ASN 形如 "AS17429"（VIP 字段），非 VIP 时不存在。 */
+const parseAsn = (value) => {
+  const matched =
+    typeof value === "string" ? /^AS(\d{1,10})$/i.exec(value.trim()) : null;
+  const number = matched ? Number.parseInt(matched[1], 10) : NaN;
+
+  return Number.isInteger(number) && number > 0 && number < 2 ** 32
+    ? number
+    : null;
+};
+
 const lookupIp9 = async (clientIp, fetchImpl) => {
+  const cached = readCachedIp9(clientIp);
+  if (cached !== undefined) return cached;
+
   try {
     const url = new URL(IP9_API_URL);
     url.searchParams.set("ip", clientIp);
 
-    const response = await fetchImpl(url.toString(), {
-      headers: { accept: "application/json" },
-      signal: AbortSignal.timeout(IP_LOOKUP_TIMEOUT_MS),
-    });
+    const response = await fetchWithTimeout(
+      fetchImpl,
+      url.toString(),
+      { headers: { accept: "application/json" } },
+      IP_LOOKUP_TIMEOUT_MS,
+    );
 
     if (!response.ok) return null;
 
     const payload = await response.json();
     if (!payload || typeof payload !== "object") return null;
 
-    const data = payload.data;
-    if (!data || typeof data !== "object") return null;
+    // 文档约定 ret=200 正常；ret=400 表示 IP 非法，data 为空数组。
+    if (Number(payload.ret) !== 200) return null;
 
-    return {
+    const data = payload.data;
+    if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+
+    const result = {
       organization: sanitizeText(data.isp, 120),
+      asn: parseAsn(data.ip_asn),
       location: buildLocation([
         sanitizeText(data.country, 40),
         sanitizeText(data.prov, 60),
@@ -171,7 +226,12 @@ const lookupIp9 = async (clientIp, fetchImpl) => {
         sanitizeText(data.area, 60),
       ]),
     };
+
+    writeCachedIp9(clientIp, result);
+    return result;
   } catch {
+    // 失败也做短负缓存，避免共享出口 IP 被限速时持续重试。
+    writeCachedIp9(clientIp, null);
     return null;
   }
 };
@@ -222,12 +282,12 @@ export const handleNetworkInfo = async (
       const edgeone = getEdgeOneFields(request);
 
       if (edgeone?.clientIp) {
-        // 边缘函数拿到的 clientIp/geo 已由平台注入；ip9 仅用于补充运营商信息。
+        // 边缘函数拿到的 clientIp/geo 已由平台注入；ip9 仅用于补充运营商/ASN。
         const ip9 = await lookupIp9(edgeone.clientIp, fetchImpl);
         info = {
           platform: "edgeone",
           clientIp: edgeone.clientIp,
-          asn: null,
+          asn: ip9?.asn ?? null,
           organization: ip9?.organization ?? null,
           edgeLocation: null,
           location: edgeone.location ?? ip9?.location ?? null,
