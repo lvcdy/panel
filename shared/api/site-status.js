@@ -1,7 +1,10 @@
+import { corsHeaders, isCrossOriginDenied } from "./cors.js";
 import { isValidStatusDomain } from "./ip.js";
+import { checkRateLimit } from "./rate-limit.js";
 
 const STATUS_API_URL = "https://isyourwebsitedownrightnow.com/api/status";
-const UPSTREAM_TIMEOUT_MS = 5_000;
+// 上游偶发 4s+，需小于前端 7s 请求超时，同时给慢上游留出返回 SLOW 的余量。
+const UPSTREAM_TIMEOUT_MS = 4_500;
 const ALLOWED_STATUSES = new Set([
   "UP",
   "DOWN",
@@ -10,14 +13,37 @@ const ALLOWED_STATUSES = new Set([
   "UNKNOWN",
 ]);
 
-const jsonResponse = (body, status = 200) =>
+const baseHeaders = (request, env) => ({
+  "content-type": "application/json; charset=utf-8",
+  "cache-control": "no-store",
+  "x-content-type-options": "nosniff",
+  ...corsHeaders(request, env),
+});
+
+const jsonResponse = (body, status, request, env) =>
   new Response(JSON.stringify(body), {
     status,
+    headers: baseHeaders(request, env),
+  });
+
+const deniedResponse = (request, env) =>
+  jsonResponse({ error: "Origin not allowed" }, 403, request, env);
+
+const preflightResponse = (request, env) =>
+  new Response(null, {
+    status: 204,
     headers: {
-      "content-type": "application/json; charset=utf-8",
       "cache-control": "no-store",
-      "access-control-allow-origin": "*",
-      "x-content-type-options": "nosniff",
+      ...corsHeaders(request, env),
+    },
+  });
+
+const rateLimitedResponse = (request, env, retryAfter) =>
+  new Response(JSON.stringify({ error: "Too many requests" }), {
+    status: 429,
+    headers: {
+      ...baseHeaders(request, env),
+      "retry-after": String(retryAfter),
     },
   });
 
@@ -57,24 +83,40 @@ export const sanitizeSiteStatusPayload = (payload) => {
  * 固定上游状态服务代理。不直接 fetch 用户提供的 URL，
  * 只把经过格式校验的公共域名交给状态服务。
  */
-export const handleSiteStatus = async (request, fetchImpl = fetch) => {
+export const handleSiteStatus = async (
+  request,
+  fetchImpl = fetch,
+  env = {},
+) => {
+  // 默认拒绝：未列入白名单的跨源来源一律不发放 CORS 头。
+  if (isCrossOriginDenied(request, env)) {
+    return deniedResponse(request, env);
+  }
+
+  if (request.method === "OPTIONS") {
+    return preflightResponse(request, env);
+  }
+
   if (request.method !== "GET") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
       headers: {
-        "content-type": "application/json; charset=utf-8",
-        "allow": "GET",
-        "cache-control": "no-store",
-        "access-control-allow-origin": "*",
+        ...baseHeaders(request, env),
+        allow: "GET, OPTIONS",
       },
     });
+  }
+
+  const rate = checkRateLimit(request, { route: "site-status", env });
+  if (!rate.allowed) {
+    return rateLimitedResponse(request, env, rate.retryAfter);
   }
 
   const url = new URL(request.url);
   const domain = (url.searchParams.get("domain") ?? "").trim();
 
   if (!isValidStatusDomain(domain)) {
-    return jsonResponse({ error: "Invalid domain" }, 400);
+    return jsonResponse({ error: "Invalid domain" }, 400, request, env);
   }
 
   try {
@@ -87,18 +129,33 @@ export const handleSiteStatus = async (request, fetchImpl = fetch) => {
     });
 
     if (!upstream.ok) {
-      return jsonResponse({ error: "Status service unavailable" }, 502);
+      return jsonResponse(
+        { error: "Status service unavailable" },
+        502,
+        request,
+        env,
+      );
     }
 
     let payload;
     try {
       payload = await upstream.json();
     } catch {
-      return jsonResponse({ error: "Invalid status response" }, 502);
+      return jsonResponse(
+        { error: "Invalid status response" },
+        502,
+        request,
+        env,
+      );
     }
 
-    return jsonResponse(sanitizeSiteStatusPayload(payload));
+    return jsonResponse(sanitizeSiteStatusPayload(payload), 200, request, env);
   } catch {
-    return jsonResponse({ error: "Status service unavailable" }, 502);
+    return jsonResponse(
+      { error: "Status service unavailable" },
+      502,
+      request,
+      env,
+    );
   }
 };

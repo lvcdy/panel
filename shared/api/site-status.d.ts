@@ -11,4 +11,5 @@ export declare const sanitizeSiteStatusPayload: (
 export declare const handleSiteStatus: (
     request: Request,
     fetchImpl?: typeof fetch,
+    env?: Record<string, string | undefined>,
 ) => Promise<Response>;

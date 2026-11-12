@@ -36,6 +36,7 @@ interface DevResponse {
 type WebHandler = (
   request: Request,
   fetchImpl?: typeof fetch,
+  env?: Record<string, string | undefined>,
 ) => Promise<Response>;
 
 const toWebRequest = (req: DevRequest): Request => {
@@ -71,7 +72,10 @@ const createDevMiddleware = (
       const devRes = res as unknown as DevResponse;
       try {
         const request = toWebRequest(req as unknown as DevRequest);
-        await sendWebResponse(await handler(request), devRes);
+        await sendWebResponse(
+          await handler(request, undefined, process.env),
+          devRes,
+        );
       } catch {
         devRes.statusCode = 500;
         devRes.setHeader('content-type', 'application/json; charset=utf-8');

@@ -2,5 +2,5 @@
 import { handleSiteStatus } from "../../shared/api/site-status.js";
 
 export async function onRequestGet(context) {
-  return handleSiteStatus(context.request);
+  return handleSiteStatus(context.request, fetch, context.env);
 }

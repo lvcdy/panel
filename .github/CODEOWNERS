@@ -1,0 +1,10 @@
+# 仓库所有者默认复核所有变更；安全关键路径需额外复核。
+* @lvcdy
+
+# 安全规则、自动化与信任边界实现：变更必须由所有者复核（配合分支保护）。
+/.github/ @lvcdy
+/docs/security/ @lvcdy
+/SECURITY.md @lvcdy
+/shared/api/ @lvcdy
+/scripts/generate-deployment-files.mjs @lvcdy
+/astro.config.ts @lvcdy

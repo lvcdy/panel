@@ -8,7 +8,9 @@
     "start": "astro dev",
     "build": "astro build && node scripts/generate-deployment-files.mjs",
     "preview": "astro preview",
-    "typecheck": "astro check"
+    "typecheck": "astro check",
+    "test": "node --test tests/security.test.mjs",
+    "security:audit": "pnpm audit --audit-level=high"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

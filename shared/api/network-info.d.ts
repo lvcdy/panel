@@ -14,4 +14,5 @@ export interface NetworkInfoPayload {
 export declare const handleNetworkInfo: (
     request: Request,
     fetchImpl?: typeof fetch,
+    env?: Record<string, string | undefined>,
 ) => Promise<Response>;

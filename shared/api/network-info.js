@@ -1,16 +1,41 @@
+import { corsHeaders, isCrossOriginDenied } from "./cors.js";
 import { normalizePublicIp, sanitizeText } from "./ip.js";
+import { checkRateLimit } from "./rate-limit.js";
 
 const IP9_API_URL = "https://ip9.com.cn/get";
 const IP_LOOKUP_TIMEOUT_MS = 1_500;
 
-const jsonResponse = (body, status = 200) =>
+const baseHeaders = (request, env) => ({
+  "content-type": "application/json; charset=utf-8",
+  "cache-control": "private, no-store",
+  "x-content-type-options": "nosniff",
+  ...corsHeaders(request, env),
+});
+
+const jsonResponse = (body, status, request, env) =>
   new Response(JSON.stringify(body), {
     status,
+    headers: baseHeaders(request, env),
+  });
+
+const deniedResponse = (request, env) =>
+  jsonResponse({ error: "Origin not allowed" }, 403, request, env);
+
+const preflightResponse = (request, env) =>
+  new Response(null, {
+    status: 204,
     headers: {
-      "content-type": "application/json; charset=utf-8",
       "cache-control": "private, no-store",
-      "access-control-allow-origin": "*",
-      "x-content-type-options": "nosniff",
+      ...corsHeaders(request, env),
+    },
+  });
+
+const rateLimitedResponse = (request, env, retryAfter) =>
+  new Response(JSON.stringify({ error: "Too many requests" }), {
+    status: 429,
+    headers: {
+      ...baseHeaders(request, env),
+      "retry-after": String(retryAfter),
     },
   });
 
@@ -61,11 +86,15 @@ const countryName = (code) => {
 };
 
 const getCloudflareFields = (request) => {
-  const cf = request.cf;
-  if (!cf || typeof cf !== "object") return null;
-
   const headers = request.headers;
   const clientIp = normalizePublicIp(headers.get("cf-connecting-ip"));
+
+  // EdgeOne Makers 的 V8 运行时也会提供 request.cf 兼容对象（字段为空），
+  // 因此不能仅凭 request.cf 存在就判定为 Cloudflare，必须以平台注入的
+  // cf-connecting-ip 头为准。
+  if (!clientIp) return null;
+
+  const cf = request.cf && typeof request.cf === "object" ? request.cf : {};
 
   const asn = toAsn(cf.asn);
   const organization = sanitizeText(cf.asOrganization, 120);
@@ -83,6 +112,35 @@ const getCloudflareFields = (request) => {
     organization,
     edgeLocation,
     location,
+  };
+};
+
+/**
+ * EdgeOne Edge Functions 通过 request.eo 暴露客户端信息：
+ * - request.eo.clientIp：访客公网 IP
+ * - request.eo.geo：countryName / regionName / cityName 等地理信息
+ * 同时保留旧版 eo-connecting-ip 头的兜底，兼容不同接入方式。
+ */
+const getEdgeOneFields = (request) => {
+  const eo =
+    request.eo && typeof request.eo === "object" ? request.eo : null;
+  const headerIp = normalizePublicIp(
+    request.headers.get("eo-connecting-ip"),
+  );
+  const clientIp = normalizePublicIp(eo?.clientIp) ?? headerIp;
+
+  if (!eo && !headerIp) return null;
+
+  const geo =
+    eo?.geo && typeof eo.geo === "object" ? eo.geo : {};
+
+  return {
+    clientIp,
+    location: buildLocation([
+      sanitizeText(geo.countryName, 80),
+      sanitizeText(geo.regionName, 80),
+      sanitizeText(geo.cityName, 80),
+    ]),
   };
 };
 
@@ -118,17 +176,33 @@ const lookupIp9 = async (clientIp, fetchImpl) => {
   }
 };
 
-export const handleNetworkInfo = async (request, fetchImpl = fetch) => {
+export const handleNetworkInfo = async (
+  request,
+  fetchImpl = fetch,
+  env = {},
+) => {
+  // 默认拒绝：未列入白名单的跨源来源一律不发放 CORS 头。
+  if (isCrossOriginDenied(request, env)) {
+    return deniedResponse(request, env);
+  }
+
+  if (request.method === "OPTIONS") {
+    return preflightResponse(request, env);
+  }
+
   if (request.method !== "GET") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
       headers: {
-        "content-type": "application/json; charset=utf-8",
-        "allow": "GET",
-        "cache-control": "private, no-store",
-        "access-control-allow-origin": "*",
+        ...baseHeaders(request, env),
+        allow: "GET, OPTIONS",
       },
     });
+  }
+
+  const rate = checkRateLimit(request, { route: "network-info", env });
+  if (!rate.allowed) {
+    return rateLimitedResponse(request, env, rate.retryAfter);
   }
 
   let info = {
@@ -145,20 +219,28 @@ export const handleNetworkInfo = async (request, fetchImpl = fetch) => {
     if (cloudflare) {
       info = cloudflare;
     } else {
-      // 只信任平台注入的 EdgeOne 客户端 IP，不使用可被调用方伪造的 X-Forwarded-For。
-      const eoClientIp = normalizePublicIp(
-        request.headers.get("eo-connecting-ip"),
-      );
+      const edgeone = getEdgeOneFields(request);
 
-      if (eoClientIp) {
-        const ip9 = await lookupIp9(eoClientIp, fetchImpl);
+      if (edgeone?.clientIp) {
+        // 边缘函数拿到的 clientIp/geo 已由平台注入；ip9 仅用于补充运营商信息。
+        const ip9 = await lookupIp9(edgeone.clientIp, fetchImpl);
         info = {
           platform: "edgeone",
-          clientIp: eoClientIp,
+          clientIp: edgeone.clientIp,
           asn: null,
           organization: ip9?.organization ?? null,
           edgeLocation: null,
-          location: ip9?.location ?? null,
+          location: edgeone.location ?? ip9?.location ?? null,
+        };
+      } else if (edgeone) {
+        // 能识别为 EdgeOne 但拿不到客户端 IP：保留平台信息便于排查。
+        info = {
+          platform: "edgeone",
+          clientIp: null,
+          asn: null,
+          organization: null,
+          edgeLocation: null,
+          location: edgeone.location,
         };
       }
     }
@@ -181,14 +263,19 @@ export const handleNetworkInfo = async (request, fetchImpl = fetch) => {
     "location",
   ].filter((field) => info[field] !== null);
 
-  return jsonResponse({
-    platform: info.platform,
-    clientIp: info.clientIp,
-    asn: info.asn,
-    organization: info.organization,
-    edgeLocation: info.edgeLocation,
-    location: info.location,
-    availableFields,
-    updatedAt: new Date().toISOString(),
-  });
+  return jsonResponse(
+    {
+      platform: info.platform,
+      clientIp: info.clientIp,
+      asn: info.asn,
+      organization: info.organization,
+      edgeLocation: info.edgeLocation,
+      location: info.location,
+      availableFields,
+      updatedAt: new Date().toISOString(),
+    },
+    200,
+    request,
+    env,
+  );
 };

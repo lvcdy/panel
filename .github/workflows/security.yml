@@ -1,0 +1,128 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Audit (fail on high/critical)
+        run: pnpm audit --audit-level=high
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  codeql:
+    name: CodeQL (SAST)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
+      - run: pnpm test
+      - uses: github/codeql-action/analyze@v3
+
+  build-attest-sign:
+    name: Build, SBOM, attest, sign
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Generate SBOM (CycloneDX)
+        run: >
+          pnpm dlx @cyclonedx/cyclonedx-npm@^4
+          --output-file dist/sbom.cdx.json
+      - name: Package and checksum artifacts
+        run: |
+          tar -czf panel-dist.tgz dist
+          sha256sum panel-dist.tgz dist/sbom.cdx.json > panel-dist.sha256
+          cat panel-dist.sha256
+      - name: Generate build provenance (SLSA)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: panel-dist.tgz
+      - uses: sigstore/cosign-installer@v3
+      - name: Sign artifacts (keyless cosign)
+        run: |
+          cosign sign-blob --yes \
+            --output-signature panel-dist.tgz.sig \
+            --output-certificate panel-dist.tgz.pem \
+            panel-dist.tgz
+      - name: Verify signature (post-build, pre-release)
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          cosign verify-blob \
+            --certificate panel-dist.tgz.pem \
+            --signature panel-dist.tgz.sig \
+            --certificate-identity-regexp "^https://github.com/${REPO}/" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            panel-dist.tgz
+      - name: Upload security artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-artifacts
+          path: |
+            panel-dist.tgz
+            panel-dist.tgz.sig
+            panel-dist.tgz.pem
+            panel-dist.sha256
+            dist/sbom.cdx.json
