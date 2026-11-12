@@ -103,8 +103,9 @@ Cloudflare 的 `cf-connecting-ip` + `request.cf`、EdgeOne 的 `request.eo.clien
 
 ## 6. SBOM + Sigstore / cosign
 
-- **SBOM**：每次 CI 构建生成 CycloneDX（`@cyclonedx/cyclonedx-npm`），与构建产物
-  一起归档为 GitHub Actions Artifact（保留期按仓库设置），并在 release 附件中发布。
+- **SBOM**：每次 CI 构建使用 `anchore/sbom-action`（Syft）生成 CycloneDX JSON
+  （`dist/sbom.cdx.json`），与构建产物、校验和、签名一起归档为 GitHub Actions
+  Artifact，并在 release 附件中发布。
 - **签名**：使用 cosign keyless（OIDC 身份 = 本仓库 workflow）对构建归档做
   `sign-blob`；签名与证书随产物归档。
 - **验证**：`cosign verify-blob --certificate-identity-regexp
