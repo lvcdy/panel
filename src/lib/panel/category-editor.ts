@@ -1,4 +1,5 @@
 import { showToast } from "../toast";
+import { isConfirmDialogOpen } from "./confirm";
 import { isValidIconClass, normalizeIconClass } from "./icon";
 import {
     addCategory,
@@ -313,7 +314,8 @@ export const initCategoryEditor = (): void => {
     elements.overlay.addEventListener("click", () => closeAndNotify());
 
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && isOpen) {
+        if (event.defaultPrevented) return;
+        if (event.key === "Escape" && isOpen && !isConfirmDialogOpen()) {
             event.preventDefault();
             event.stopPropagation();
             closeAndNotify();

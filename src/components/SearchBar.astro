@@ -22,6 +22,7 @@ const renderEngineIcon = (engineId: string, icon: string, color: string) => {
       class="search-engine-btn w-10 h-10 flex items-center justify-center rounded-full cursor-pointer shrink-0"
       aria-label="选择搜索引擎"
       aria-haspopup="listbox"
+      aria-controls="engineMenu"
       aria-expanded="false"
     >
       <i
@@ -62,7 +63,6 @@ const renderEngineIcon = (engineId: string, icon: string, color: string) => {
     id="searchTip"
     class="mt-2.5 text-center text-red-400/80 text-xs opacity-0 transition-opacity duration-300"
     role="alert"
-    aria-live="polite"
   >
     请输入搜索内容
   </div>
@@ -143,78 +143,5 @@ const renderEngineIcon = (engineId: string, icon: string, color: string) => {
         aria-hidden="true"
       ></i>
     </button>
-  </div>
-
-  <div
-    id="custom-engine-modal"
-    class="fixed inset-0 z-50 hidden"
-    aria-hidden="true"
-  >
-    <div
-      id="custom-engine-modal-overlay"
-      class="absolute inset-0 bg-transparent"
-    ></div>
-    <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div
-        class="w-full max-w-md rounded-2xl border border-white/15 bg-black/65 backdrop-blur-xl p-5 shadow-2xl"
-        role="dialog"
-        aria-labelledby="custom-engine-modal-title"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <h3
-            id="custom-engine-modal-title"
-            class="text-base font-semibold text-white"
-          >
-            配置搜索引擎
-          </h3>
-          <button
-            id="custom-engine-modal-close"
-            type="button"
-            class="h-8 w-8 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label="关闭"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-          </button>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <input
-            id="custom-engine-name-input"
-            type="text"
-            class="h-10 w-full rounded-lg border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/40"
-            placeholder="引擎名称（可选）"
-          />
-          <input
-            id="custom-engine-url-input"
-            type="url"
-            class="h-10 w-full rounded-lg border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/40"
-            placeholder="https://example.com/search?q= 或 https://example.com/search?q={q}"
-          />
-          <input
-            id="custom-engine-placeholder-input"
-            type="text"
-            class="h-10 w-full rounded-lg border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-white/40"
-            placeholder="搜索框提示语（可选）"
-          />
-        </div>
-
-        <div class="mt-4 flex gap-2">
-          <button
-            id="custom-engine-save-btn"
-            type="button"
-            class="flex-1 h-9 rounded-lg border border-white/20 bg-white/15 text-white text-sm font-medium hover:bg-white/25 transition-colors"
-          >
-            保存
-          </button>
-          <button
-            id="custom-engine-clear-btn"
-            type="button"
-            class="h-9 px-3 rounded-lg border border-white/20 bg-white/5 text-white/90 text-sm hover:bg-white/10 transition-colors"
-          >
-            恢复默认
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </search>

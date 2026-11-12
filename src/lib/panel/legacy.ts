@@ -59,3 +59,9 @@ export const clearLegacyKeys = (): void => {
         removeStoredValue(key);
     });
 };
+
+/** 是否仍残留任意旧键（用于升级后清理，不影响读取顺序） */
+export const hasLegacyKeys = (): boolean =>
+    Object.values(LEGACY_STORAGE_KEYS).some(
+        (key) => getStoredText(key) !== "",
+    );

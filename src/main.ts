@@ -1,4 +1,4 @@
-﻿import { initSettings } from "./lib/settings";
+import { initSettings } from "./lib/settings";
 import { initNetworkInfo } from "./lib/network-info";
 import { initCategoryDelete } from "./lib/panel/category-delete";
 import { initCategoryEditor } from "./lib/panel/category-editor";
@@ -16,7 +16,6 @@ import * as UI from "./lib";
 import { initSearch } from "./init/search-init";
 import {
   initRevealAnimations,
-  initTooltipPositioning,
   initLinkIconFallback,
 } from "./init/page-effects";
 
@@ -60,11 +59,9 @@ export const initApp = () => {
   UI.setupFloatingButtonHandler(els.floatingSearchBtn, els.input);
   UI.setupScrollListener(els.floatingSearchBtn);
   UI.setupCategoryCollapse();
-  UI.setupSiteStatusBadges();
 
   // ── 页面效果 ──
   initRevealAnimations();
-  initTooltipPositioning();
   initLinkIconFallback();
 
   // ── 延迟加载的网络数据 ──

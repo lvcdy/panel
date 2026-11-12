@@ -1,8 +1,12 @@
 import { SITE_STATUS_URL } from "./config";
 import { getStoredJson, setStoredJson } from "./storage";
 
-const SITE_STATUS_TIMEOUT = 2_000;
+// 客户端超时必须大于服务端上游超时（shared/api/site-status.js 的 4.5s），
+// 否则先 abort 会触发 markApiUnavailable，让所有徽章一起失效。
+const SITE_STATUS_TIMEOUT = 7_000;
 const SITE_STATUS_CONCURRENCY = 4;
+// 上游临时故障只影响当前域名，不应全局禁用整页状态检测。
+const PER_DOMAIN_FALLBACK_STATUSES = new Set([400, 429, 502, 503, 504]);
 const SITE_STATUS_CACHE_KEY = "site-status-cache" as const;
 const SITE_STATUS_CACHE_TTL = 10 * 60 * 1000;
 const SITE_STATUS_FALLBACK_TTL = 60 * 1000;
@@ -171,9 +175,10 @@ const fetchSiteStatus = async (domain: string): Promise<SiteStatusView> => {
             signal: controller.signal,
         });
 
-        // A 400 is a per-domain validation failure; it must not disable the
-        // API for other domains. 404/5xx and network failures are global.
-        if (response.status === 400) {
+        // 400 是域名校验失败；502/503/504 是上游临时不可用。这些都只影响
+        // 当前域名，不能让整页状态检测停摆。404（Functions 未部署）和网络
+        // 失败才视为全局不可用。
+        if (PER_DOMAIN_FALLBACK_STATUSES.has(response.status)) {
             return fallbackStatus;
         }
 
@@ -256,7 +261,7 @@ const drainStatusQueue = () => {
         statusQueue.length > 0
     ) {
         const domain = statusQueue.shift();
-        if (!domain) return;
+        if (!domain) continue;
 
         const queued = queuedDomains.get(domain);
         if (!queued) continue;

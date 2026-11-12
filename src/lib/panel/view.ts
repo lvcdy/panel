@@ -92,6 +92,8 @@ export const initNavigationView = (): void => {
     if (wasPanelConfigStored()) {
         renderPanelNavigation({ captureCollapsed: false });
     } else {
+        // 未存配置时保留 Astro 静态渲染的导航，但仍需挂上状态徽章。
+        setupSiteStatusBadges();
         document.documentElement.removeAttribute("data-panel-config-pending");
     }
 };

@@ -109,6 +109,20 @@ export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
     let isVisible = false;
     let ticking = false;
 
+    // 隐藏时移出 Tab 序，避免键盘用户聚焦到看不见的按钮。
+    const applyVisibility = (visible: boolean) => {
+        if (!visible && document.activeElement === floatingBtn) {
+            (floatingBtn as HTMLElement).blur();
+        }
+        floatingBtn.classList.toggle("opacity-0", !visible);
+        floatingBtn.classList.toggle("opacity-100", visible);
+        floatingBtn.style.pointerEvents = visible ? "auto" : "none";
+        floatingBtn.setAttribute("aria-hidden", String(!visible));
+        floatingBtn.tabIndex = visible ? 0 : -1;
+    };
+
+    applyVisibility(false);
+
     window.addEventListener("scroll", () => {
         if (ticking) return;
         ticking = true;
@@ -116,9 +130,7 @@ export const setupScrollListener = (floatingBtn: HTMLElement | null) => {
             const shouldShow = window.scrollY > SCROLL_THRESHOLD;
             if (shouldShow !== isVisible) {
                 isVisible = shouldShow;
-                floatingBtn.classList.toggle("opacity-0", !shouldShow);
-                floatingBtn.classList.toggle("opacity-100", shouldShow);
-                floatingBtn.style.pointerEvents = shouldShow ? "auto" : "none";
+                applyVisibility(shouldShow);
             }
             ticking = false;
         });

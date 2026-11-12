@@ -69,7 +69,13 @@ export const initSearch = (els: ReturnType<typeof UI.createElementCache>) => {
     if (addCustomEngineLabel) addCustomEngineLabel.textContent = "编辑搜索引擎";
   };
 
+  let lastFocusedBeforeModal: HTMLElement | null = null;
+
   const openCustomEngineModal = () => {
+    lastFocusedBeforeModal =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     const config = getSavedCustomSearchEngine();
     if (customEngineNameInput) customEngineNameInput.value = config?.name || "";
     if (customEngineUrlInput) customEngineUrlInput.value = config?.url || "";
@@ -86,8 +92,43 @@ export const initSearch = (els: ReturnType<typeof UI.createElementCache>) => {
     if (customEngineModal) {
       customEngineModal.classList.add("hidden");
       customEngineModal.setAttribute("aria-hidden", "true");
+      lastFocusedBeforeModal?.focus();
+      lastFocusedBeforeModal = null;
     }
   };
+
+  const modalEl = customEngineModal;
+  if (modalEl) {
+    // 弹窗内的 Esc 与 Tab 焦点陷阱：aria-modal 要求焦点不能逃出弹窗。
+    modalEl.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        closeCustomEngineModal();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const focusables = Array.from(
+        modalEl.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.offsetParent !== null);
+
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+  }
 
   const emitCustomEngineUpdated = () => {
     window.dispatchEvent(new CustomEvent("custom-search-engine:updated"));

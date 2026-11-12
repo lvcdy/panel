@@ -36,8 +36,23 @@ const base = import.meta.env.BASE_URL;
     </script>
     <noscript>
       <style>
-        html[data-panel-config-pending] #linkGridContent {
-          visibility: visible;
+        /* 无 JS 时 reveal 观察器与配置渲染都不会执行：强制显示全部内容。 */
+        .animate-fade-in-up,
+        .will-reveal,
+        .will-reveal .animate-fade-in-up {
+          opacity: 1 !important;
+          visibility: visible !important;
+          transform: none !important;
+          animation: none !important;
+        }
+
+        .info-capsule {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+
+        #linkGridContent {
+          visibility: visible !important;
         }
       </style>
     </noscript>

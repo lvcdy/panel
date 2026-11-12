@@ -336,13 +336,13 @@ const updateSearchFeedback = (matchCount: number, query: string): void => {
     }
 
     if (feedback) {
-        feedback.classList.remove("hidden");
+        feedback.classList.remove("hidden", "text-white/50", "text-white/40");
         if (matchCount > 0) {
             feedback.textContent = `找到 ${matchCount} 个匹配结果`;
-            feedback.className = "search-feedback text-white/50";
+            feedback.classList.add("text-white/50");
         } else {
             feedback.textContent = "未找到匹配结果，回车可使用搜索引擎搜索";
-            feedback.className = "search-feedback text-white/40";
+            feedback.classList.add("text-white/40");
         }
     }
 

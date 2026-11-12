@@ -50,12 +50,12 @@ const updateWeatherIcon = (weatherBoxEl: HTMLElement, code?: string) => {
     iconEl.className = `fas ${WEATHER_ICON_BY_CODE[code || ""] || "fa-cloud-sun"} capsule-icon`;
 };
 
-export const fetchWeatherInfo = async (
-    weatherEl: HTMLElement | null,
-    weatherBoxEl: HTMLElement | null,
-) => {
-    if (!weatherEl || !weatherBoxEl) return;
+let inFlightWeatherRequest: Promise<void> | null = null;
 
+const runWeatherRequest = async (
+    weatherEl: HTMLElement,
+    weatherBoxEl: HTMLElement,
+) => {
     weatherEl.textContent = LOADING_WEATHER_TEXT;
 
     try {
@@ -67,8 +67,26 @@ export const fetchWeatherInfo = async (
         weatherEl.textContent = FALLBACK_WEATHER_TEXT;
         updateWeatherIcon(weatherBoxEl);
     } finally {
-        weatherBoxEl.style.opacity = "1";
+        weatherBoxEl.classList.add("is-ready");
     }
+};
+
+export const fetchWeatherInfo = (
+    weatherEl: HTMLElement | null,
+    weatherBoxEl: HTMLElement | null,
+): Promise<void> => {
+    if (!weatherEl || !weatherBoxEl) return Promise.resolve();
+
+    // 连点胶囊时复用同一个请求，避免旧响应覆盖新响应。
+    if (inFlightWeatherRequest) return inFlightWeatherRequest;
+
+    const request = runWeatherRequest(weatherEl, weatherBoxEl).finally(() => {
+        if (inFlightWeatherRequest === request) {
+            inFlightWeatherRequest = null;
+        }
+    });
+    inFlightWeatherRequest = request;
+    return request;
 };
 
 export const setupWeatherInfoHandler = (

@@ -160,7 +160,6 @@ const renderLink = (
         titleParts.push(link.tags.map((tag) => `#${tag}`).join(" "));
     }
     const title = escapeAttr(titleParts.join(" · "));
-    const tooltip = escapeAttr(`访问 ${link.name}`);
     const searchAttr = escapeAttr(searchText);
     const descriptionAttr = escapeAttr(link.description);
     const favorite = renderFavorite(link);
@@ -189,7 +188,7 @@ const renderLink = (
         : "";
     const statusBadge = link.status !== false ? renderStatusBadge(link.url) : "";
 
-    return `<li data-link-id="${linkId}" data-category-id="${categoryId}"><a href="${url}"${targetAttrs} class="sun-card glass flex items-center gap-3 p-3 rounded-xl group relative${animationClass} h-full" style="${style}" data-url="${url}" data-link-id="${linkId}" data-category-id="${categoryId}" data-tooltip="${tooltip}" data-search-text="${searchAttr}" data-description="${descriptionAttr}" title="${title}">${renderCardIcon(link)}<span data-card-text class="flex-1 min-w-0 text-white/85 font-semibold text-sm truncate transition-colors duration-200 group-hover:text-white">${name}</span>${favorite}${searchDetails}${statusBadge}</a></li>`;
+    return `<li data-link-id="${linkId}" data-category-id="${categoryId}"><a href="${url}"${targetAttrs} class="sun-card glass flex items-center gap-3 p-3 rounded-xl group relative${animationClass} h-full" style="${style}" data-url="${url}" data-link-id="${linkId}" data-category-id="${categoryId}" data-search-text="${searchAttr}" data-description="${descriptionAttr}" title="${title}">${renderCardIcon(link)}<span data-card-text class="flex-1 min-w-0 text-white/85 font-semibold text-sm truncate transition-colors duration-200 group-hover:text-white">${name}</span>${favorite}${searchDetails}${statusBadge}</a></li>`;
 };
 
 const renderAddLinkTile = (category: PanelCategory): string => {

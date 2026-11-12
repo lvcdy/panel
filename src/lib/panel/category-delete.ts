@@ -385,6 +385,7 @@ export const initCategoryDelete = (): void => {
     });
 
     document.addEventListener("keydown", (event) => {
+        if (event.defaultPrevented) return;
         if (event.key !== "Escape" || !isOpen) return;
         if (isConfirmDialogOpen()) return;
         event.preventDefault();

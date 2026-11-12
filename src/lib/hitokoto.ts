@@ -8,9 +8,6 @@ const getHitokotoApiList = (): string[] => {
     return customApi ? [customApi, ...HITOKOTO_APIS] : [...HITOKOTO_APIS];
 };
 
-export const getSavedHitokotoApi = (): string =>
-    getPanelSettings().hitokotoApi;
-
 export const setCustomHitokotoApi = (
     url: string,
 ): StoreResult<PanelConfig> => {

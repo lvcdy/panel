@@ -5,16 +5,21 @@ import { isValidHttpUrl } from "./utils";
 
 const resolveBackgroundUrl = (url: string): string => url || BG_URL;
 
+// 连续切换背景时，只允许最后一次请求落地，避免旧图 onload 覆盖新图。
+let backgroundGeneration = 0;
+
 const applyBackgroundByUrl = (
     url: string,
     priority: "high" | "low" = "low",
 ): void => {
+    const generation = ++backgroundGeneration;
     const img = new Image();
     img.decoding = "async";
     img.fetchPriority = priority;
     img.src = url;
 
     const applyBackground = () => {
+        if (generation !== backgroundGeneration) return;
         document.documentElement.style.setProperty("--bg-url", `url("${img.src}")`);
         document.body.classList.add("bg-loaded");
     };
@@ -24,6 +29,7 @@ const applyBackgroundByUrl = (
     } else {
         img.onload = applyBackground;
         img.onerror = () => {
+            if (generation !== backgroundGeneration) return;
             document.documentElement.style.setProperty("--bg-url", `url("${url}")`);
             document.body.classList.add("bg-loaded");
         };

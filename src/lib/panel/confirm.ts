@@ -87,6 +87,9 @@ export const initConfirmDialog = (): void => {
         if (event.key === "Escape" && active) {
             event.preventDefault();
             event.stopPropagation();
+            // 同一 document 上后注册的 Esc 监听（编辑器/分类删除等）必须被拦住，
+            // 否则确认框会被连同一层弹窗一起关闭。
+            event.stopImmediatePropagation();
             finish(false);
         }
     });

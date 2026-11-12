@@ -126,10 +126,7 @@ const handleFullImport = async (file: File): Promise<void> => {
 
         if (!confirmed) return;
 
-        // 确认时重新读取 Store；replacePanelConfig 会先校验、持久化成功后才提交。
-        const current = getPanelConfig();
-        console.debug(`Panel 导入前分类数：${current.categories.length}`);
-
+        // replacePanelConfig 会先校验、持久化成功后才提交。
         const replaced = replacePanelConfig(result.config);
         if (!replaced.ok) {
             reportStoreFailure(replaced);
@@ -177,10 +174,7 @@ const handleNavigationImport = async (file: File): Promise<void> => {
 
         if (!confirmed) return;
 
-        // 使用写入时刻 Store 中的最新设置，只替换 categories。
-        const current = getPanelConfig();
-        console.debug(`Panel 导入前分类数：${current.categories.length}`);
-
+        // 只替换 categories，settings 仍以写入时刻 Store 中的最新值为准。
         const replaced = replaceNavigation(result.categories);
         if (!replaced.ok) {
             reportStoreFailure(replaced);

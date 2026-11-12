@@ -1,5 +1,7 @@
 export const PANEL_SCHEMA_VERSION = 1 as const;
 export const PANEL_CONFIG_STORAGE_KEY = "panel-config" as const;
+/** 解析失败时隔离原始数据，避免下一次写入直接覆盖损坏内容 */
+export const PANEL_CONFIG_QUARANTINE_KEY = "panel-config-corrupt" as const;
 
 export type ThemeMode = "dark";
 

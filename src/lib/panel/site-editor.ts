@@ -1,6 +1,7 @@
 import { closeSettingsPanel } from "../settings";
 import { showToast } from "../toast";
 import { getIconQueryUrl, isValidHttpUrl } from "../utils";
+import { isConfirmDialogOpen } from "./confirm";
 import { isValidIconClass, normalizeIconClass } from "./icon";
 import {
     addLink,
@@ -591,8 +592,6 @@ export const closeSiteEditor = (restoreFocus = true): void => {
     lastFocused = null;
 };
 
-export const isSiteEditorOpen = (): boolean => isOpen;
-
 export const initSiteEditor = (): void => {
     if (initialized || typeof document === "undefined") return;
 
@@ -608,7 +607,8 @@ export const initSiteEditor = (): void => {
     elements.overlay.addEventListener("click", () => closeSiteEditor());
 
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && isOpen) {
+        if (event.defaultPrevented) return;
+        if (event.key === "Escape" && isOpen && !isConfirmDialogOpen()) {
             event.preventDefault();
             event.stopPropagation();
             closeSiteEditor();
@@ -677,7 +677,7 @@ export const initSiteEditor = (): void => {
     });
 
     subscribePanelConfig((_config, change) => {
-        if (isOpen && change.source === "remote") {
+        if (isOpen && change.source === "remote" && change.categoriesChanged) {
             closeSiteEditor();
             showToast(
                 "配置已在其他标签页更新，请重新打开编辑",

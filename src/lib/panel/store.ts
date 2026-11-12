@@ -1,12 +1,13 @@
-import { getStoredText, trySetStoredText } from "../storage";
+import { getStoredText, setStoredText, trySetStoredText } from "../storage";
 import {
     clonePanelConfig,
     cloneSettings,
     createDefaultPanelConfig,
 } from "./defaults";
 import { createUserCategoryId, createUserLinkId } from "./ids";
-import { clearLegacyKeys, readLegacySettings } from "./legacy";
+import { clearLegacyKeys, hasLegacyKeys, readLegacySettings } from "./legacy";
 import {
+    PANEL_CONFIG_QUARANTINE_KEY,
     PANEL_CONFIG_STORAGE_KEY,
     type CategoryDeleteMode,
     type CategoryInput,
@@ -154,6 +155,10 @@ const handleStorageEvent = (event: StorageEvent): void => {
 
     const parsed = parseStoredConfig(event.newValue);
     if (!parsed.ok) {
+        // 其他标签页写入的坏配置同样先隔离，避免下一次写入覆盖原始数据。
+        if (event.newValue) {
+            setStoredText(PANEL_CONFIG_QUARANTINE_KEY, event.newValue);
+        }
         console.warn("忽略其他标签页写入的无效 Panel 配置:", parsed.details);
         return;
     }
@@ -175,10 +180,18 @@ export const initPanelStore = (): void => {
         if (parsed.ok) {
             currentConfig = parsed.value;
             storedConfigLoaded = true;
+            // 升级用户可能仍留着旧分散键，下一次本地写入成功后统一清理。
+            pendingLegacyCleanup = hasLegacyKeys();
         } else {
             currentConfig = createDefaultPanelConfig(readLegacySettings());
-            initWarning =
-                "本地配置读取失败，已临时使用默认配置；原始数据未被覆盖。";
+            // 先把损坏的原始数据复制到隔离键，避免后续写入把它覆盖掉。
+            const quarantined = setStoredText(
+                PANEL_CONFIG_QUARANTINE_KEY,
+                raw,
+            );
+            initWarning = quarantined
+                ? "本地配置读取失败，已临时使用默认配置；原始数据已备份到 panel-config-corrupt。"
+                : "本地配置读取失败，已临时使用默认配置；原始数据未被覆盖。";
             pendingLegacyCleanup = true;
             console.warn("Panel 配置读取失败:", parsed.details);
         }
@@ -514,37 +527,6 @@ export const deleteLink = (linkId: string): StoreResult<PanelConfig> =>
         if (!location) throw new Error("网站不存在");
 
         location.category.links.splice(location.index, 1);
-    });
-
-export const moveLink = (
-    linkId: string,
-    targetCategoryId: string,
-    targetIndex: number,
-): StoreResult<PanelConfig> =>
-    updatePanelConfig((draft) => {
-        const location = findLinkLocation(draft, linkId);
-        if (!location) throw new Error("网站不存在");
-
-        const target = draft.categories.find(
-            (category) => category.id === targetCategoryId,
-        );
-        if (!target) throw new Error("目标分类不存在");
-
-        if (target.id === location.category.id) {
-            location.category.links.splice(location.index, 1);
-            const adjusted =
-                location.index < targetIndex ? targetIndex - 1 : targetIndex;
-            const insertAt = Math.max(
-                0,
-                Math.min(adjusted, target.links.length),
-            );
-            target.links.splice(insertAt, 0, location.link);
-            return;
-        }
-
-        location.category.links.splice(location.index, 1);
-        const insertAt = Math.max(0, Math.min(targetIndex, target.links.length));
-        target.links.splice(insertAt, 0, location.link);
     });
 
 /**

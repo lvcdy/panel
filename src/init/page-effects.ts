@@ -46,20 +46,6 @@ export const revealAllSections = () => {
   });
 };
 
-/** 初始化 Tooltip 位置修正（靠近顶部时向下显示） */
-export const initTooltipPositioning = () => {
-  document.addEventListener("mouseover", (event) => {
-    const target = (event.target as HTMLElement).closest?.<HTMLElement>("[data-tooltip]");
-    if (!target) return;
-    const rect = target.getBoundingClientRect();
-    if (rect.top < 80) {
-      target.setAttribute("data-tooltip-pos", "bottom");
-    } else {
-      target.removeAttribute("data-tooltip-pos");
-    }
-  });
-};
-
 /** 初始化链接图标加载与降级显示（可重复调用，仅处理新图片） */
 export const initLinkIconFallback = () => {
   const revealLinkIcon = (img: HTMLImageElement) => {
