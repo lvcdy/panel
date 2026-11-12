@@ -87,9 +87,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - name: Generate SBOM (CycloneDX)
-        run: >
-          pnpm dlx @cyclonedx/cyclonedx-npm@^4
-          --output-file dist/sbom.cdx.json
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: dist/sbom.cdx.json
+          artifact-name: panel-sbom
+          upload-artifact: false
       - name: Package and checksum artifacts
         run: |
           tar -czf panel-dist.tgz dist

@@ -1,3 +1,12 @@
 allowBuilds:
   esbuild: true
   sharp: true
+# 供应链：依赖版本固定（见 pnpm-lock.yaml），并覆盖已知存在高危公告的传递依赖。
+overrides:
+  fast-uri: ^3.1.7
+  source-map-js: ^1.2.2
+minimumReleaseAgeExclude:
+  - '@astrojs/markdown-satteri@0.4.9'
+  - '@astrojs/runtime@0.1.1'
+  - '@astrojs/vite-plugin-astro@0.1.2'
+  - astro@7.4.11

@@ -198,7 +198,7 @@ pnpm security:audit  # 依赖漏洞审计（高危以上失败）
 
 | 技术 | 版本 | 描述 |
 |------|------|------|
-| [Astro](https://astro.build) | 7.2 | 静态站点构建（Vite 8 驱动） |
+| [Astro](https://astro.build) | 7.4 | 静态站点构建（Vite 8 驱动） |
 | [Tailwind CSS](https://tailwindcss.com) | 4.3 | 实用优先 CSS 框架（Vite 插件集成） |
 | [Font Awesome Free](https://fontawesome.com) | 7.3 | 图标库 |
 | [TypeScript](https://www.typescriptlang.org) | 6.0 | 类型安全的 JavaScript（strict） |
